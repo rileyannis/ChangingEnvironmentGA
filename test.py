@@ -20,6 +20,8 @@ for gen in range(NUMBER_OF_GENERATIONS):
                 org += 1
             else:
                 org -= 1
+        org = min(org, 100)
+        org = max(org, 0)
         new_population.append(org)
 
     new_new_population = []
