@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+Riley's first research project.
+"""
 import random
 
 NUMBER_OF_ORGANISMS = 10
