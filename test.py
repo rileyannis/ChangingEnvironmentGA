@@ -2,15 +2,13 @@
 """
 Riley's first research project.
 """
+from __future__ import division
 import random
 
 NUMBER_OF_ORGANISMS = 10
 MAX_GENOTYPE = 100
 MUTATION_RATE = 0.45
 NUMBER_OF_GENERATIONS = 20
-
-
-
 
 def create_initial_population():
     population = []
@@ -53,10 +51,20 @@ def get_next_generation(population):
     return new_new_population
 
 def print_status(generation, population):
-    print("Gen = {}  Pop = {}".format(generation, population))
+    average_fitness = get_average_fitness(population)
+    print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
-population = create_initial_population()
+def evolve_population():
+    population = create_initial_population()
+    for gen in range(NUMBER_OF_GENERATIONS):
+        population = get_next_generation(population)
+        print_status(gen, population)
 
-for gen in range(NUMBER_OF_GENERATIONS):
-    population = get_next_generation(population)
-    print_status(gen, population)
+def get_average_fitness(pop):
+    total = 0
+    for org in pop:
+        total += org
+    return total / len(pop)
+
+if __name__ == "__main__":
+    evolve_population()
