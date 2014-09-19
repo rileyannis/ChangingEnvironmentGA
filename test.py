@@ -29,12 +29,7 @@ def get_mutated_organism(org):
     new_org = max(new_org, 0)
     return new_org
 
-
-
-
-population = create_initial_population()
-
-for gen in range(NUMBER_OF_GENERATIONS):
+def get_mutated_population(population):
     new_population = []
     for org in population:
         if random.random() < MUTATION_RATE:
@@ -42,12 +37,26 @@ for gen in range(NUMBER_OF_GENERATIONS):
             new_population.append(new_org)
         else:
             new_population.append(org)
+    return new_population
 
-    new_new_population = []
+def get_selected_population(population):
+    new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
-        org_1 = random.choice(new_population)
-        org_2 = random.choice(new_population)
-        new_new_population.append(max(org_1, org_2))
-    population = new_new_population
-    print("generation is: {}".format(gen))
-    print("Population is: {}".format(population))
+        org_1 = random.choice(population)
+        org_2 = random.choice(population)
+        new_population.append(max(org_1, org_2))
+    return new_population
+
+def get_next_generation(population):
+    new_population = get_mutated_population(population)
+    new_new_population = get_selected_population(new_population)
+    return new_new_population
+
+def print_status(generation, population):
+    print("Gen = {}  Pop = {}".format(generation, population))
+
+population = create_initial_population()
+
+for gen in range(NUMBER_OF_GENERATIONS):
+    population = get_next_generation(population)
+    print_status(gen, population)
