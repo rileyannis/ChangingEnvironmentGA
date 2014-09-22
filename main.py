@@ -25,9 +25,12 @@ def create_random_organism():
     return "".join(genotype)
 
 def get_mutated_organism(org):
+    "Mutates one character in organism at random"
     mut_location = random.randrange(len(TARGET_STRING))
-    mut_letter = random.choice(LETTERS)
-    return org[:mut_location] + mut_letter + org[mut_location + 1:]
+    while True:
+        mut_letter = random.choice(LETTERS)
+        if mut_letter != org[mut_location]:
+            return org[:mut_location] + mut_letter + org[mut_location + 1:]
 
 def get_mutated_population(population):
     new_population = []
@@ -69,6 +72,7 @@ def get_better_organism(org1, org2):
     return org2
 
 def get_fitness(org):
+    "Returns the number of matching letters between org and target"
     matches = 0
     for i in range(len(TARGET_STRING)):
         if TARGET_STRING[i] == org[i]:

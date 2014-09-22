@@ -17,6 +17,10 @@ class TestMainModule(unittest.TestCase):
         fitness = main.get_fitness(one_off)
         self.assertEqual(fitness, len(main.TARGET_STRING) - 1)
 
+    def test_get_mutated_organism(self):
+        for _ in range(200):
+            mutated_org = main.get_mutated_organism(main.TARGET_STRING)
+            self.assertNotEqual(mutated_org, main.TARGET_STRING)
 
 if __name__ == "__main__":
     unittest.main()
