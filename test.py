@@ -22,5 +22,13 @@ class TestMainModule(unittest.TestCase):
             mutated_org = main.get_mutated_organism(main.TARGET_STRING)
             self.assertNotEqual(mutated_org, main.TARGET_STRING)
 
+    def test_create_random_organism(self):
+        org = main.create_random_organism()
+        self.assertEqual(len(org), len(main.TARGET_STRING))
+
+    def test_create_initial_population(self):
+        pop = main.create_initial_population()
+        self.assertEqual(len(pop), main.NUMBER_OF_ORGANISMS)
+
 if __name__ == "__main__":
     unittest.main()
