@@ -5,12 +5,14 @@ Riley's first research project.
 from __future__ import division
 import random
 from string import ascii_uppercase
+import csv
 
-NUMBER_OF_ORGANISMS = 200
-MUTATION_RATE = 0.90
-NUMBER_OF_GENERATIONS = 1000
-TARGET_STRING = "METHINKS IT IS LIKE A WEASEL"
-LETTERS = ascii_uppercase + " "
+NUMBER_OF_ORGANISMS = None
+MUTATION_RATE = None
+NUMBER_OF_GENERATIONS = None
+TARGET_STRING = None
+LETTERS = None
+OUTPUT_FILE = None
 
 def create_initial_population():
     population = []
@@ -89,10 +91,13 @@ def print_status(generation, population):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population():
+    generations_average_fitness_list = [("Generation","Average_Fitness")]
     population = create_initial_population()
     for gen in range(NUMBER_OF_GENERATIONS):
         population = get_next_generation(population)
-        print_status(gen, population)
+        average_fitness = get_average_fitness(population)
+        generations_average_fitness_list.append((gen, average_fitness))
+    return generations_average_fitness_list
 
 def get_average_fitness(pop):
     total = 0
@@ -111,6 +116,15 @@ def set_global_variables(args):
     TARGET_STRING = args.target_string
     global LETTERS
     LETTERS = args.letters
+    global OUTPUT_FILE
+    OUTPUT_FILE = args.output_file
 
-if __name__ == "__main__":
-    evolve_population()
+def save_to_file(data):
+    "Data is a list of tuples to be saved to a csv file"
+    with open(OUTPUT_FILE, "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+
+def generate_data():
+    data = evolve_population()
+    save_to_file(data)

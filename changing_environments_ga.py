@@ -1,25 +1,21 @@
 import ConfigParser
 import argparse
-from main import set_global_variables, evolve_population
+from main import set_global_variables, generate_data
 import sys
 from string import ascii_uppercase
 
 def add_arguements(parser):
-    parser.add_argument('--number_of_generations', type=int, dest="number_of_generations",
-                       help='number of generations')
+    parser.add_argument('--number_of_generations', type=int, help='number of generations')
 
-    parser.add_argument('--number_of_organisms', type=int, dest="number_of_organisms",
-                       help='number of organisms')
+    parser.add_argument('--number_of_organisms', type=int, help='number of organisms')
 
-    parser.add_argument('--mutation_rate', type=float, dest="mutation_rate",
-                       help='mutation rate')
+    parser.add_argument('--mutation_rate', type=float, help='mutation rate')
 
-    parser.add_argument('--target_string', type=str, dest="target_string",
-                       help='target string')
+    parser.add_argument('--target_string', type=str, help='target string')
 
-    parser.add_argument('--letters', type=str, dest="letters",
-                       help='letters')
+    parser.add_argument('--letters', type=str, help='letters')
 
+    parser.add_argument('--output_file', help='output_file')
 
 def parse_everything():
     # Parse any conf_file specification
@@ -58,7 +54,7 @@ def parse_everything():
 def main():
     args = parse_everything()
     set_global_variables(args)
-    evolve_population()
+    generate_data()
 
 if __name__ == "__main__":
     main()
