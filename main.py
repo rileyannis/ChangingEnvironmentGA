@@ -100,5 +100,17 @@ def get_average_fitness(pop):
         total += get_fitness(org)
     return total / len(pop)
 
+def set_global_variables(args):
+    global NUMBER_OF_ORGANISMS
+    NUMBER_OF_ORGANISMS = args.number_of_organisms
+    global MUTATION_RATE
+    MUTATION_RATE = args.mutation_rate
+    global NUMBER_OF_GENERATIONS
+    NUMBER_OF_GENERATIONS = args.number_of_generations
+    global TARGET_STRING
+    TARGET_STRING = args.target_string
+    global LETTERS
+    LETTERS = args.letters
+
 if __name__ == "__main__":
     evolve_population()
