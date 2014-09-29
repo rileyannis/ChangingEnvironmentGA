@@ -6,12 +6,11 @@ from __future__ import division
 import random
 from string import ascii_uppercase
 import csv
+import string_org
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
-TARGET_STRING = None
-LETTERS = None
 OUTPUT_FILE = None
 
 def create_initial_population():
@@ -20,19 +19,6 @@ def create_initial_population():
         population.append(create_random_organism())
     return population
 
-def create_random_organism():
-    genotype = []
-    for _ in range(len(TARGET_STRING)):
-        genotype.append(random.choice(LETTERS))
-    return "".join(genotype)
-
-def get_mutated_organism(org):
-    "Mutates one character in organism at random"
-    mut_location = random.randrange(len(TARGET_STRING))
-    while True:
-        mut_letter = random.choice(LETTERS)
-        if mut_letter != org[mut_location]:
-            return org[:mut_location] + mut_letter + org[mut_location + 1:]
 
 def get_mutated_population(population):
     new_population = []
@@ -72,14 +58,6 @@ def get_better_organism(org1, org2):
     if get_fitness(org1) > get_fitness(org2):
         return org1
     return org2
-
-def get_fitness(org):
-    "Returns the number of matching letters between org and target"
-    matches = 0
-    for i in range(len(TARGET_STRING)):
-        if TARGET_STRING[i] == org[i]:
-            matches += 1
-    return matches
 
 def get_next_generation(population):
     new_population = get_mutated_population(population)
@@ -128,3 +106,9 @@ def save_to_file(data):
 def generate_data():
     data = evolve_population()
     save_to_file(data)
+
+if __name__ == "__main__":
+    s = string_org.StringOrg("xxxxxx")
+    print(s)
+    print(s.get_fitness())
+    print(s.get_mutant())
