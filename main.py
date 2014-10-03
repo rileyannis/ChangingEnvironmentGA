@@ -16,7 +16,7 @@ OUTPUT_FILE = None
 def create_initial_population():
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
-        population.append(create_random_organism())
+        population.append(string_org.StringOrg())
     return population
 
 

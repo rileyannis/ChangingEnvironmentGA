@@ -8,7 +8,9 @@ class StringOrg(object):
     this is a class that represents organisms as a string
     fitness equals distance to the target string
     """
-    def __init__(self, genotype):
+    def __init__(self, genotype=None):
+        if genotype is None:
+            genotype = create_random_genotype()
         assert len(genotype) == len(TARGET_STRING)
         self.genotype = genotype
 
@@ -43,8 +45,8 @@ def get_fitness(org):
             matches += 1
     return matches
 
-def create_random_organism():
+def create_random_genotype():
     genotype = []
     for _ in range(len(TARGET_STRING)):
         genotype.append(random.choice(LETTERS))
-    return StringOrg("".join(genotype))
+    return "".join(genotype)
