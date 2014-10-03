@@ -24,7 +24,7 @@ def get_mutated_population(population):
     new_population = []
     for org in population:
         if random.random() < MUTATION_RATE:
-            new_org = get_mutated_organism(org)
+            new_org = org.get_mutant()
             new_population.append(new_org)
         else:
             new_population.append(org)
@@ -39,19 +39,22 @@ def get_selected_population_soft(population):
     return new_population
 
 def get_selected_population(pop):
+    """
+    fix me!!!!!!
+    """
     best_org = get_best_organism(pop)
     new_population = [best_org]
     while len(new_population) < NUMBER_OF_ORGANISMS:
-        new_population.append(get_mutated_organism(best_org))
+        new_population.append(best_org.get_mutant())
     return new_population
 
 def get_best_organism(pop):
     best_fitness = -1
     best_org = None
     for org in pop:
-        if get_fitness(org) > best_fitness:
+        if org.get_fitness() > best_fitness:
             best_org = org
-            best_fitness = get_fitness(org)
+            best_fitness = org.get_fitness()
     return best_org
 
 def get_better_organism(org1, org2):
@@ -80,7 +83,7 @@ def evolve_population():
 def get_average_fitness(pop):
     total = 0
     for org in pop:
-        total += get_fitness(org)
+        total += org.get_fitness()
     return total / len(pop)
 
 def set_global_variables(args):
