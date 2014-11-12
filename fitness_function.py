@@ -2,32 +2,26 @@ from math import floor, sqrt
 import numpy as np
 import scipy.stats as stats
 import random
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
+
+"""
+Example usage:
+solution = [2,2]
+f = Fitness_Function(sphere_function, 0, 2)
+fitness = f.evaluate(solution)
+"""
 
 def main():
     ff = Fitness_Function(sphere_function, 0, 2)
     ff.transform(-1)
     #print fitness2([1,1])
     #plotFitnessFunction(ff.fitness1)
-    plotFitnessFunction(ff.fitness2)
-    print ff.correlation()
+    #plotFitnessFunction(ff.fitness2)
+    #print ff.correlation()
 
 def sphere_function(val, mods):
     res =  val*val
     res = np.add(res, mods)
     return res
-
-def plotFitnessFunction(function):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    X = np.arange(-512, 512, 10)
-    Y = np.arange(-512, 512, 10)
-    X, Y = np.meshgrid(X, Y)
-    Z = function([X,Y])
-    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)
-    plt.show()
 
 class Fitness_Function:
     def __init__(self, func, optimal, arglen):
@@ -37,6 +31,7 @@ class Fitness_Function:
         self.optimal = 0
         self.arglen = arglen
         self.range_ = (-512, 512)
+        self.flipped = False
 
         def fitness1(vals):
             total = 0.0
@@ -46,13 +41,18 @@ class Fitness_Function:
 
         self.fitness1 = fitness1
 
+    def evaluate(self, solution):
+        if self.flipped:
+            return self.fitness2(solution)
+        return self.fitness1(solution)
+
     def correlation(self, samples=100):
         vals1 = []
         vals2 = []
         for i in range(samples):
             solution = []
             for j in range(self.arglen):
-                solution.append(random.randrange(*self.rng))
+                solution.append(random.randrange(*self.range_))
             vals1.append(self.fitness1(solution))
             vals2.append(self.fitness2(solution))
         slope, intercept, r_value, p_value, std_err = stats.linregress(vals1, vals2)
@@ -63,14 +63,14 @@ class Fitness_Function:
         for i in range(samples):
             solution = []
             for j in range(self.arglen):
-                solution.append(random.randrange(*self.rng))
+                solution.append(random.randrange(*self.range_))
             vals.append(self.fitness1(solution))
         return stats.tstd(vals)
 
     def setMods(self, corr):
         self.mods = {}
         sd = self.sd()
-        for i in range(self.rng[0], self.rng[1]):
+        for i in range(self.range_[0], self.range_[1]):
             self.mods[i] = random.normalvariate(0, 10*sd * (1 - abs(corr)))
 
     def transform(self, corr):
