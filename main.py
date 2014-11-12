@@ -94,10 +94,8 @@ def set_global_variables(args):
     MUTATION_RATE = args.mutation_rate
     global NUMBER_OF_GENERATIONS
     NUMBER_OF_GENERATIONS = args.number_of_generations
-    global TARGET_STRING
-    TARGET_STRING = args.target_string
-    global LETTERS
-    LETTERS = args.letters
+    string_org.TARGET_STRING = args.target_string
+    string_org.LETTERS = args.letters
     global OUTPUT_FILE
     OUTPUT_FILE = args.output_file
 
