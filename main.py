@@ -58,13 +58,13 @@ def get_best_organism(pop):
     return best_org
 
 def get_better_organism(org1, org2):
-    if get_fitness(org1) > get_fitness(org2):
+    if org1.get_fitness() > org2.get_fitness():
         return org1
     return org2
 
 def get_next_generation(population):
     new_population = get_mutated_population(population)
-    new_new_population = get_selected_population(new_population)
+    new_new_population = get_selected_population_soft(new_population)
     return new_new_population
 
 def print_status(generation, population):
@@ -78,6 +78,7 @@ def evolve_population():
         population = get_next_generation(population)
         average_fitness = get_average_fitness(population)
         generations_average_fitness_list.append((gen, average_fitness))
+        print_status(gen, population)
     return generations_average_fitness_list
 
 def get_average_fitness(pop):
