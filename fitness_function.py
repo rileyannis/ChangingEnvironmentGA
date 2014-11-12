@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def main():
     ff = Fitness_Function(sphere_function, 0, 2)
-    ff.transform(.9)
+    ff.transform(-1)
     #print fitness2([1,1])
     #plotFitnessFunction(ff.fitness1)
     plotFitnessFunction(ff.fitness2)
@@ -36,7 +36,7 @@ class Fitness_Function:
         self.fitness2 = None
         self.optimal = 0
         self.arglen = arglen
-        self.rng = (-512, 512)
+        self.range_ = (-512, 512)
 
         def fitness1(vals):
             total = 0.0
