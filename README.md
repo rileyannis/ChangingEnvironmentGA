@@ -6,4 +6,4 @@ This project will observe the relative improvement in fitness of a digital organ
 
 Researchers:
 ============
-Riley Annis, Josh Nahum, Emiley Dolson
+Riley Annis, Josh Nahum, Emily Dolson
