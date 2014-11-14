@@ -58,7 +58,7 @@ def get_best_organism(pop):
     return best_org
 
 def get_better_organism(org1, org2):
-    if org1.get_fitness() > org2.get_fitness():
+    if org1.should_maximize_fitness and (org1.get_fitness() > org2.get_fitness()):
         return org1
     return org2
 
