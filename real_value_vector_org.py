@@ -2,6 +2,7 @@ import random
 from fitness_function import Fitness_Function, sphere_function
 
 LENGTH = None
+RANGE = None
 
 class RealValueVectorOrg(object):
     """
@@ -10,18 +11,18 @@ class RealValueVectorOrg(object):
     the length is determined at object creation
     """
 
-    should_maximize_fitness = False
-    assert not LENGTH is None
-    object_to_calculate_fitness = Fitness_Function(sphere_function, 0, LENGTH)
-
     def __init__(self, genotype=None):
+        self.should_maximize_fitness = False
+        assert not LENGTH is None
+        self.object_to_calculate_fitness = Fitness_Function(sphere_function, 0, LENGTH)
+
         if genotype is None:
-            genotype = create_random_genotype(LENGTH)
+            genotype = create_random_genotype()
         assert LENGTH == len(genotype)
         self.genotype = genotype
 
     def get_fitness(self):
-        return object_to_calculate_fitness.evaluate(self.genotype)
+        return self.object_to_calculate_fitness.evaluate(self.genotype)
 
     def get_mutant(self):
         return RealValueVectorOrg(get_mutated_genotype(self.genotype))
@@ -38,7 +39,7 @@ class RealValueVectorOrg(object):
 def get_mutated_genotype(genotype):
     "Mutates one locus in organism at random"
     mut_location = random.randrange(len(genotype))
-    mut_value = random.uniform(-512, 512)
+    mut_value = random.uniform(RANGE[0], RANGE[1])
     mutant = genotype[:]
     mutant[mut_location] = mut_value
     return mutant
@@ -46,5 +47,5 @@ def get_mutated_genotype(genotype):
 def create_random_genotype():
     genotype = []
     for _ in range(LENGTH):
-        genotype.append(random.uniform(-512, 512))
+        genotype.append(random.uniform(RANGE[0], RANGE[1]))
     return genotype

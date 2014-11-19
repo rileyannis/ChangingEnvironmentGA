@@ -7,16 +7,21 @@ import random
 from string import ascii_uppercase
 import csv
 import string_org
+import real_value_vector_org
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
 OUTPUT_FILE = None
+ORG_TYPE = None
 
 def create_initial_population():
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
-        population.append(string_org.StringOrg())
+        if ORG_TYPE == "string":
+            population.append(string_org.StringOrg())
+        elif ORG_TYPE == "vector":
+            population.append(real_value_vector_org.RealValueVectorOrg())
     return population
 
 
@@ -94,8 +99,16 @@ def set_global_variables(args):
     MUTATION_RATE = args.mutation_rate
     global NUMBER_OF_GENERATIONS
     NUMBER_OF_GENERATIONS = args.number_of_generations
-    string_org.TARGET_STRING = args.target_string
-    string_org.LETTERS = args.letters
+    global ORG_TYPE
+    ORG_TYPE = args.org_type
+    if args.org_type == "string":
+        string_org.TARGET_STRING = args.target_string
+        string_org.LETTERS = args.letters
+    elif args.org_type == "vector":
+        real_value_vector_org.LENGTH = int(args.length)
+        range_list = args.range.strip("()").split(",")
+        range_list = [int(x.strip()) for x in range_list]
+        real_value_vector_org.RANGE = tuple(range_list)
     global OUTPUT_FILE
     OUTPUT_FILE = args.output_file
 
