@@ -8,14 +8,15 @@ from string import ascii_uppercase
 import csv
 import string_org
 import real_value_vector_org
-from data_handling import init_file, log_fitness
+import scipy.stats as stats
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
-OUTPUT_FILE = None
+OUTPUT_FILE = "fitness.dat"
 ORG_TYPE = None
 TOURNAMENT_SIZE = 2
+VERBOSE = False
 
 def create_initial_population():
     population = []
@@ -87,14 +88,19 @@ def print_status(generation, population):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population():
-    generations_average_fitness_list = [("Generation","Average_Fitness")]
+    generations_average_fitness_list = [("Generation", "Average_Fitness", \
+                    "Standard_Deviation", "Best_fitness", "Best_org")]
     population = create_initial_population()
     for gen in range(NUMBER_OF_GENERATIONS):
         population = get_next_generation(population)
         average_fitness = get_average_fitness(population)
-        generations_average_fitness_list.append((gen, average_fitness))
-        print_status(gen, population)
-        log_fitness(population)
+        best_org = get_best_organism(population)
+        best_fitness = best_org.get_fitness()
+        stdev = stats.tstd([org.get_fitness() for org in population])
+        generations_average_fitness_list.append((gen, average_fitness, \
+                                    stdev, best_fitness, best_org))
+        if VERBOSE:
+            print_status(gen, population)
     return generations_average_fitness_list
 
 def get_average_fitness(pop):
@@ -129,8 +135,12 @@ def save_to_file(data):
         writer = csv.writer(f)
         writer.writerows(data)
 
+def init_output_file():
+    with open(OUTPUT_FILE, "wb+") as f:
+        pass
+
 def generate_data():
-    init_file()
+    init_output_file()
     data = evolve_population()
     save_to_file(data)
 
