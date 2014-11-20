@@ -15,6 +15,7 @@ MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
 OUTPUT_FILE = None
 ORG_TYPE = None
+TOURNAMENT_SIZE = 2
 
 def create_initial_population():
     population = []
@@ -39,9 +40,10 @@ def get_mutated_population(population):
 def get_selected_population_soft(population):
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
-        org_1 = random.choice(population)
-        org_2 = random.choice(population)
-        new_population.append(get_better_organism(org_1, org_2))
+        #org_1 = random.choice(population)
+        orgs = [random.choice(population) for i in range(TOURNAMENT_SIZE)]
+        #new_population.append(get_better_organism(org_1, org_2))
+        new_population.append(get_best_organism(orgs))
     return new_population
 
 def get_selected_population(pop):
@@ -56,16 +58,23 @@ def get_selected_population(pop):
 
 def get_best_organism(pop):
     best_fitness = -1
+    if not pop[0].should_maximize_fitness:
+        best_fitness = float("inf")
     best_org = None
     for org in pop:
-        if org.get_fitness() > best_fitness:
+        if (org.should_maximize_fitness and org.get_fitness() > best_fitness) \
+                     or (not org.should_maximize_fitness and \
+                     org.get_fitness() < best_fitness):
             best_org = org
             best_fitness = org.get_fitness()
     return best_org
 
 def get_better_organism(org1, org2):
-    if org1.should_maximize_fitness and (org1.get_fitness() > org2.get_fitness()):
+    if (org1.should_maximize_fitness and (org1.get_fitness() > \
+            org2.get_fitness())) or (not org1.should_maximize_fitness \
+            and org1.get_fitness() < org2.get_fitness()):
         return org1
+    
     return org2
 
 def get_next_generation(population):
