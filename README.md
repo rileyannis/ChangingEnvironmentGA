@@ -7,3 +7,7 @@ This project will observe the relative improvement in fitness of a digital organ
 Researchers:
 ============
 Riley Annis, Josh Nahum, Emily Dolson
+
+To-Do:
+======
+Add config options for real value orgs
