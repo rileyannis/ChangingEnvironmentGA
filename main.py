@@ -8,6 +8,7 @@ from string import ascii_uppercase
 import csv
 import string_org
 import real_value_vector_org
+from data_handling import init_file, log_fitness
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
@@ -84,6 +85,7 @@ def evolve_population():
         average_fitness = get_average_fitness(population)
         generations_average_fitness_list.append((gen, average_fitness))
         print_status(gen, population)
+        log_fitness(population)
     return generations_average_fitness_list
 
 def get_average_fitness(pop):
@@ -119,6 +121,7 @@ def save_to_file(data):
         writer.writerows(data)
 
 def generate_data():
+    init_file()
     data = evolve_population()
     save_to_file(data)
 
