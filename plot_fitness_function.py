@@ -5,7 +5,7 @@ from fitness_function import *
 
 def main():
     ff = Fitness_Function(sphere_function, 0, 2)
-    ff.transform(-1)
+    ff.transform(.95)
     #print fitness2([1,1])
     #plotFitnessFunction(ff.fitness1)
     plotFitnessFunction(ff.fitness2)
@@ -14,8 +14,9 @@ def main():
 def plotFitnessFunction(function):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    X = np.arange(-512, 512, 10)
-    Y = np.arange(-512, 512, 10)
+    interval = float(512+512)/MOD_SAMPLES
+    X = np.arange(-512, 511, interval)
+    Y = np.arange(-512, 511, interval)
     X, Y = np.meshgrid(X, Y)
     Z = function([X,Y])
     surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=False)

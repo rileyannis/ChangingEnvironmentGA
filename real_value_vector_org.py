@@ -3,7 +3,7 @@ from fitness_function import Fitness_Function, sphere_function
 
 LENGTH = None
 RANGE = None
-MUTATION_EFFECT_SIZE = 10
+MUTATION_EFFECT_SIZE = None
 
 class RealValueVectorOrg(object):
     """

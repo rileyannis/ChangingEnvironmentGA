@@ -13,9 +13,9 @@ import scipy.stats as stats
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
-OUTPUT_FILE = "fitness.dat"
+OUTPUT_FILE = None
 ORG_TYPE = None
-TOURNAMENT_SIZE = 2
+TOURNAMENT_SIZE = None
 VERBOSE = False
 
 def create_initial_population():
@@ -116,6 +116,8 @@ def set_global_variables(args):
     MUTATION_RATE = args.mutation_rate
     global NUMBER_OF_GENERATIONS
     NUMBER_OF_GENERATIONS = args.number_of_generations
+    global TOURNAMENT_SIZE
+    TOURNAMENT_SIZE = int(args.tournament_size)
     global ORG_TYPE
     ORG_TYPE = args.org_type
     if args.org_type == "string":
@@ -126,6 +128,7 @@ def set_global_variables(args):
         range_list = args.range.strip("()").split(",")
         range_list = [int(x.strip()) for x in range_list]
         real_value_vector_org.RANGE = tuple(range_list)
+        real_value_vector_org.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
     global OUTPUT_FILE
     OUTPUT_FILE = args.output_file
 
