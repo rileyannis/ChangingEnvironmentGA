@@ -115,13 +115,17 @@ class Fitness_Function:
         sd = self.sd()
         return random.normalvariate(0, 10*sd * (1 - abs(self.corr)))
 
-    def transform(self, corr):
+    def switch_to_fitness2(self, corr):
         self.corr = corr
         self.setMods()
         fitness2 = self.create_alternate_fitness_function()
         if corr < 0:
             self.fitness2 = self.invert(fitness2)
         self.fitness2 = fitness2
+        self.flipped = True
+
+    def switch_to_fitness1(self):
+        self.flipped = False
 
     def create_alternate_fitness_function(self):
         def fitness2(vals):
