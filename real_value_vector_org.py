@@ -14,7 +14,7 @@ class RealValueVectorOrg(object):
 
     def __init__(self, fitness_function, genotype=None):
         self.should_maximize_fitness = False
-        self.object_to_calculate_fitness fitness_function
+        self.object_to_calculate_fitness = fitness_function
 
         if genotype is None:
             genotype = create_random_genotype()

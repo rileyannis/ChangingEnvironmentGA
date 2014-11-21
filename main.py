@@ -9,6 +9,8 @@ import csv
 import string_org
 import real_value_vector_org
 import scipy.stats as stats
+import fitness_function as ff
+from math import floor
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
@@ -17,14 +19,15 @@ OUTPUT_FILE = None
 ORG_TYPE = None
 TOURNAMENT_SIZE = None
 VERBOSE = False
+ALTERNATE_ENVIRONMENT_CORR = None
 
-def create_initial_population():
+def create_initial_population(fitness_function):
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         if ORG_TYPE == "string":
-            population.append(string_org.StringOrg())
+            population.append(string_org.StringOrg(fitness_function))
         elif ORG_TYPE == "vector":
-            population.append(real_value_vector_org.RealValueVectorOrg())
+            population.append(real_value_vector_org.RealValueVectorOrg(fitness_function))
     return population
 
 
@@ -88,10 +91,16 @@ def print_status(generation, population):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population():
+    fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
     generations_average_fitness_list = [("Generation", "Average_Fitness", \
                     "Standard_Deviation", "Best_fitness", "Best_org")]
-    population = create_initial_population()
+    population = create_initial_population(fitness_function)
     for gen in range(NUMBER_OF_GENERATIONS):
+        if gen == int(floor(NUMBER_OF_GENERATIONS/3.0)):
+            fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
+            fitness_function.set_flipped(True)
+        elif gen == int(floor(NUMBER_OF_GENERATIONS*2.0/3.0)):
+            fitness_function.set_flipped(False)
         population = get_next_generation(population)
         average_fitness = get_average_fitness(population)
         best_org = get_best_organism(population)
@@ -131,6 +140,8 @@ def set_global_variables(args):
         real_value_vector_org.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
     global OUTPUT_FILE
     OUTPUT_FILE = args.output_file
+    global ALTERNATE_ENVIRONMENT_CORR
+    ALTERNATE_ENVIRONMENT_CORR = float(args.alternate_environment_corr)
 
 def save_to_file(data):
     "Data is a list of tuples to be saved to a csv file"
