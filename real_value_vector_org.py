@@ -12,21 +12,22 @@ class RealValueVectorOrg(object):
     the length is determined at object creation
     """
 
-    def __init__(self, genotype=None):
+    def __init__(self, fitness_function, genotype=None):
         self.should_maximize_fitness = False
-        assert not LENGTH is None
-        self.object_to_calculate_fitness = Fitness_Function(sphere_function, 0, LENGTH)
+        self.object_to_calculate_fitness fitness_function
 
         if genotype is None:
             genotype = create_random_genotype()
         assert LENGTH == len(genotype)
         self.genotype = genotype
+        self.fitness_function = fitness_function
 
     def get_fitness(self):
         return self.object_to_calculate_fitness.evaluate(self.genotype)
 
     def get_mutant(self):
-        return RealValueVectorOrg(get_mutated_genotype(self.genotype))
+        return RealValueVectorOrg(self.fitness_function, \
+                                  get_mutated_genotype(self.genotype))
 
     def __str__(self):
         return "RealValueVectorOrg({})".format(self.genotype)
@@ -35,7 +36,7 @@ class RealValueVectorOrg(object):
         return str(self)
 
     def get_clone(self):
-        return RealValueVectorOrg(self.genotype)
+        return RealValueVectorOrg(self.fitness_function, self.genotype)
 
 def get_mutated_genotype(genotype):
     "Mutates one locus in organism at random"

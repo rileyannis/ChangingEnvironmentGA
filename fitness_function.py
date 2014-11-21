@@ -34,6 +34,7 @@ def rosenbrock_function(vals, mods):
         res = 100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2
 
 class Fitness_Function:
+
     def __init__(self, func, optimal, arglen):
         self.func = func
         self.fitness1 = func
@@ -42,6 +43,9 @@ class Fitness_Function:
         self.arglen = arglen
         self.range_ = (-512, 512)
         self.flipped = False
+
+    def set_flipped(self, value):
+        self.flipped = value
 
     def evaluate(self, solution):
         if self.flipped:
@@ -115,17 +119,13 @@ class Fitness_Function:
         sd = self.sd()
         return random.normalvariate(0, 10*sd * (1 - abs(self.corr)))
 
-    def switch_to_fitness2(self, corr):
+    def create_fitness2(self, corr):
         self.corr = corr
         self.setMods()
         fitness2 = self.create_alternate_fitness_function()
         if corr < 0:
             self.fitness2 = self.invert(fitness2)
         self.fitness2 = fitness2
-        self.flipped = True
-
-    def switch_to_fitness1(self):
-        self.flipped = False
 
     def create_alternate_fitness_function(self):
         def fitness2(vals):
