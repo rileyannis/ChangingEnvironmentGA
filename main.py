@@ -63,6 +63,19 @@ def get_best_organism(pop):
             best_fitness = org.get_fitness()
     return best_org
 
+def get_best_reference_organism(pop):
+    best_fitness = -1
+    if not pop[0].should_maximize_fitness:
+        best_fitness = float("inf")
+    best_org = None
+    for org in pop:
+        if (org.should_maximize_fitness and org.get_reference_fitness() > best_fitness) \
+                     or (not org.should_maximize_fitness and \
+                     org.get_reference_fitness() < best_fitness):
+            best_org = org
+            best_fitness = org.get_reference_fitness()
+    return best_org
+
 def get_better_organism(org1, org2):
     if (org1.should_maximize_fitness and (org1.get_fitness() > \
             org2.get_fitness())) or (not org1.should_maximize_fitness \
@@ -97,6 +110,10 @@ def evolve_population():
         best_org = get_best_organism(population)
         best_fitness = best_org.get_fitness()
         stdev = stats.tstd([org.get_fitness() for org in population])
+
+        reference_list = generations_average_fitness_list[:]
+        #Create reference data set here
+
         generations_average_fitness_list.append((gen, average_fitness, \
                                     stdev, best_fitness, best_org))
         if VERBOSE:
@@ -107,6 +124,12 @@ def get_average_fitness(pop):
     total = 0
     for org in pop:
         total += org.get_fitness()
+    return total / len(pop)
+
+def get_average_reference_fitness(pop):
+    total = 0
+    for org in pop:
+        total += org.get_reference_fitness()
     return total / len(pop)
 
 def set_global_variables(args):
