@@ -5,7 +5,8 @@ from fitness_function import *
 
 def main():
     ff = Fitness_Function(sphere_function, 0, 2)
-    ff.transform(.95)
+    ff.create_fitness2(1)
+    ff.set_flipped(True)
     #print fitness2([1,1])
     #plotFitnessFunction(ff.fitness1)
     plotFitnessFunction(ff.fitness2)

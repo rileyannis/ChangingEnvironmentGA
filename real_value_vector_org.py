@@ -1,9 +1,8 @@
 import random
-from fitness_function import Fitness_Function, sphere_function
+from fitness_function import Fitness_Function, sphere_function, MUTATION_EFFECT_SIZE
 
 LENGTH = None
 RANGE = None
-MUTATION_EFFECT_SIZE = None
 
 class RealValueVectorOrg(object):
     """
@@ -24,6 +23,12 @@ class RealValueVectorOrg(object):
 
     def get_fitness(self):
         return self.object_to_calculate_fitness.evaluate(self.genotype)
+
+    def get_reference_fitness(self):
+        return self.object_to_calculate_fitness.fitness1_fitness(self.genotype)
+
+    def get_alternate_fitness(self):
+        return self.object_to_calculate_fitness.fitness2_fitness(self.genotype)
 
     def get_mutant(self):
         return RealValueVectorOrg(self.fitness_function, \

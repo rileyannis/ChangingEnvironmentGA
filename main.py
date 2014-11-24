@@ -137,6 +137,7 @@ def set_global_variables(args):
         range_list = args.range.strip("()").split(",")
         range_list = [int(x.strip()) for x in range_list]
         real_value_vector_org.RANGE = tuple(range_list)
+        ff.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
         real_value_vector_org.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
     global OUTPUT_FILE
     OUTPUT_FILE = args.output_file
