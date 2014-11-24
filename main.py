@@ -134,6 +134,9 @@ def set_global_variables(args):
     OUTPUT_FILE = args.output_file
     global ALTERNATE_ENVIRONMENT_CORR
     ALTERNATE_ENVIRONMENT_CORR = float(args.alternate_environment_corr)
+    global VERBOSE
+    VERBOSE = args.verbose
+    
 
 def save_to_file(data):
     "Data is a list of tuples to be saved to a csv file"

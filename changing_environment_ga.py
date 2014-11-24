@@ -16,7 +16,7 @@ def add_arguements(parser):
     parser.add_argument('--letters', type=str, help='letters')
 
     parser.add_argument('--output_file', help='output_file')
-
+    parser.add_argument("-v", "--verbose", action="store_true")
 def parse_everything():
     # Parse any conf_file specification
     # We make this parser with add_help=False so that
