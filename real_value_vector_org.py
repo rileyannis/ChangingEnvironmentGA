@@ -1,10 +1,12 @@
 import random
 from fitness_function import Fitness_Function, sphere_function, MUTATION_EFFECT_SIZE
+from functools import total_ordering
 
 LENGTH = None
 RANGE_MIN = None
 RANGE_MAX = None
 
+@total_ordering
 class RealValueVectorOrg(object):
     """
     this is a class that represents organisms as a real value vector
@@ -32,17 +34,25 @@ class RealValueVectorOrg(object):
         return self.object_to_calculate_fitness.fitness2_fitness(self.genotype)
 
     def get_mutant(self):
-        return RealValueVectorOrg(self.fitness_function, \
+        return RealValueVectorOrg(self.fitness_function,
                                   get_mutated_genotype(self.genotype))
+
+    def get_clone(self):
+        return RealValueVectorOrg(self.fitness_function, self.genotype)
+
+    def __lt__(self, other):
+        if self.get_fitness() < other.get_fitness():
+            return True
+        return self.genotype < other.genotype
+
+    def __eq__(self, other):
+        return self.genotype == other.genotype
 
     def __str__(self):
         return "RealValueVectorOrg({})".format(self.genotype)
 
     def __repr__(self):
         return str(self)
-
-    def get_clone(self):
-        return RealValueVectorOrg(self.fitness_function, self.genotype)
 
 def get_mutated_genotype(genotype):
     "Mutates one locus in organism at random"
