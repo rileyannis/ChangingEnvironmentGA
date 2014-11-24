@@ -14,7 +14,7 @@ class RealValueVectorOrg(object):
     the length is determined at object creation
     """
 
-    def __init__(self, fitness_function, genotype=None):
+    def __init__(self, fitness_function=None, genotype=None, environment=None):
         self.should_maximize_fitness = False
         self.object_to_calculate_fitness = fitness_function
 
@@ -23,9 +23,17 @@ class RealValueVectorOrg(object):
         assert LENGTH == len(genotype)
         self.genotype = genotype
         self.fitness_function = fitness_function
+        self.environment = environment
 
     def get_fitness(self):
         return self.object_to_calculate_fitness.evaluate(self.genotype)
+
+    def fitness(self, environment=None):
+        if environment is None:
+            if self.environment is None:
+                raise AssertionError("Can't call fitness unless you set an environment")
+            environment = self.environment
+        return environment(self.genotype)
 
     def get_reference_fitness(self):
         return self.object_to_calculate_fitness.fitness1_fitness(self.genotype)
@@ -41,7 +49,7 @@ class RealValueVectorOrg(object):
         return RealValueVectorOrg(self.fitness_function, self.genotype)
 
     def __lt__(self, other):
-        if self.get_fitness() < other.get_fitness():
+        if self.fitness(self.environment) < other.fitness(self.environment):
             return True
         return self.genotype < other.genotype
 

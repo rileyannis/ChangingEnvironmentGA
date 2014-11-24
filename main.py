@@ -23,13 +23,14 @@ TOURNAMENT_SIZE = None
 VERBOSE = False
 ALTERNATE_ENVIRONMENT_CORR = None
 
-def create_initial_population(fitness_function):
+def create_initial_population(environment=None):
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         if ORG_TYPE == "string":
-            population.append(string_org.StringOrg(fitness_function))
+            population.append(string_org.StringOrg(environment))
         elif ORG_TYPE == "vector":
-            population.append(real_value_vector_org.RealValueVectorOrg(fitness_function))
+            population.append(
+                real_value_vector_org.RealValueVectorOrg(environment))
     return population
 
 
@@ -43,79 +44,77 @@ def get_mutated_population(population):
             new_population.append(org)
     return new_population
 
-def get_selected_population_soft(population):
+def get_selected_population_soft(population, environment):
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         orgs = [random.choice(population) for _ in range(TOURNAMENT_SIZE)]
-        new_population.append(get_best_organism(orgs))
+        new_population.append(get_best_organism(orgs, environment))
     return new_population
 
-def get_best_organism(pop, reference=False):
-    best_fitness = -1
-    if not pop[0].should_maximize_fitness:
-        best_fitness = float("inf")
-    best_org = None
+def get_best_organism(pop, environment):
+    best_org = pop[0]
     for org in pop:
-        fitness = org.get_reference_fitness() if reference else org.get_fitness()
-        if (org.should_maximize_fitness and fitness > best_fitness) \
-                     or (not org.should_maximize_fitness and \
-                     fitness < best_fitness):
+        old_environment = org.environment
+        org.environment = environment
+        if org > best_org:
             best_org = org
-            best_fitness = fitness
+        org.environment = old_environment
     return best_org
 
-def get_next_generation(population):
+def get_next_generation(population, environment):
     new_population = get_mutated_population(population)
-    new_new_population = get_selected_population_soft(new_population)
+    new_new_population = get_selected_population_soft(new_population, environment)
     return new_new_population
 
-def print_status(generation, population):
-    average_fitness = get_average_fitness(population)
+def print_status(generation, population, environment):
+    average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
-def evolve_population():
-    """Currently only works for vector orgs."""
-    fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
-    generations_average_fitness_list = [("Generation", "Average_Fitness", \
+def evolve_population(reference_environment, alternative_environment):
+    """Currently only works for vector orgs."""    
+    current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation", "Best_fitness", "Best_org")]
-    population = create_initial_population(fitness_function)
+    reference_fitness_list = current_fitness_list[:]
+
+    current_environment = reference_environment
+
+    start_of_trimester_2 = int(floor(NUMBER_OF_GENERATIONS/3.0))
+    start_of_trimester_3 = int(floor(NUMBER_OF_GENERATIONS*2.0/3.0))
+
+    population = create_initial_population(reference_environment)
     for gen in range(NUMBER_OF_GENERATIONS):
-        if gen == int(floor(NUMBER_OF_GENERATIONS/3.0)):
-            fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
-            fitness_function.set_flipped(True)
-        elif gen == int(floor(NUMBER_OF_GENERATIONS*2.0/3.0)):
-            fitness_function.set_flipped(False)
-        population = get_next_generation(population)
-        average_fitness = get_average_fitness(population)
-        best_org = get_best_organism(population)
-        best_fitness = best_org.get_fitness()
-        stdev = stats.tstd([org.get_fitness() for org in population])
-
-        reference_list = generations_average_fitness_list[:]
-        average_reference_fitness = get_average_reference_fitness(population)
-        best_reference_org = get_best_organism(population, reference=True)
-        best_reference_fitness = best_reference_org.get_reference_fitness()
-        stdev_reference = stats.tstd([org.get_reference_fitness() for org in population])
-        reference_list.append((gen, average_reference_fitness, \
-                                    stdev_reference, best_reference_fitness, best_reference_org))
-
-        generations_average_fitness_list.append((gen, average_fitness, \
-                                    stdev, best_fitness, best_org))
+        if gen == start_of_trimester_2:
+            current_environment = alternative_environment
+        elif gen == start_of_trimester_3:
+            current_environment = reference_environment
+        population = get_next_generation(population, current_environment)
+        average_fitness, best_org, best_fitness, stdev = get_generation_stats(
+            population, current_environment)
+        current_fitness_list.append(
+            (gen, average_fitness, stdev, best_fitness, best_org))
+        average_fitness, best_org, best_fitness, stdev = get_generation_stats(
+            population, reference_environment)
+        reference_fitness_list.append(
+            (gen, average_fitness, stdev, best_fitness, best_org))
         if VERBOSE:
-            print_status(gen, population)
-    return generations_average_fitness_list, reference_list,  fitness_function
+            print_status(gen, population, current_environment)
+    return current_fitness_list, reference_fitness_list
 
-def get_average_fitness(pop):
+def get_generation_stats(population, environment):
+    average_fitness = get_average_fitness(population, environment)
+    best_org = get_best_organism(population, environment)
+    best_fitness = best_org.fitness(environment)
+    stdev = stats.tstd([org.fitness(environment) 
+                        for org in population])
+    return average_fitness, best_org, best_fitness, stdev
+    
+
+def get_average_fitness(pop, environment):
     total = 0
     for org in pop:
-        total += org.get_fitness()
+        total += org.fitness(environment)
     return total / len(pop)
 
-def get_average_reference_fitness(pop):
-    total = 0
-    for org in pop:
-        total += org.get_reference_fitness()
-    return total / len(pop)
 
 def set_global_variables(config):
     global OUTPUT_FOLDER
@@ -160,7 +159,13 @@ def save_corr_to_file(fitness_function, filename):
         f.write(str(fitness_function.correlation()))
 
 def generate_data():
-    experienced_fits, reference_fits, fitness_function = evolve_population()
+    fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
+    fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
+    reference_environment  = fitness_function.fitness1_fitness
+    alternative_environment  = fitness_function.fitness2_fitness
+
+    experienced_fits, reference_fits = evolve_population(
+        reference_environment, alternative_environment)
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
     os.mkdir(OUTPUT_FOLDER)
