@@ -46,9 +46,7 @@ def get_mutated_population(population):
 def get_selected_population_soft(population):
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
-        #org_1 = random.choice(population)
-        orgs = [random.choice(population) for i in range(TOURNAMENT_SIZE)]
-        #new_population.append(get_better_organism(org_1, org_2))
+        orgs = [random.choice(population) for _ in range(TOURNAMENT_SIZE)]
         new_population.append(get_best_organism(orgs))
     return new_population
 
@@ -65,14 +63,6 @@ def get_best_organism(pop, reference=False):
             best_org = org
             best_fitness = fitness
     return best_org
-
-def get_better_organism(org1, org2):
-    if (org1.should_maximize_fitness and (org1.get_fitness() > \
-            org2.get_fitness())) or (not org1.should_maximize_fitness \
-            and org1.get_fitness() < org2.get_fitness()):
-        return org1
-    
-    return org2
 
 def get_next_generation(population):
     new_population = get_mutated_population(population)
