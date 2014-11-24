@@ -5,7 +5,7 @@ run:
 	python changing_environment_ga.py -c config.ini
 
 clean:
-	rm *~
+	rm *~ *.pyc *.csv
 
 test:
 	python -m unittest discover
