@@ -135,7 +135,7 @@ def set_global_variables(args):
     global ALTERNATE_ENVIRONMENT_CORR
     ALTERNATE_ENVIRONMENT_CORR = float(args.alternate_environment_corr)
     global VERBOSE
-    VERBOSE = args.verbose
+    VERBOSE = args.verbose == "True"
     
 
 def save_to_file(data):
