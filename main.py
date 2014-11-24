@@ -109,47 +109,45 @@ def get_average_fitness(pop):
         total += org.get_fitness()
     return total / len(pop)
 
-def set_global_variables(args):
+def set_global_variables(config):
     global NUMBER_OF_ORGANISMS
-    NUMBER_OF_ORGANISMS = args.number_of_organisms
+    NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
     global MUTATION_RATE
-    MUTATION_RATE = args.mutation_rate
+    MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
     global NUMBER_OF_GENERATIONS
-    NUMBER_OF_GENERATIONS = args.number_of_generations
+    NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
     global TOURNAMENT_SIZE
-    TOURNAMENT_SIZE = int(args.tournament_size)
+    TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
     global ORG_TYPE
-    ORG_TYPE = args.org_type
-    if args.org_type == "string":
-        string_org.TARGET_STRING = args.target_string
-        string_org.LETTERS = args.letters
-    elif args.org_type == "vector":
-        real_value_vector_org.LENGTH = int(args.length)
-        range_list = args.range.strip("()").split(",")
-        range_list = [int(x.strip()) for x in range_list]
-        real_value_vector_org.RANGE = tuple(range_list)
-        ff.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
-        real_value_vector_org.MUTATION_EFFECT_SIZE = float(args.mutation_effect_size)
-    global OUTPUT_FILE
-    OUTPUT_FILE = args.output_file
+    ORG_TYPE = config.get("DEFAULT", "org_type")
+    if ORG_TYPE == "string":
+        string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
+        string_org.LETTERS = config.get("DEFAULT", "letters")
+    elif ORG_TYPE == "vector":
+        real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")
+        range_minimum = config.getint("DEFAULT", "range_minimum")
+        range_maximum = config.getint("DEFAULT", "range_maximum")
+        real_value_vector_org.RANGE = (range_minimum, range_maximum)
+        mut_effect_size = config.getfloat("DEFAULT", "mutation_effect_size")
+        ff.MUTATION_EFFECT_SIZE = mut_effect_size
+        real_value_vector_org.MUTATION_EFFECT_SIZE = mut_effect_size
+    global OUTPUT_FOLDER
+    OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global ALTERNATE_ENVIRONMENT_CORR
-    ALTERNATE_ENVIRONMENT_CORR = float(args.alternate_environment_corr)
+    ALTERNATE_ENVIRONMENT_CORR = config.get(
+        "DEFAULT", "alternate_environment_corr")
     global VERBOSE
-    VERBOSE = args.verbose == "True"
+    VERBOSE = config.getboolean("DEFAULT", "verbose")
     
 
 def save_to_file(data):
     "Data is a list of tuples to be saved to a csv file"
-    with open(OUTPUT_FILE, "wb") as f:
+    with open("fitness.csv", "wb") as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
-def init_output_file():
-    with open(OUTPUT_FILE, "wb+") as f:
-        pass
 
 def generate_data():
-    init_output_file()
     data = evolve_population()
     save_to_file(data)
 
