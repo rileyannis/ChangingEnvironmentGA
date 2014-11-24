@@ -112,13 +112,18 @@ def evolve_population():
         stdev = stats.tstd([org.get_fitness() for org in population])
 
         reference_list = generations_average_fitness_list[:]
-        #Create reference data set here
+        average_reference_fitness = get_average_reference_fitness(population)
+        best_reference_org = get_best_reference_organism(population)
+        best_reference_fitness = best_reference_org.get_reference_fitness()
+        stdev_reference = stats.tstd([org.get_reference_fitness() for org in population])
+        reference_list.append((gen, average_reference_fitness, \
+                                    stdev_reference, best_reference_fitness, best_reference_org))
 
         generations_average_fitness_list.append((gen, average_fitness, \
                                     stdev, best_fitness, best_org))
         if VERBOSE:
             print_status(gen, population)
-    return generations_average_fitness_list, fitness_function
+    return generations_average_fitness_list, reference_list,  fitness_function
 
 def get_average_fitness(pop):
     total = 0
@@ -169,13 +174,20 @@ def save_fitnesses_to_file(data):
         writer = csv.writer(f)
         writer.writerows(data)
 
+def save_reference_to_file(data):
+    "Data is a list of tuples to be saved to a csv file"
+    with open("reference.csv", "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+
 def save_corr_to_file(fitness_function):
     with open("correlation.txt", "w") as f:
         f.write(str(fitness_function.correlation()))
 
 def generate_data():
-    data, fitness_function = evolve_population()
+    data, reference_data, fitness_function = evolve_population()
     save_fitnesses_to_file(data)
+    save_reference_to_file(reference_data)
     save_corr_to_file(fitness_function)
 
 if __name__ == "__main__":
