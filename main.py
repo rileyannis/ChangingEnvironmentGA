@@ -12,6 +12,7 @@ import scipy.stats as stats
 import fitness_function as ff
 from math import floor
 import os
+import shutil
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
@@ -113,13 +114,18 @@ def evolve_population():
         stdev = stats.tstd([org.get_fitness() for org in population])
 
         reference_list = generations_average_fitness_list[:]
-        #Create reference data set here
+        average_reference_fitness = get_average_reference_fitness(population)
+        best_reference_org = get_best_reference_organism(population)
+        best_reference_fitness = best_reference_org.get_reference_fitness()
+        stdev_reference = stats.tstd([org.get_reference_fitness() for org in population])
+        reference_list.append((gen, average_reference_fitness, \
+                                    stdev_reference, best_reference_fitness, best_reference_org))
 
         generations_average_fitness_list.append((gen, average_fitness, \
                                     stdev, best_fitness, best_org))
         if VERBOSE:
             print_status(gen, population)
-    return generations_average_fitness_list, fitness_function
+    return generations_average_fitness_list, reference_list,  fitness_function
 
 def get_average_fitness(pop):
     total = 0
@@ -138,6 +144,8 @@ def set_global_variables(config):
     OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global CONFIG_FILE
     CONFIG_FILE = config.get("DEFAULT", "config_file")
+    global VERBOSE
+    VERBOSE = config.getboolean("DEFAULT", "verbose")
     global NUMBER_OF_ORGANISMS
     NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
     global MUTATION_RATE
@@ -162,30 +170,33 @@ def set_global_variables(config):
     global ALTERNATE_ENVIRONMENT_CORR
     ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
         "DEFAULT", "alternate_environment_corr")
-    global VERBOSE
-    VERBOSE = config.getboolean("DEFAULT", "verbose")
     
-
-def save_fitnesses_to_file(data):
-    "Data is a list of tuples to be saved to a csv file"
-    filename = os.path.join(OUTPUT_FOLDER, "fitness.csv")
+def save_fitnesses_to_file(fitnesses, filename):
     with open(filename, "wb") as f:
         writer = csv.writer(f)
-        writer.writerows(data)
+        writer.writerows(fitnesses)
 
-def save_corr_to_file(fitness_function):
-    filename = os.path.join(OUTPUT_FOLDER, "correlation.dat")
+def save_corr_to_file(fitness_function, filename):
     with open(filename, "w") as f:
         f.write(str(fitness_function.correlation()))
 
 def generate_data():
-    data, fitness_function = evolve_population()
+    experienced_fits, reference_fits, fitness_function = evolve_population()
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
     os.mkdir(OUTPUT_FOLDER)
     config_filename = os.path.basename(CONFIG_FILE)
     config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
     shutil.copyfile(CONFIG_FILE, config_dest)
-    save_fitnesses_to_file(data)
-    save_corr_to_file(fitness_function)
+    
+    experienced_filename = os.path.join(
+        OUTPUT_FOLDER, "experienced_fitnesses.csv")
+    reference_filename = os.path.join(
+        OUTPUT_FOLDER, "reference_fitnesses.csv")
+    corr_filename = os.path.join(
+        OUTPUT_FOLDER, "correlation.dat")
+
+    save_fitnesses_to_file(experienced_fits, experienced_filename)
+    save_fitnesses_to_file(reference_fits, reference_filename)
+    save_corr_to_file(fitness_function, corr_filename)
 

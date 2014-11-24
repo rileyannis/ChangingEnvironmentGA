@@ -1,11 +1,15 @@
-vector:
-	python changing_environment_ga.py -c vector_config.ini -o test_data
+.PHONY: clean
+
+all: clean vector
+
+vector: 
+	python changing_environment_ga.py -c vector_config.ini -o default_data
 
 run:
-	python changing_environment_ga.py -c config.ini -o test_data
+	python changing_environment_ga.py -c config.ini -o default_data
 
 clean:
-	rm *~ *.pyc *.csv
+	-@rm -r *~ *.pyc *.csv default_data 2>/dev/null || true
 
 test:
 	python -m unittest discover
