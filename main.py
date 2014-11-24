@@ -162,8 +162,9 @@ def set_global_variables(config):
     elif ORG_TYPE == "vector":
         real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")
         range_minimum = config.getint("DEFAULT", "range_minimum")
+        real_value_vector_org.RANGE_MIN = range_minimum
         range_maximum = config.getint("DEFAULT", "range_maximum")
-        real_value_vector_org.RANGE = (range_minimum, range_maximum)
+        real_value_vector_org.RANGE_MAX = range_maximum
         mut_effect_size = config.getfloat("DEFAULT", "mutation_effect_size")
         ff.MUTATION_EFFECT_SIZE = mut_effect_size
         real_value_vector_org.MUTATION_EFFECT_SIZE = mut_effect_size

@@ -2,7 +2,8 @@ import random
 from fitness_function import Fitness_Function, sphere_function, MUTATION_EFFECT_SIZE
 
 LENGTH = None
-RANGE = None
+RANGE_MIN = None
+RANGE_MAX = None
 
 class RealValueVectorOrg(object):
     """
@@ -46,20 +47,26 @@ class RealValueVectorOrg(object):
 def get_mutated_genotype(genotype):
     "Mutates one locus in organism at random"
     mut_location = random.randrange(len(genotype))
-    mut_value = random.normalvariate(0, MUTATION_EFFECT_SIZE)
+    delta = random.normalvariate(0, MUTATION_EFFECT_SIZE)
+    mutant_value = genotype[mut_location] + delta
+
     mutant = genotype[:]
-    mutant[mut_location] += mut_value
-
-    #wraparound if range exceeded
-    if mutant[mut_location] < RANGE[0]: 
-        mutant[mut_location] = RANGE[1] + RANGE[0] - mutant[mut_location]
-    elif mutant[mut_location] > RANGE[1]:
-        mutant[mut_location] = RANGE[0] + mutant[mut_location] - RANGE[1]
-
+    mutant[mut_location] = wrap_around(mutant_value)            
     return mutant
+
+def wrap_around(value):
+    width = RANGE_MAX - RANGE_MIN
+    while value < RANGE_MIN or value > RANGE_MAX:
+        if value < RANGE_MIN:
+            value += width
+        else:
+            value -= width
+     
+    return value
+
 
 def create_random_genotype():
     genotype = []
     for _ in range(LENGTH):
-        genotype.append(random.uniform(RANGE[0], RANGE[1]))
+        genotype.append(random.uniform(RANGE_MIN, RANGE_MAX))
     return genotype
