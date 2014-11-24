@@ -141,12 +141,7 @@ def save_to_file(data):
         writer = csv.writer(f)
         writer.writerows(data)
 
-def init_output_file():
-    with open(OUTPUT_FILE, "wb+") as f:
-        pass
-
 def generate_data():
-    init_output_file()
     data = evolve_population()
     save_to_file(data)
 
