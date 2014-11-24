@@ -101,7 +101,7 @@ def evolve_population():
                                     stdev, best_fitness, best_org))
         if VERBOSE:
             print_status(gen, population)
-    return generations_average_fitness_list
+    return generations_average_fitness_list, fitness_function
 
 def get_average_fitness(pop):
     total = 0
@@ -138,15 +138,20 @@ def set_global_variables(args):
     VERBOSE = args.verbose
     
 
-def save_to_file(data):
+def save_fitnesses_to_file(data):
     "Data is a list of tuples to be saved to a csv file"
-    with open(OUTPUT_FILE, "wb") as f:
+    with open("fitnesses.csv", "wb") as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
+def save_corr_to_file(fitness_function):
+    with open("correlation.txt", "w") as f:
+        f.write(str(fitness_function.correlation()))
+
 def generate_data():
-    data = evolve_population()
-    save_to_file(data)
+    data, fitness_function = evolve_population()
+    save_fitnesses_to_file(data)
+    save_corr_to_file(fitness_function)
 
 if __name__ == "__main__":
     s = string_org.StringOrg("xxxxxx")
