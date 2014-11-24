@@ -11,6 +11,7 @@ import real_value_vector_org
 import scipy.stats as stats
 import fitness_function as ff
 from math import floor
+import os
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
@@ -133,6 +134,10 @@ def get_average_reference_fitness(pop):
     return total / len(pop)
 
 def set_global_variables(config):
+    global OUTPUT_FOLDER
+    OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
+    global CONFIG_FILE
+    CONFIG_FILE = config.get("DEFAULT", "config_file")
     global NUMBER_OF_ORGANISMS
     NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
     global MUTATION_RATE
@@ -154,8 +159,6 @@ def set_global_variables(config):
         mut_effect_size = config.getfloat("DEFAULT", "mutation_effect_size")
         ff.MUTATION_EFFECT_SIZE = mut_effect_size
         real_value_vector_org.MUTATION_EFFECT_SIZE = mut_effect_size
-    global OUTPUT_FOLDER
-    OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global ALTERNATE_ENVIRONMENT_CORR
     ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
         "DEFAULT", "alternate_environment_corr")
@@ -165,21 +168,24 @@ def set_global_variables(config):
 
 def save_fitnesses_to_file(data):
     "Data is a list of tuples to be saved to a csv file"
-    with open("fitnesses.csv", "wb") as f:
+    filename = os.path.join(OUTPUT_FOLDER, "fitness.csv")
+    with open(filename, "wb") as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
 def save_corr_to_file(fitness_function):
-    with open("correlation.txt", "w") as f:
+    filename = os.path.join(OUTPUT_FOLDER, "correlation.dat")
+    with open(filename, "w") as f:
         f.write(str(fitness_function.correlation()))
 
 def generate_data():
     data, fitness_function = evolve_population()
+    if os.path.exists(OUTPUT_FOLDER):
+        raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
+    os.mkdir(OUTPUT_FOLDER)
+    config_filename = os.path.basename(CONFIG_FILE)
+    config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
+    shutil.copyfile(CONFIG_FILE, config_dest)
     save_fitnesses_to_file(data)
     save_corr_to_file(fitness_function)
 
-if __name__ == "__main__":
-    s = string_org.StringOrg("xxxxxx")
-    print(s)
-    print(s.get_fitness())
-    print(s.get_mutant())

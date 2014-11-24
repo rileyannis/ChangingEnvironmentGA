@@ -11,10 +11,13 @@ def parse_everything():
     conf_parser.add_argument("-c", "--config_file", nargs=1)
     conf_parser.add_argument("-o", '--output_folder', nargs=1)
     args = conf_parser.parse_args()
+    output_folder = args.output_folder[0]
+    config_file = args.config_file[0]
 
     config = ConfigParser.SafeConfigParser()
-    config.read([args.config_file[0]])
-    config.set("DEFAULT", "output_folder", args.output_folder[0])
+    config.read([config_file])
+    config.set("DEFAULT", "config_file", config_file)
+    config.set("DEFAULT", "output_folder", output_folder)
     return config
 
 def main():
