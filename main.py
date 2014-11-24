@@ -23,14 +23,14 @@ TOURNAMENT_SIZE = None
 VERBOSE = False
 ALTERNATE_ENVIRONMENT_CORR = None
 
-def create_initial_population(environment=None):
+def create_initial_population():
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         if ORG_TYPE == "string":
-            population.append(string_org.StringOrg(environment))
+            population.append(string_org.StringOrg())
         elif ORG_TYPE == "vector":
             population.append(
-                real_value_vector_org.RealValueVectorOrg(environment))
+                real_value_vector_org.RealValueVectorOrg())
     return population
 
 
@@ -73,32 +73,41 @@ def print_status(generation, population, environment):
 def evolve_population(reference_environment, alternative_environment):
     """Currently only works for vector orgs."""    
     current_fitness_list = [("Generation", "Average_Fitness", 
-                    "Standard_Deviation", "Best_fitness", "Best_org")]
+                    "Standard_Deviation")]
+    current_fitness_best = [("Generation", "Best_fitness", "Best_org")]
+
     reference_fitness_list = current_fitness_list[:]
+    reference_fitness_best = current_fitness_best[:]
 
     current_environment = reference_environment
 
     start_of_trimester_2 = int(floor(NUMBER_OF_GENERATIONS/3.0))
     start_of_trimester_3 = int(floor(NUMBER_OF_GENERATIONS*2.0/3.0))
 
-    population = create_initial_population(reference_environment)
+    population = create_initial_population()
     for gen in range(NUMBER_OF_GENERATIONS):
         if gen == start_of_trimester_2:
             current_environment = alternative_environment
         elif gen == start_of_trimester_3:
             current_environment = reference_environment
         population = get_next_generation(population, current_environment)
-        average_fitness, best_org, best_fitness, stdev = get_generation_stats(
+
+        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
             population, current_environment)
-        current_fitness_list.append(
-            (gen, average_fitness, stdev, best_fitness, best_org))
-        average_fitness, best_org, best_fitness, stdev = get_generation_stats(
+        current_fitness_list.append((gen, average_fitness, stdev))
+        current_fitness_best.append((gen, best_fitness, best_org))
+
+        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
             population, reference_environment)
-        reference_fitness_list.append(
-            (gen, average_fitness, stdev, best_fitness, best_org))
+        reference_fitness_list.append((gen, average_fitness, stdev))
+        reference_fitness_best.append((gen, best_fitness, best_org))
+
         if VERBOSE:
             print_status(gen, population, current_environment)
-    return current_fitness_list, reference_fitness_list
+    
+    result =  (current_fitness_list, current_fitness_best, 
+               reference_fitness_list, reference_fitness_best)
+    return result
 
 def get_generation_stats(population, environment):
     average_fitness = get_average_fitness(population, environment)
@@ -106,7 +115,7 @@ def get_generation_stats(population, environment):
     best_fitness = best_org.fitness(environment)
     stdev = stats.tstd([org.fitness(environment) 
                         for org in population])
-    return average_fitness, best_org, best_fitness, stdev
+    return average_fitness, stdev, best_org, best_fitness
     
 
 def get_average_fitness(pop, environment):
@@ -149,10 +158,10 @@ def set_global_variables(config):
     ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
         "DEFAULT", "alternate_environment_corr")
     
-def save_fitnesses_to_file(fitnesses, filename):
+def save_table_to_file(table, filename):
     with open(filename, "wb") as f:
         writer = csv.writer(f)
-        writer.writerows(fitnesses)
+        writer.writerows(table)
 
 def save_corr_to_file(fitness_function, filename):
     with open(filename, "w") as f:
@@ -164,8 +173,9 @@ def generate_data():
     reference_environment  = fitness_function.fitness1_fitness
     alternative_environment  = fitness_function.fitness2_fitness
 
-    experienced_fits, reference_fits = evolve_population(
+    experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
+
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
     os.mkdir(OUTPUT_FOLDER)
@@ -177,10 +187,16 @@ def generate_data():
         OUTPUT_FOLDER, "experienced_fitnesses.csv")
     reference_filename = os.path.join(
         OUTPUT_FOLDER, "reference_fitnesses.csv")
+    experienced_best_filename = os.path.join(
+        OUTPUT_FOLDER, "experienced_best_fitnesses.csv")
+    reference_best_filename = os.path.join(
+        OUTPUT_FOLDER, "reference_best_fitnesses.csv")
     corr_filename = os.path.join(
         OUTPUT_FOLDER, "correlation.dat")
 
-    save_fitnesses_to_file(experienced_fits, experienced_filename)
-    save_fitnesses_to_file(reference_fits, reference_filename)
+    save_table_to_file(experienced_fits, experienced_filename)
+    save_table_to_file(reference_fits, reference_filename)
+    save_table_to_file(experienced_bests, experienced_best_filename)
+    save_table_to_file(reference_bests, reference_best_filename)
     save_corr_to_file(fitness_function, corr_filename)
 

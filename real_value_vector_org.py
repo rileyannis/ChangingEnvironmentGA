@@ -14,19 +14,12 @@ class RealValueVectorOrg(object):
     the length is determined at object creation
     """
 
-    def __init__(self, fitness_function=None, genotype=None, environment=None):
-        self.should_maximize_fitness = False
-        self.object_to_calculate_fitness = fitness_function
-
+    def __init__(self, genotype=None):
         if genotype is None:
             genotype = create_random_genotype()
         assert LENGTH == len(genotype)
         self.genotype = genotype
-        self.fitness_function = fitness_function
-        self.environment = environment
-
-    def get_fitness(self):
-        return self.object_to_calculate_fitness.evaluate(self.genotype)
+        self.environment = None
 
     def fitness(self, environment=None):
         if environment is None:
@@ -35,21 +28,14 @@ class RealValueVectorOrg(object):
             environment = self.environment
         return environment(self.genotype)
 
-    def get_reference_fitness(self):
-        return self.object_to_calculate_fitness.fitness1_fitness(self.genotype)
-
-    def get_alternate_fitness(self):
-        return self.object_to_calculate_fitness.fitness2_fitness(self.genotype)
-
     def get_mutant(self):
-        return RealValueVectorOrg(self.fitness_function,
-                                  get_mutated_genotype(self.genotype))
+        return RealValueVectorOrg(get_mutated_genotype(self.genotype))
 
     def get_clone(self):
-        return RealValueVectorOrg(self.fitness_function, self.genotype)
+        return RealValueVectorOrg(self.genotype)
 
     def __lt__(self, other):
-        if self.fitness(self.environment) < other.fitness(self.environment):
+        if self.fitness(self.environment) > other.fitness(self.environment):
             return True
         return self.genotype < other.genotype
 
@@ -79,9 +65,7 @@ def wrap_around(value):
             value += width
         else:
             value -= width
-     
     return value
-
 
 def create_random_genotype():
     genotype = []
