@@ -60,6 +60,7 @@ class Fitness_Function:
         self.arglen = arglen
         self.range_ = (-512, 512)
         self.flipped = False
+        self.corr = None
 
         def f1(vals):
             return self.func(vals, None)
@@ -78,6 +79,8 @@ class Fitness_Function:
         return self.fitness1(solution)
 
     def fitness2_fitness(self, solution):
+        if self.corr is None:
+            raise AssertionError("Need to initialize corr first")
         if self.fitness2 != None:
             return self.fitness2(solution)
         else:
