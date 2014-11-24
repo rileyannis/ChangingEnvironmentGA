@@ -52,30 +52,18 @@ def get_selected_population_soft(population):
         new_population.append(get_best_organism(orgs))
     return new_population
 
-def get_best_organism(pop):
+def get_best_organism(pop, reference=False):
     best_fitness = -1
     if not pop[0].should_maximize_fitness:
         best_fitness = float("inf")
     best_org = None
     for org in pop:
-        if (org.should_maximize_fitness and org.get_fitness() > best_fitness) \
+        fitness = org.get_reference_fitness() if reference else org.get_fitness()
+        if (org.should_maximize_fitness and fitness > best_fitness) \
                      or (not org.should_maximize_fitness and \
-                     org.get_fitness() < best_fitness):
+                     fitness < best_fitness):
             best_org = org
-            best_fitness = org.get_fitness()
-    return best_org
-
-def get_best_reference_organism(pop):
-    best_fitness = -1
-    if not pop[0].should_maximize_fitness:
-        best_fitness = float("inf")
-    best_org = None
-    for org in pop:
-        if (org.should_maximize_fitness and org.get_reference_fitness() > best_fitness) \
-                     or (not org.should_maximize_fitness and \
-                     org.get_reference_fitness() < best_fitness):
-            best_org = org
-            best_fitness = org.get_reference_fitness()
+            best_fitness = fitness
     return best_org
 
 def get_better_organism(org1, org2):
@@ -115,7 +103,7 @@ def evolve_population():
 
         reference_list = generations_average_fitness_list[:]
         average_reference_fitness = get_average_reference_fitness(population)
-        best_reference_org = get_best_reference_organism(population)
+        best_reference_org = get_best_organism(population, reference=True)
         best_reference_fitness = best_reference_org.get_reference_fitness()
         stdev_reference = stats.tstd([org.get_reference_fitness() for org in population])
         reference_list.append((gen, average_reference_fitness, \
