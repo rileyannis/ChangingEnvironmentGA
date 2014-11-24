@@ -157,7 +157,7 @@ def set_global_variables(config):
     global OUTPUT_FOLDER
     OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global ALTERNATE_ENVIRONMENT_CORR
-    ALTERNATE_ENVIRONMENT_CORR = config.get(
+    ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
         "DEFAULT", "alternate_environment_corr")
     global VERBOSE
     VERBOSE = config.getboolean("DEFAULT", "verbose")
