@@ -50,16 +50,6 @@ def get_selected_population_soft(population):
         new_population.append(get_best_organism(orgs))
     return new_population
 
-def get_selected_population(pop):
-    """
-    fix me!!!!!!
-    """
-    best_org = get_best_organism(pop)
-    new_population = [best_org]
-    while len(new_population) < NUMBER_OF_ORGANISMS:
-        new_population.append(best_org.get_mutant())
-    return new_population
-
 def get_best_organism(pop):
     best_fitness = -1
     if not pop[0].should_maximize_fitness:
@@ -91,6 +81,7 @@ def print_status(generation, population):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population():
+    """Currently only works for vector orgs."""
     fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
     generations_average_fitness_list = [("Generation", "Average_Fitness", \
                     "Standard_Deviation", "Best_fitness", "Best_org")]
