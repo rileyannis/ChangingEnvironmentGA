@@ -65,7 +65,6 @@ class Fitness_Function:
         def f1(vals):
             return self.func(vals, None)
         self.fitness1 = f1
-        self.sd = self.sd()
 
     def set_flipped(self, value):
         self.flipped = value
@@ -79,12 +78,9 @@ class Fitness_Function:
         return self.fitness1(solution)
 
     def fitness2_fitness(self, solution):
-        if self.corr is None:
-            raise AssertionError("Need to initialize corr first")
-        if self.fitness2 != None:
-            return self.fitness2(solution)
-        else:
-            return None
+        if self.fitness2 is None:
+            raise AssertionError("Need to initialize fitness2 first")
+        return self.fitness2(solution)
 
     def correlation(self, samples=100):
         vals1 = []
@@ -205,7 +201,7 @@ class Fitness_Function:
         self.set_mods_dict()
         fitness2 = self.create_alternate_fitness_function()
         if corr < 0:
-            self.fitness2 = self.invert(fitness2)
+            fitness2 = self.invert(fitness2)
         self.fitness2 = fitness2
 
     def create_alternate_fitness_function(self):
