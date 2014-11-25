@@ -13,6 +13,7 @@ import fitness_function as ff
 from math import floor
 import os
 import shutil
+import datetime
 
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
@@ -22,6 +23,7 @@ ORG_TYPE = None
 TOURNAMENT_SIZE = None
 VERBOSE = False
 ALTERNATE_ENVIRONMENT_CORR = None
+START_TIME = None
 
 def create_initial_population():
     population = []
@@ -130,6 +132,8 @@ def set_global_variables(config):
     OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global CONFIG_FILE
     CONFIG_FILE = config.get("DEFAULT", "config_file")
+    global START_TIME
+    START_TIME = config.getfloat("DEFAULT", "start_time")
     global VERBOSE
     VERBOSE = config.getboolean("DEFAULT", "verbose")
     global NUMBER_OF_ORGANISMS
@@ -163,9 +167,9 @@ def save_table_to_file(table, filename):
         writer = csv.writer(f)
         writer.writerows(table)
 
-def save_corr_to_file(fitness_function, filename):
+def save_string_to_file(string, filename):
     with open(filename, "w") as f:
-        f.write(str(fitness_function.correlation()))
+        f.write(string)
 
 def generate_data():
     fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
@@ -180,23 +184,28 @@ def generate_data():
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
     os.mkdir(OUTPUT_FOLDER)
     config_filename = os.path.basename(CONFIG_FILE)
+
+    def join_path(filename):
+        return os.path.join(OUTPUT_FOLDER, filename)
+
     config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
     shutil.copyfile(CONFIG_FILE, config_dest)
     
-    experienced_filename = os.path.join(
-        OUTPUT_FOLDER, "experienced_fitnesses.csv")
-    reference_filename = os.path.join(
-        OUTPUT_FOLDER, "reference_fitnesses.csv")
-    experienced_best_filename = os.path.join(
-        OUTPUT_FOLDER, "experienced_best_fitnesses.csv")
-    reference_best_filename = os.path.join(
-        OUTPUT_FOLDER, "reference_best_fitnesses.csv")
-    corr_filename = os.path.join(
-        OUTPUT_FOLDER, "correlation.dat")
+    experienced_filename = join_path("experienced_fitnesses.csv")
+    reference_filename = join_path("reference_fitnesses.csv")
+    experienced_best_filename = join_path("experienced_best_fitnesses.csv")
+    reference_best_filename = join_path("reference_best_fitnesses.csv")
+    corr_filename = join_path("correlation.dat")
+    time_filename = join_path("time.dat")
 
     save_table_to_file(experienced_fits, experienced_filename)
     save_table_to_file(reference_fits, reference_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
     save_table_to_file(reference_bests, reference_best_filename)
-    save_corr_to_file(fitness_function, corr_filename)
+    save_string_to_file(str(fitness_function.correlation()), corr_filename)
 
+    start_time = datetime.datetime.fromtimestamp(START_TIME)
+    end_time = datetime.datetime.now()
+    time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
+    save_string_to_file(time_str, time_filename)
+    
