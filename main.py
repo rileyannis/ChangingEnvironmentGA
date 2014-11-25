@@ -15,6 +15,7 @@ import os
 import shutil
 import datetime
 
+FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
 MUTATION_RATE = None
 NUMBER_OF_GENERATIONS = None
@@ -58,9 +59,11 @@ def get_best_organism(pop, environment):
     for org in pop:
         old_environment = org.environment
         org.environment = environment
+        best_org.environment = environment
         if org > best_org:
             best_org = org
         org.environment = old_environment
+        best_org.environment = old_environment
     return best_org
 
 def get_next_generation(population, environment):
@@ -150,6 +153,14 @@ def set_global_variables(config):
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
     elif ORG_TYPE == "vector":
+        fitness_function_type_str = config.get("DEFAULT", "fitness_function_type")
+        global FITNESS_FUNCTION_TYPE
+        if fitness_function_type_str == "sphere":
+            FITNESS_FUNCTION_TYPE = ff.sphere_function
+        elif fitness_function_type_str == "rosenbrock":
+            FITNESS_FUNCTION_TYPE = ff.rosenbrock_function
+        else:
+            raise AssertionError("Unknown (but needed) function type (i.e. sphere)")
         real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")
         range_minimum = config.getint("DEFAULT", "range_minimum")
         real_value_vector_org.RANGE_MIN = range_minimum
@@ -172,7 +183,7 @@ def save_string_to_file(string, filename):
         f.write(string)
 
 def generate_data():
-    fitness_function = ff.Fitness_Function(ff.sphere_function, 0, real_value_vector_org.LENGTH)
+    fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
     fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
     reference_environment  = fitness_function.fitness1_fitness
     alternative_environment  = fitness_function.fitness2_fitness
