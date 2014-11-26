@@ -193,7 +193,7 @@ def generate_data():
 
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
-    os.mkdir(OUTPUT_FOLDER)
+    os.makedirs(OUTPUT_FOLDER)
     config_filename = os.path.basename(CONFIG_FILE)
 
     def join_path(filename):
