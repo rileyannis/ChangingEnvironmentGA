@@ -50,7 +50,7 @@ if __name__ == "__main__":
     config_files = []
 
     for function_type, alt_corr in itertools.product(function_types, alt_corrs):
-        config_filename = "{}_{}.ini".format(function_type, alt_corr)
+        config_filename = "{0}_{1}.ini".format(function_type, alt_corr)
         contents = config_common.format(function_type, alt_corr)
         write_to_file(config_filename, contents)
         config_files.append(config_filename)
