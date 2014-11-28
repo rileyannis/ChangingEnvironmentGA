@@ -10,7 +10,7 @@ def convert_config_file_name_to_job(file_name, output_dir_base):
 common = """
 #!/bin/bash -login
 
-#PBS -l walltime=00:00:30
+#PBS -l walltime=02:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=1gb
 #PBS -N changing_environment_test
@@ -28,7 +28,7 @@ config_common = """
 fitness_function_type = {0}
 number_of_organisms = 500
 mutation_rate = 0.20
-number_of_generations = 2000
+number_of_generations = {2}
 org_type = vector
 length = 20
 range_minimum = -512
@@ -40,7 +40,7 @@ verbose = False
 """
 alt_corrs = [-1, -0.5, 0, 0.5, 1]
 function_types = ["sphere", "rosenbrock"]
-
+num_gens = [40000]
 def write_to_file(filename, contents):
     with open(filename, "w") as file_handle:
         file_handle.write(contents)
@@ -49,13 +49,13 @@ def write_to_file(filename, contents):
 if __name__ == "__main__":
     config_files = []
 
-    for function_type, alt_corr in itertools.product(function_types, alt_corrs):
-        config_filename = "{0}_{1}.ini".format(function_type, alt_corr)
-        contents = config_common.format(function_type, alt_corr)
+    for function_type, alt_corr, gen in itertools.product(function_types, alt_corrs, num_gens):
+        config_filename = "{0}_{1}_{2}gen.ini".format(function_type, alt_corr, gen)
+        contents = config_common.format(function_type, alt_corr, gen)
         write_to_file(config_filename, contents)
         config_files.append(config_filename)
 
-    output_dir_base = "junkdata1"
+    output_dir_base = "longer_run"
     jobs = [convert_config_file_name_to_job(name, output_dir_base) for name in config_files]
 
 
