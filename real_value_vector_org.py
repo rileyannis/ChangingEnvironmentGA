@@ -48,6 +48,10 @@ class RealValueVectorOrg(object):
     def __repr__(self):
         return str(self)
 
+    def is_better_than(self, other, environment):
+        return self.fitness(environment) < other.fitness(environment)
+
+
 def _get_mutated_genotype(genotype, effect_size):
     "Mutates one locus in organism at random"
     mut_location = random.randrange(len(genotype))

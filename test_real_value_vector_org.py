@@ -50,6 +50,12 @@ class TestRealValueVectorOrg(unittest.TestCase):
         org2 = org1.get_clone()
         self.assertNotEqual(org1, org2)
 
+    def test_is_better_than(self):
+        org1 = rvvo.RealValueVectorOrg([0,0])        
+        org2 = rvvo.RealValueVectorOrg([0,1])
+        self.assertTrue(org1.is_better_than(org2, sum))
+        self.assertFalse(org2.is_better_than(org1, sum))
+
 class TestRealValueVectorOrgFunctions(unittest.TestCase):
     """Testing the internal functions of the module."""
 
