@@ -1,10 +1,9 @@
 import random
-from fitness_function import Fitness_Function, sphere_function, MUTATION_EFFECT_SIZE
-from functools import total_ordering
 
 LENGTH = None
 RANGE_MIN = None
 RANGE_MAX = None
+MUTATION_EFFECT_SIZE = None
 
 class RealValueVectorOrg(object):
     """
@@ -16,13 +15,13 @@ class RealValueVectorOrg(object):
     def __init__(self, genotype=None):
         if genotype is None:
             genotype = _create_random_genotype()
-        assert LENGTH == len(genotype)
         self.genotype = genotype
 
     def fitness(self, environment):
         return environment(self.genotype)
 
     def get_mutant(self):
+        
         return RealValueVectorOrg(_get_mutated_genotype(self.genotype, MUTATION_EFFECT_SIZE))
 
     def get_clone(self):

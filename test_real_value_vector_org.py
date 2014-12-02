@@ -8,7 +8,7 @@ class TestRealValueVectorOrg(unittest.TestCase):
         rvvo.LENGTH = 2
         rvvo.RANGE_MIN = -2
         rvvo.RANGE_MAX = 2
-        
+        rvvo.MUTATION_EFFECT_SIZE = 10
 
     def test_init(self):
         org = rvvo.RealValueVectorOrg()
@@ -47,7 +47,7 @@ class TestRealValueVectorOrg(unittest.TestCase):
 
     def test_get_mutant(self):
         org1 = rvvo.RealValueVectorOrg([0,0])
-        org2 = org1.get_clone()
+        org2 = org1.get_mutant()
         self.assertNotEqual(org1, org2)
 
     def test_is_better_than(self):
