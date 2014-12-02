@@ -6,7 +6,6 @@ LENGTH = None
 RANGE_MIN = None
 RANGE_MAX = None
 
-@total_ordering
 class RealValueVectorOrg(object):
     """
     this is a class that represents organisms as a real value vector
@@ -19,13 +18,8 @@ class RealValueVectorOrg(object):
             genotype = _create_random_genotype()
         assert LENGTH == len(genotype)
         self.genotype = genotype
-        self.environment = None
 
-    def fitness(self, environment=None):
-        if environment is None:
-            if self.environment is None:
-                raise AssertionError("Can't call fitness unless you set an environment")
-            environment = self.environment
+    def fitness(self, environment):
         return environment(self.genotype)
 
     def get_mutant(self):
@@ -33,11 +27,6 @@ class RealValueVectorOrg(object):
 
     def get_clone(self):
         return RealValueVectorOrg(self.genotype)
-
-    def __lt__(self, other):
-        if self.fitness(self.environment) > other.fitness(self.environment):
-            return True
-        return self.genotype < other.genotype
 
     def __eq__(self, other):
         return self.genotype == other.genotype

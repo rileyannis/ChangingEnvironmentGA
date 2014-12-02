@@ -57,13 +57,8 @@ def get_selected_population_soft(population, environment):
 def get_best_organism(pop, environment):
     best_org = pop[0]
     for org in pop:
-        old_environment = org.environment
-        org.environment = environment
-        best_org.environment = environment
-        if org > best_org:
+        if org.is_better_than(best_org, environment):
             best_org = org
-        org.environment = old_environment
-        best_org.environment = old_environment
     return best_org
 
 def get_next_generation(population, environment):
