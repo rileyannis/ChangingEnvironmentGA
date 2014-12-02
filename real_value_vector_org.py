@@ -16,7 +16,7 @@ class RealValueVectorOrg(object):
 
     def __init__(self, genotype=None):
         if genotype is None:
-            genotype = create_random_genotype()
+            genotype = _create_random_genotype()
         assert LENGTH == len(genotype)
         self.genotype = genotype
         self.environment = None
@@ -29,7 +29,7 @@ class RealValueVectorOrg(object):
         return environment(self.genotype)
 
     def get_mutant(self):
-        return RealValueVectorOrg(get_mutated_genotype(self.genotype))
+        return RealValueVectorOrg(_get_mutated_genotype(self.genotype, MUTATION_EFFECT_SIZE))
 
     def get_clone(self):
         return RealValueVectorOrg(self.genotype)
@@ -48,26 +48,26 @@ class RealValueVectorOrg(object):
     def __repr__(self):
         return str(self)
 
-def get_mutated_genotype(genotype):
+def _get_mutated_genotype(genotype, effect_size):
     "Mutates one locus in organism at random"
     mut_location = random.randrange(len(genotype))
-    delta = random.normalvariate(0, MUTATION_EFFECT_SIZE)
+    delta = random.normalvariate(0, effect_size)
     mutant_value = genotype[mut_location] + delta
 
     mutant = genotype[:]
-    mutant[mut_location] = wrap_around(mutant_value)            
+    mutant[mut_location] = _wrap_around(mutant_value, RANGE_MIN, RANGE_MAX)            
     return mutant
 
-def wrap_around(value):
-    width = RANGE_MAX - RANGE_MIN
-    while value < RANGE_MIN or value > RANGE_MAX:
-        if value < RANGE_MIN:
+def _wrap_around(value, min_, max_):
+    width = max_ - min_
+    while value < min_ or value > max_:
+        if value < min_:
             value += width
         else:
             value -= width
     return value
 
-def create_random_genotype():
+def _create_random_genotype():
     genotype = []
     for _ in range(LENGTH):
         genotype.append(random.uniform(RANGE_MIN, RANGE_MAX))
