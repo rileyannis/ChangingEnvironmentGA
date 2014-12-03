@@ -19,3 +19,4 @@ test:
 
 coverage: .coverage
 	coverage report -m
+	rm .coverage

@@ -30,6 +30,9 @@ class RealValueVectorOrg(object):
     def __eq__(self, other):
         return self.genotype == other.genotype
 
+    def __ne__(self, other):
+        return not self == other
+
     def __str__(self):
         return "RealValueVectorOrg({})".format(self.genotype)
 

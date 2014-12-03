@@ -23,15 +23,14 @@ class StringOrg(object):
     def get_mutant(self):
         return StringOrg(_get_mutated_genotype(self.genotype))
 
-    def __str__(self):
-        print("in str, genotype is", self.genotype)
-        return "StringOrg(\"{}\")".format(self.genotype)
-
     def __eq__(self, other):
         return self.genotype == other.genotype
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return not self == other
+
+    def __str__(self):
+        return "StringOrg(\"{}\")".format(self.genotype)
 
     def __repr__(self):
         return str(self)

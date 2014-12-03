@@ -30,12 +30,12 @@ class TestStringOrg(unittest.TestCase):
     def test_eq_true(self):
         org1 = so.StringOrg("AA")
         org2 = so.StringOrg("AA")
-        self.assertEqual(org1, org2)
+        self.assertTrue(org1 == org2)
 
     def test_eq_false(self):
         org1 = so.StringOrg("AA")
         org2 = so.StringOrg("BB")
-        self.assertNotEqual(org1, org2)
+        self.assertFalse(org1 == org2)
 
     def test_get_clone(self):
         org1 = so.StringOrg("AA")
@@ -46,6 +46,18 @@ class TestStringOrg(unittest.TestCase):
         org1 = so.StringOrg("AA")
         org2 = org1.get_mutant()
         self.assertNotEqual(org1, org2)
+
+    def test_str(self):
+        org1 = so.StringOrg("CC")
+        org2 = so.StringOrg("AA")
+        self.assertIs(type(str(org1)), type("CC"))
+        self.assertNotEqual(str(org1), str(org2))
+
+    def test_repr(self):
+        org1 = so.StringOrg("CC")
+        org2 = so.StringOrg("AA")
+        self.assertIs(type(repr(org1)), type("CC"))
+        self.assertNotEqual(repr(org1), repr(org2))
 
     def test_is_better_than(self):
         org1 = so.StringOrg("CC")
@@ -105,7 +117,3 @@ class StringOrgFunctions(unittest.TestCase):
     def test_default_environment_best(self):
         org = so.StringOrg("CC")
         self.assertEqual(so.default_environment(org.genotype), len(so.TARGET_STRING))
-
-
-if __name__ == "__main__":
-    unittest.main()

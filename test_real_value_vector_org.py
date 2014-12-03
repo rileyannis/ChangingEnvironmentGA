@@ -40,6 +40,19 @@ class TestRealValueVectorOrg(unittest.TestCase):
         org2 = rvvo.RealValueVectorOrg([0,1])
         self.assertNotEqual(org1, org2)
 
+    def test_str(self):
+        org1 = rvvo.RealValueVectorOrg([0,0])        
+        org2 = rvvo.RealValueVectorOrg([0,1])
+        self.assertIs(type(str(org1)), str)
+        self.assertNotEqual(str(org1), str(org2))
+
+    def test_repr(self):
+        org1 = rvvo.RealValueVectorOrg([0,0])        
+        org2 = rvvo.RealValueVectorOrg([0,1])
+        self.assertIs(type(repr(org1)), str)
+        self.assertNotEqual(repr(org1), repr(org2))
+
+
     def test_get_clone(self):
         org1 = rvvo.RealValueVectorOrg([0,0])
         org2 = org1.get_clone()
@@ -75,6 +88,3 @@ class TestRealValueVectorOrgFunctions(unittest.TestCase):
     def test_create_random_genotype(self):
         genotype = rvvo._create_random_genotype()
         self.assertEqual(rvvo.LENGTH, len(genotype))
-
-if __name__ == "__main__":
-    unittest.main()
