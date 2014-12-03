@@ -17,7 +17,7 @@ class StringOrg(object):
         assert len(genotype) == len(TARGET_STRING)
         self.genotype = genotype
 
-    def get_fitness(self, environment):
+    def fitness(self, environment):
         return environment(self.genotype)
 
     def get_mutant(self):
@@ -39,7 +39,7 @@ class StringOrg(object):
         return StringOrg(self.genotype)
 
     def is_better_than(self, other, environment):
-        return self.get_fitness(environment) > other.get_fitness(environment)
+        return self.fitness(environment) > other.fitness(environment)
 
 def _get_mutated_genotype(genotype):
     "Mutates one character in organism at random"

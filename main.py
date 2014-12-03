@@ -211,7 +211,8 @@ def generate_data():
     save_table_to_file(reference_fits, reference_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
     save_table_to_file(reference_bests, reference_best_filename)
-    save_string_to_file(str(fitness_function.correlation()), corr_filename)
+    if ORG_TYPE == "vector":
+        save_string_to_file(str(fitness_function.correlation()), corr_filename)
 
     start_time = datetime.datetime.fromtimestamp(START_TIME)
     end_time = datetime.datetime.now()
