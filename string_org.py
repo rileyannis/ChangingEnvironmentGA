@@ -57,6 +57,9 @@ def default_environment(genotype):
             matches += 1
     return matches
 
+def hash_environment(genotype):
+    return hash(genotype)
+
 def _create_random_genotype():
     genotype = []
     for _ in range(len(TARGET_STRING)):

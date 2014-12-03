@@ -117,3 +117,7 @@ class StringOrgFunctions(unittest.TestCase):
     def test_default_environment_best(self):
         org = so.StringOrg("CC")
         self.assertEqual(so.default_environment(org.genotype), len(so.TARGET_STRING))
+
+    def test_hash_environment(self):
+        org = so.StringOrg("AA")
+        self.assertIs(type(so.hash_environment(org.genotype)), int)

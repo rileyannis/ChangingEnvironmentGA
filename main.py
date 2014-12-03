@@ -71,7 +71,6 @@ def print_status(generation, population, environment):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population(reference_environment, alternative_environment):
-    """Currently only works for vector orgs."""    
     current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation")]
     current_fitness_best = [("Generation", "Best_fitness", "Best_org")]
@@ -178,10 +177,14 @@ def save_string_to_file(string, filename):
         f.write(string)
 
 def generate_data():
-    fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
-    fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
-    reference_environment  = fitness_function.fitness1_fitness
-    alternative_environment  = fitness_function.fitness2_fitness
+    if ORG_TYPE == "vector":
+        fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
+        fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
+        reference_environment  = fitness_function.fitness1_fitness
+        alternative_environment  = fitness_function.fitness2_fitness
+    elif ORG_TYPE == "string":
+        reference_environment  = string_org.default_environment
+        alternative_environment  = string_org.hash_environment
 
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
