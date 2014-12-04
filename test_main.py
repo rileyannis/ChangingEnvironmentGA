@@ -30,7 +30,6 @@ class TestMain(unittest.TestCase):
         new_pop = main.get_mutated_population(pop)
         self.assertNotEqual(pop, new_pop)
         self.assertEqual(len(pop), len(new_pop))
-        main.MUTATION_RATE = .1
 
     def test_get_mutated_population_no_mutation(self):
         pop = main.create_initial_population()
@@ -38,12 +37,13 @@ class TestMain(unittest.TestCase):
         new_pop = main.get_mutated_population(pop)
         self.assertEqual(pop, new_pop)
         self.assertEqual(len(pop), len(new_pop))
-        main.MUTATION_RATE = .1
 
-    def test_get_selected_population_soft(self):
+    def test_get_selected_population(self):
         environment = so.default_environment
         pop = main.create_initial_population()
-        new_pop = main.get_selected_population_soft(pop, environment)
+        new_pop = main.get_selected_population(pop, environment)
+        for org in new_pop:
+            self.assertIn(org, pop)
         self.assertEqual(len(pop), len(new_pop))
 
     def test_get_best_organism(self):
@@ -51,8 +51,22 @@ class TestMain(unittest.TestCase):
         pop = main.create_initial_population()
         best_org = main.get_best_organism(pop, environment)
         self.assertIs(type(best_org), so.StringOrg)
+        for org in pop:
+            self.assertFalse(org.is_better_than(best_org, environment))
 
-#    def test_get_next_generation(self):
-#        environment = so.default_environment
-#        pop = main.create_initial_population()
-#        new_pop = main.get_next_generation()
+    def test_get_next_generation_max_mutation(self):
+        environment = so.default_environment
+        pop = main.create_initial_population()
+        main.MUTATION_RATE = 1
+        new_pop = main.get_next_generation(pop, environment)
+        self.assertNotEqual(pop, new_pop)
+        self.assertEqual(len(pop), len(new_pop))
+
+    def test_get_next_generation_no_mutation(self):
+        environment = so.default_environment
+        pop = main.create_initial_population()
+        main.MUTATION_RATE = 0
+        new_pop = main.get_next_generation(pop, environment)
+        for org in new_pop:
+            self.assertIn(org, pop)
+        self.assertEqual(len(pop), len(new_pop))

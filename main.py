@@ -47,7 +47,7 @@ def get_mutated_population(population):
             new_population.append(org)
     return new_population
 
-def get_selected_population_soft(population, environment):
+def get_selected_population(population, environment):
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         orgs = [random.choice(population) for _ in range(TOURNAMENT_SIZE)]
@@ -63,7 +63,7 @@ def get_best_organism(pop, environment):
 
 def get_next_generation(population, environment):
     new_population = get_mutated_population(population)
-    new_new_population = get_selected_population_soft(new_population, environment)
+    new_new_population = get_selected_population(new_population, environment)
     return new_new_population
 
 def print_status(generation, population, environment):
