@@ -2,9 +2,11 @@ import csv
 import os
 import pandas as pd
 import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-import scipy.stats as stats
+#import scipy.stats as stats
 
 def main():
     test_dir = "first_pass"
@@ -63,7 +65,8 @@ def plot_aggregate_over_time(data, directory="."):
         #stdevs = []
 
         for i in range(len(series[0])):
-            averages.append(stats.tmean([np.log(s[i]) for s in series]))
+            logs = [np.log(s[i]) for s in series]
+            averages.append(sum(logs)/float(len(logs)))
         lines[config] = Line2D(data[config]["1"]["average_reference"]["Generation"], averages)
     
         x = data[config]["1"]["average_reference"]["Generation"]
@@ -79,7 +82,7 @@ def plot_average_final_fitness(data, directory="."):
     finals = []
     
     for config in data:
-        if "sphere" not in config:
+        if "sphere" in config:
             for run in data[config]:
                 corrs.append(data[config][run]["correlation"])
                 finals.append(float(data[config][run]["average_reference"]["Average_Fitness"][-1:]))
