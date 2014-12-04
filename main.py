@@ -47,7 +47,7 @@ def get_mutated_population(population):
             new_population.append(org)
     return new_population
 
-def get_selected_population_soft(population, environment):
+def get_selected_population(population, environment):
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         orgs = [random.choice(population) for _ in range(TOURNAMENT_SIZE)]
@@ -57,18 +57,13 @@ def get_selected_population_soft(population, environment):
 def get_best_organism(pop, environment):
     best_org = pop[0]
     for org in pop:
-        old_environment = org.environment
-        org.environment = environment
-        best_org.environment = environment
-        if org > best_org:
+        if org.is_better_than(best_org, environment):
             best_org = org
-        org.environment = old_environment
-        best_org.environment = old_environment
     return best_org
 
 def get_next_generation(population, environment):
     new_population = get_mutated_population(population)
-    new_new_population = get_selected_population_soft(new_population, environment)
+    new_new_population = get_selected_population(new_population, environment)
     return new_new_population
 
 def print_status(generation, population, environment):
@@ -76,7 +71,6 @@ def print_status(generation, population, environment):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population(reference_environment, alternative_environment):
-    """Currently only works for vector orgs."""    
     current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation")]
     current_fitness_best = [("Generation", "Best_fitness", "Best_org")]
@@ -183,10 +177,14 @@ def save_string_to_file(string, filename):
         f.write(string)
 
 def generate_data():
-    fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
-    fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
-    reference_environment  = fitness_function.fitness1_fitness
-    alternative_environment  = fitness_function.fitness2_fitness
+    if ORG_TYPE == "vector":
+        fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
+        fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
+        reference_environment  = fitness_function.fitness1_fitness
+        alternative_environment  = fitness_function.fitness2_fitness
+    elif ORG_TYPE == "string":
+        reference_environment  = string_org.default_environment
+        alternative_environment  = string_org.hash_environment
 
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
@@ -213,7 +211,8 @@ def generate_data():
     save_table_to_file(reference_fits, reference_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
     save_table_to_file(reference_bests, reference_best_filename)
-    save_string_to_file(str(fitness_function.correlation()), corr_filename)
+    if ORG_TYPE == "vector":
+        save_string_to_file(str(fitness_function.correlation()), corr_filename)
 
     start_time = datetime.datetime.fromtimestamp(START_TIME)
     end_time = datetime.datetime.now()
