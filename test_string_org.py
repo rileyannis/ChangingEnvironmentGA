@@ -24,7 +24,7 @@ class TestStringOrg(unittest.TestCase):
 
     def test_fitness(self):
         org = so.StringOrg("AA")
-        fitness = org.get_fitness(so.default_environment)
+        fitness = org.fitness(so.default_environment)
         self.assertEqual(fitness, 0)
 
     def test_eq_true(self):
@@ -67,26 +67,26 @@ class TestStringOrg(unittest.TestCase):
 
     def test_get_fitness_perfect(self):
         org = so.StringOrg(so.TARGET_STRING)
-        fitness = org.get_fitness(so.default_environment)
+        fitness = org.fitness(so.default_environment)
         self.assertEqual(fitness, len(so.TARGET_STRING))
 
     def test_get_fitness_worst(self):
         terrible_org_genotype = "0" * len(so.TARGET_STRING)
         org = so.StringOrg(terrible_org_genotype)
-        fitness = org.get_fitness(so.default_environment)
+        fitness = org.fitness(so.default_environment)
         self.assertEqual(fitness, 0)
 
     def test_get_fitness_one_off(self):
         one_off_genotype = so.TARGET_STRING[:-1] + "0"
         org = so.StringOrg(one_off_genotype)
-        fitness = org.get_fitness(so.default_environment)
+        fitness = org.fitness(so.default_environment)
         self.assertEqual(fitness, len(so.TARGET_STRING) - 1)
 
     def test_get_mutated_organism(self):
         org = so.StringOrg()
         mutated_org = org.get_mutant()
-        fit = org.get_fitness(so.default_environment)
-        fit_mutated = mutated_org.get_fitness(so.default_environment)
+        fit = org.fitness(so.default_environment)
+        fit_mutated = mutated_org.fitness(so.default_environment)
         fit_difference = abs(fit - fit_mutated)
         self.assertLessEqual(fit_difference, 1)
 
