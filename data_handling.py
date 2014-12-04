@@ -9,7 +9,7 @@ from matplotlib.lines import Line2D
 #import scipy.stats as stats
 
 def main():
-    test_dir = "first_pass"
+    test_dir = "longer_run_many"
     data = get_data(test_dir)
     plot_aggregate_over_time(data)
     #plot_average_final_fitness(data, test_dir)
@@ -55,7 +55,7 @@ def plot_aggregate_over_time(data, directory="."):
     plt.clf()
     lines = {}
     for config in data:
-        if "rosen" not in config:
+        if "rosen" in config:
             continue
         series = []
         for run in data[config]:
@@ -65,7 +65,7 @@ def plot_aggregate_over_time(data, directory="."):
         #stdevs = []
 
         for i in range(len(series[0])):
-            logs = [np.log(s[i]) for s in series]
+            logs = [s[i] for s in series]
             averages.append(sum(logs)/float(len(logs)))
         lines[config] = Line2D(data[config]["1"]["average_reference"]["Generation"], averages)
     
@@ -75,7 +75,7 @@ def plot_aggregate_over_time(data, directory="."):
     plt.xlabel("Generation")
     plt.ylabel("Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/runs_over_time.png")
+    plt.savefig(directory+"/runs_over_time_sphere_2500gen_notlog.png")
 
 def plot_average_final_fitness(data, directory="."):
     corrs = []
