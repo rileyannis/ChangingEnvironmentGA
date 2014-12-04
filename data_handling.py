@@ -2,12 +2,14 @@ import csv
 import os
 import pandas as pd
 import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-import scipy.stats as stats
+#import scipy.stats as stats
 
 def main():
-    test_dir = "first_pass"
+    test_dir = "longer_run_many"
     data = get_data(test_dir)
     plot_aggregate_over_time(data)
     #plot_average_final_fitness(data, test_dir)
@@ -53,7 +55,7 @@ def plot_aggregate_over_time(data, directory="."):
     plt.clf()
     lines = {}
     for config in data:
-        if "sphere" not in config:
+        if "sphere" in config:
             continue
         series = []
         for run in data[config]:
@@ -63,14 +65,15 @@ def plot_aggregate_over_time(data, directory="."):
         #stdevs = []
 
         for i in range(len(series[0])):
-            averages.append(stats.tmean([np.log(s[i]) for s in series]))
+            logs = [np.log(s[i]) for s in series]
+            averages.append(sum(logs)/float(len(logs)))
         lines[config] = Line2D(data[config]["1"]["average_reference"]["Generation"], averages)
     
         x = data[config]["1"]["average_reference"]["Generation"]
         plt.plot(x, averages, hold=True, label=config)
-    plt.legend(loc="lower left")
+    plt.legend(loc="upper left")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/runs_over_time.png")
+    plt.savefig(directory+"/runs_over_time_rosenberg.png")
 
 def plot_average_final_fitness(data, directory="."):
     corrs = []
@@ -84,6 +87,8 @@ def plot_average_final_fitness(data, directory="."):
                 finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
     
     plt.plot(corrs, np.log(finals), ".")
+    plt.xlabel("Generation")
+    plt.label("Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter.png")
 
 if __name__ == "__main__":
