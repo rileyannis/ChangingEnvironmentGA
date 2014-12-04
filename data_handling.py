@@ -53,7 +53,7 @@ def plot_aggregate_over_time(data, directory="."):
     plt.clf()
     lines = {}
     for config in data:
-        if "sphere" not in config:
+        if "rosen" not in config:
             continue
         series = []
         for run in data[config]:
@@ -68,7 +68,9 @@ def plot_aggregate_over_time(data, directory="."):
     
         x = data[config]["1"]["average_reference"]["Generation"]
         plt.plot(x, averages, hold=True, label=config)
-    plt.legend(loc="lower left")
+    plt.legend(loc="upper right")
+    plt.xlabel("Generation")
+    plt.ylabel("Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
     plt.savefig(directory+"/runs_over_time.png")
 
@@ -77,13 +79,15 @@ def plot_average_final_fitness(data, directory="."):
     finals = []
     
     for config in data:
-        if "sphere" in config:
+        if "sphere" not in config:
             for run in data[config]:
                 corrs.append(data[config][run]["correlation"])
-                #finals.append(float(data[config][run]["average_reference"]["Average_Fitness"][-1:]))
-                finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
+                finals.append(float(data[config][run]["average_reference"]["Average_Fitness"][-1:]))
+                #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
     
     plt.plot(corrs, np.log(finals), ".")
+    plt.xlabel("Correlation")
+    plt.ylabel("Average Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter.png")
 
 if __name__ == "__main__":
