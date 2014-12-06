@@ -74,6 +74,42 @@ def rana_function(vals, modgen):
                  sin(sqrt(fabs(x+y+1)))
     return total
 
+def schafferF7(vals, modgen):
+    #Equation from 
+    #http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/schafferf7.html
+    total = 0.0
+    normalizer = 1.0/float(len(vals))
+    if modgen != None:
+        for i in range(len(vals)):
+            vals[i] += modgen(vals[i])
+    for i in range(len(vals)-1):
+        si = sqrt(vals[i]**2 + vals[i+1]**2)
+        total += (normalizer * sqrt(si) * (sin(50*si**0.20) + 1))**2
+    return total
+
+def deceptive(vals, modgen):
+    #Adapted from: http://www.cs.unm.edu/~neal.holts/dga/
+    #benchmarkFunction/deceptive.html
+    deceptiveness = 0.20 #This is actually more like the 
+                    #inverse of deceptiveness since smaller = more deceptive.
+    best_fitness = 1.0
+    deceptive_best = 0.7
+
+    total = 0.0
+    dimensions = len(vals)
+    for i in range(dimensions):
+        if vals[i] < deceptiveness:
+            #Then fitness value is on a negative slope with a y
+            #intercept at 1
+            total += vals[i]*(-1.0/deceptiveness) \
+			+ best_fitness
+        else:
+            #Otherwise, the fitness value is on a positive slope
+            #with an x intercept at deceptiveness
+            total += (vals[i]-deceptiveness)* \
+                       (deceptive_best/(1.0-deceptiveness))
+    return total/float(dimensions)
+
 class Fitness_Function:
 
     def __init__(self, func, optimal, arglen):

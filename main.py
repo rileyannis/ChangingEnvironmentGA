@@ -180,6 +180,10 @@ def set_global_variables(config):
             FITNESS_FUNCTION_TYPE = ff.rosenbrock_function
         elif fitness_function_type_str == "rana":
             FITNESS_FUNCTION_TYPE = ff.rana_function
+        elif fitness_function_type_str == "deceptive":
+            FITNESS_FUNCTION_TYPE = ff.deceptive
+        elif fitness_function_type_str == "schafferF7":
+            FITNESS_FUNCTION_TYPE = ff.schafferF7
         else:
             raise AssertionError("Unknown (but needed) function type (i.e. sphere)")
         real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")
