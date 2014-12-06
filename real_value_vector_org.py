@@ -1,4 +1,5 @@
 import random
+from math import sqrt
 
 LENGTH = None
 RANGE_MIN = None
@@ -42,6 +43,12 @@ class RealValueVectorOrg(object):
     def is_better_than(self, other, environment):
         return self.fitness(environment) < other.fitness(environment)
 
+    def distance(self, other, environment):
+        dist = 0.0
+        for i in range(len(self.genotype)):
+            dist += (self.genotype[i] - other.genotype[i])**2
+
+        return sqrt(dist)
 
 def _get_mutated_genotype(genotype, effect_size):
     "Mutates one locus in organism at random"

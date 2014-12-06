@@ -25,6 +25,7 @@ TOURNAMENT_SIZE = None
 VERBOSE = False
 ALTERNATE_ENVIRONMENT_CORR = None
 START_TIME = None
+CROWDING = False
 
 def create_initial_population():
     population = []
@@ -54,6 +55,13 @@ def get_selected_population(population, environment):
         new_population.append(get_best_organism(orgs, environment))
     return new_population
 
+def get_crowded_population(mutated_population, old_population, environment):
+    new_population = []
+    for org in mutated_population:
+        sample = [random.choice(old_population) for _ in range(TOURNAMENT_SIZE)]
+        new_population.append(get_best_crowded_organism(org, sample, environment))
+    return new_population
+
 def get_best_organism(pop, environment):
     best_org = pop[0]
     for org in pop:
@@ -61,9 +69,24 @@ def get_best_organism(pop, environment):
             best_org = org
     return best_org
 
+def get_best_crowded_organism(new_org, sample, environment):
+    most_similar = sample[0]
+    min_distance = float("inf")
+    for org in sample:
+        curr_dist = org.distance(new_org, environment)
+        if curr_dist < min_distance:
+            most_similar = org
+            min_distance = curr_dist
+    if new_org.is_better_than(most_similar, environment):
+        return new_org
+    return most_similar
+
 def get_next_generation(population, environment):
     new_population = get_mutated_population(population)
-    new_new_population = get_selected_population(new_population, environment)
+    if CROWDING:
+        new_new_population = get_crowded_population(new_population, population, environment)
+    else:
+        new_new_population = get_selected_population(new_population, environment)
     return new_new_population
 
 def print_status(generation, population, environment):
@@ -143,6 +166,8 @@ def set_global_variables(config):
     TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
+    global CROWDING
+    CROWDING = eval(config.get("DEFAULT", "crowding"))
     if ORG_TYPE == "string":
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
