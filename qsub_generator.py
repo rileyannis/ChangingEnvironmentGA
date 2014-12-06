@@ -10,7 +10,7 @@ def convert_config_file_name_to_job(file_name, output_dir_base):
 common = """
 #!/bin/bash -login
 
-#PBS -l walltime=06:00:00
+#PBS -l walltime=03:30:00
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=1gb
 #PBS -N changing_environment_test
@@ -33,14 +33,19 @@ org_type = vector
 length = 20
 range_minimum = -512
 range_maximum = 512
-tournament_size = 2
+tournament_size = 10
 mutation_effect_size = 10
 alternate_environment_corr = {1}
 verbose = False
+crowding = True
 """
-alt_corrs = [-1, -0.5, 0, 0.5, 1]
-function_types = ["sphere", "rosenbrock"]
-num_gens = [40000]
+
+#alt_corrs = [-1, -0.5, 0, 0.5, 1]
+#function_types = ["sphere", "rosenbrock"]
+function_types = ["rana"]
+alt_corrs = [0, .95 .99, 1]
+#alt_corrs = [1]
+num_gens = [2500]
 def write_to_file(filename, contents):
     with open(filename, "w") as file_handle:
         file_handle.write(contents)
@@ -55,7 +60,7 @@ if __name__ == "__main__":
         write_to_file(config_filename, contents)
         config_files.append(config_filename)
 
-    output_dir_base = "longer_run_many"
+    output_dir_base = "RTR"
     jobs = [convert_config_file_name_to_job(name, output_dir_base) for name in config_files]
 
 
