@@ -94,7 +94,9 @@ def deceptive(vals, modgen):
                     #inverse of deceptiveness since smaller = more deceptive.
     best_fitness = 1.0
     deceptive_best = 0.7
-
+    if modgen != None:
+        for i in range(len(vals)):
+            vals[i] += modgen(vals[i])
     total = 0.0
     dimensions = len(vals)
     for i in range(dimensions):
