@@ -11,7 +11,7 @@ solution = [2,2]
 f = Fitness_Function(sphere_function, 0, 2)
 fitness = f.evaluate(solution)
 """
-MUTATION_EFFECT_SIZE = None
+MUTATION_EFFECT_SIZE = 50#None
 MOD_SAMPLES = 32.0 #How sparse should the set of refernce points be
 CHANGE_MODIFIER = 50.0 #cludgey multiplier to get environment 2 to be in 
                        #the right ball-park of similarity to environment 1

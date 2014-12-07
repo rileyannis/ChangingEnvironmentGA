@@ -11,9 +11,9 @@ from matplotlib.lines import Line2D
 def main():
     test_dir = "RTR"
     data = get_data(test_dir)
-    plot_aggregate_over_time(data, "rana", test_dir)
-    plot_stddev_over_time(data, "rana", test_dir)
-    plot_average_final_fitness(data, "rana", test_dir)
+    plot_aggregate_over_time(data, "deceptive", test_dir)
+    plot_stddev_over_time(data, "deceptive", test_dir)
+    plot_average_final_fitness(data, "deceptive", test_dir)
     #plot_single_run_over_time(data[data.keys()[0]]["1"]["average_experienced"], test_dir)
     #print data.keys()[0]
 

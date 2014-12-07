@@ -182,7 +182,7 @@ def set_global_variables(config):
             FITNESS_FUNCTION_TYPE = ff.rana_function
         elif fitness_function_type_str == "deceptive":
             FITNESS_FUNCTION_TYPE = ff.deceptive
-        elif fitness_function_type_str == "schafferF7":
+        elif fitness_function_type_str == "schafferf7":
             FITNESS_FUNCTION_TYPE = ff.schafferF7
         else:
             raise AssertionError("Unknown (but needed) function type (i.e. sphere)")
