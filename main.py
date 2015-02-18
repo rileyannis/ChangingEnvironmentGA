@@ -28,6 +28,9 @@ START_TIME = None
 CROWDING = False
 
 def create_initial_population():
+    """
+    Create a starting population by appending randomly generated organisms to an empty list.
+    """
     population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         if ORG_TYPE == "string":
@@ -39,6 +42,9 @@ def create_initial_population():
 
 
 def get_mutated_population(population):
+    """
+    Return a new population with a percentage of organisms mutated based on the mutation rate.
+    """
     new_population = []
     for org in population:
         if random.random() < MUTATION_RATE:
@@ -49,6 +55,10 @@ def get_mutated_population(population):
     return new_population
 
 def get_selected_population(population, environment):
+    """
+    Select a number of organisms based on tournament size, pick the best one, and append it to
+    a new population. Do this until the population is full.
+    """
     new_population = []
     for _ in range(NUMBER_OF_ORGANISMS):
         orgs = [random.choice(population) for _ in range(TOURNAMENT_SIZE)]
@@ -209,7 +219,7 @@ def save_string_to_file(string, filename):
 
 def generate_data():
     if ORG_TYPE == "vector":
-        fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, 0, real_value_vector_org.LENGTH)
+        fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, real_value_vector_org.LENGTH)
         fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
         reference_environment  = fitness_function.fitness1_fitness
         alternative_environment  = fitness_function.fitness2_fitness
