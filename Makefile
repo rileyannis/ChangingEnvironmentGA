@@ -9,7 +9,7 @@ run:
 	python changing_environment_ga.py -c config.ini -o default_data
 
 clean:
-	-@rm -r *~ *.pyc *.csv default_data 2>/dev/null || true
+	-@rm -r *~ *.pyc *.csv *.c *.so build default_data 2>/dev/null || true
 
 test:
 	python -m unittest discover
@@ -21,3 +21,6 @@ coverage:
 profile:
 	-@rm -r profile_junk_data
 	python profile.py
+
+cython:
+	python setup.py build_ext --inplace
