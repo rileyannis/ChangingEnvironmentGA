@@ -1,3 +1,5 @@
+# cython: profile=True
+
 from math import floor, sqrt, ceil, cos, sin, fabs
 import numpy as np
 import scipy.interpolate
@@ -111,11 +113,25 @@ class Fitness_Function:
         self.range_ = (-512, 512)
         self.flipped = False
 
-    def _apply_modgen_to_vals(self, vals, modgen):
+    #Old version
+    def _python_apply_modgen_to_vals(self, vals, modgen):
         """
         Apply modgen to each val in vals.
         """
-        def put_in_range(val):
+        def python_put_in_range(val):
+            if val < self.range_[0]:
+                return self.range_[0]
+            if val > self.range_[1]:
+                return self.range_[1]
+            return val
+        return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
+
+    #Cython version!
+    cdef object _apply_modgen_to_vals(self, object vals, object modgen):
+        """
+        Apply modgen to each val in vals.
+        """
+        cdef double put_in_range(double val):
             if val < self.range_[0]:
                 return self.range_[0]
             if val > self.range_[1]:
@@ -160,7 +176,8 @@ class Fitness_Function:
         sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
         return [random.normalvariate(0, sd) for _ in range(MOD_SAMPLES + 1)]
 
-    def random_mod(self, val):
+    #Old version
+    def python_random_mod(self, val):
         """
         random_mod is supposed to skew each value
         global variable MOD_SAMPLES is the granularity by which the values are skewed
@@ -181,6 +198,30 @@ class Fitness_Function:
             return upper
         slope = (upper-lower)/float(ceil_val - floor_val)
         result = slope*(shifted_val - floor_val) + lower
+        return result
+
+    #Cython version
+    cdef double random_mod(self, double val):
+        """
+        random_mod is supposed to skew each value
+        global variable MOD_SAMPLES is the granularity by which the values are skewed
+        interval is the size of the range divided by the granularity
+        shifted_val is the val's position in the granularity
+        """
+        double interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
+        double shifted_val = ((self.range_[0]*-1) + val) / interval
+
+        int ceil_val = int(ceil(shifted_val))
+        int floor_val = int(floor(shifted_val))
+
+        double sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
+
+        double upper = self.mods[ceil_val]
+        double lower = self.mods[floor_val]
+        if upper == lower:
+            return upper
+        double slope = (upper-lower)/float(ceil_val - floor_val)
+        double result = slope*(shifted_val - floor_val) + lower
         return result
 
     def create_fitness2(self, corr):
