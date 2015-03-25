@@ -98,7 +98,12 @@ def deceptive(vals):
                        (deceptive_best/(1.0-deceptiveness))
     return total/float(dimensions)
 
-class Fitness_Function:
+cdef class Fitness_Function:
+
+    cdef object fitness1, fitness2, range_, mods
+    cdef int optimal, arglen
+    cdef bint flipped
+    cdef double corr
 
     def __init__(self, func, arglen):
         """
@@ -114,31 +119,37 @@ class Fitness_Function:
         self.flipped = False
 
     #Old version
-    def _python_apply_modgen_to_vals(self, vals, modgen):
-        """
-        Apply modgen to each val in vals.
-        """
-        def python_put_in_range(val):
-            if val < self.range_[0]:
-                return self.range_[0]
-            if val > self.range_[1]:
-                return self.range_[1]
-            return val
-        return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
+    #def _python_apply_modgen_to_vals(self, vals, modgen):
+    #    """
+    #    Apply modgen to each val in vals.
+    #    """
+    #    def python_put_in_range(val):
+    #        if val < self.range_[0]:
+    #            return self.range_[0]
+    #        if val > self.range_[1]:
+    #            return self.range_[1]
+    #        return val
+    #    return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
 
-    #Cython version!
     cdef object _apply_modgen_to_vals(self, object vals, object modgen):
         """
         Apply modgen to each val in vals.
         """
-        cdef double put_in_range(double val):
-            if val < self.range_[0]:
-                return self.range_[0]
-            if val > self.range_[1]:
-                return self.range_[1]
-            return val
-        return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
+        new_vals = []
+        cdef double val, mod, val_and_mod
+        for i in range(len(vals)):
+            val = vals[i]
+            mod = modgen(vals[i])
+            val_and_mod = val + mod
+            if val_and_mod < self.range_[0]:
+                new_vals.append(self.range_[0])
+            elif val_and_mod > self.range_[1]:
+                new_vals.append(self.range_[1])
+            else:
+                new_vals.append(val_and_mod)
 
+        return new_vals
+    
     def fitness1_fitness(self, vals):
         return self.fitness1(vals)
 
@@ -177,51 +188,51 @@ class Fitness_Function:
         return [random.normalvariate(0, sd) for _ in range(MOD_SAMPLES + 1)]
 
     #Old version
-    def python_random_mod(self, val):
-        """
-        random_mod is supposed to skew each value
-        global variable MOD_SAMPLES is the granularity by which the values are skewed
-        interval is the size of the range divided by the granularity
-        shifted_val is the val's position in the granularity
-        """
-        interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
-        shifted_val = ((self.range_[0]*-1) + val) / interval
-
-        ceil_val = int(ceil(shifted_val))
-        floor_val = int(floor(shifted_val))
-
-        sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
-
-        upper = self.mods[ceil_val]
-        lower = self.mods[floor_val]
-        if upper == lower:
-            return upper
-        slope = (upper-lower)/float(ceil_val - floor_val)
-        result = slope*(shifted_val - floor_val) + lower
-        return result
+    #def python_random_mod(self, val):
+    #    """
+    #    random_mod is supposed to skew each value
+    #    global variable MOD_SAMPLES is the granularity by which the values are skewed
+    #    interval is the size of the range divided by the granularity
+    #    shifted_val is the val's position in the granularity
+    #    """
+    #    interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
+    #    shifted_val = ((self.range_[0]*-1) + val) / interval
+    #
+    #    ceil_val = int(ceil(shifted_val))
+    #    floor_val = int(floor(shifted_val))
+    #
+    #    sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
+    #
+    #    upper = self.mods[ceil_val]
+    #    lower = self.mods[floor_val]
+    #    if upper == lower:
+    #        return upper
+    #    slope = (upper-lower)/float(ceil_val - floor_val)
+    #    result = slope*(shifted_val - floor_val) + lower
+    #    return result
 
     #Cython version
-    cdef double random_mod(self, double val):
+    cpdef double random_mod(self, double val):
         """
         random_mod is supposed to skew each value
         global variable MOD_SAMPLES is the granularity by which the values are skewed
         interval is the size of the range divided by the granularity
         shifted_val is the val's position in the granularity
         """
-        double interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
-        double shifted_val = ((self.range_[0]*-1) + val) / interval
+        cdef double interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
+        cdef double shifted_val = ((self.range_[0]*-1) + val) / interval
 
-        int ceil_val = int(ceil(shifted_val))
-        int floor_val = int(floor(shifted_val))
+        cdef int ceil_val = int(ceil(shifted_val))
+        cdef int floor_val = int(floor(shifted_val))
 
-        double sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
+        cdef double sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
 
-        double upper = self.mods[ceil_val]
-        double lower = self.mods[floor_val]
+        cdef double upper = self.mods[ceil_val]
+        cdef double lower = self.mods[floor_val]
         if upper == lower:
             return upper
-        double slope = (upper-lower)/float(ceil_val - floor_val)
-        double result = slope*(shifted_val - floor_val) + lower
+        cdef double slope = (upper-lower)/float(ceil_val - floor_val)
+        cdef double result = slope*(shifted_val - floor_val) + lower
         return result
 
     def create_fitness2(self, corr):
