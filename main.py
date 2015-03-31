@@ -9,6 +9,7 @@ import csv
 import string_org
 import real_value_vector_org
 import scipy.stats as stats
+#import fitness_function as ff
 import cython_fitness_function as ff
 from math import floor
 import os

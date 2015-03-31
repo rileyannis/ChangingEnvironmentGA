@@ -132,15 +132,16 @@ cdef class Fitness_Function:
     #    return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
 
     #Cython version
-    cdef object _apply_modgen_to_vals(self, object vals, object modgen):
+    cdef object _apply_modgen_to_vals(self, object vals):
         """
         Apply modgen to each val in vals.
+        Calls random_mod instead of passing it in as modgen so as to use cdef random_mod
         """
         new_vals = []
         cdef double val, mod, val_and_mod
         for i in range(len(vals)):
             val = vals[i]
-            mod = modgen(vals[i])
+            mod = self.random_mod(vals[i])
             val_and_mod = val + mod
             if val_and_mod < self.range_[0]:
                 new_vals.append(self.range_[0])
@@ -213,7 +214,7 @@ cdef class Fitness_Function:
     #    return result
 
     #Cython version
-    cpdef double random_mod(self, double val):
+    cdef double random_mod(self, double val):
         """
         random_mod is supposed to skew each value
         global variable MOD_SAMPLES is the granularity by which the values are skewed
@@ -238,7 +239,7 @@ cdef class Fitness_Function:
 
     def create_fitness2(self, corr):
         def fitness2(vals):
-            new_vals = self._apply_modgen_to_vals(vals, self.random_mod)
+            new_vals = self._apply_modgen_to_vals(vals)
             return self.fitness1(new_vals)
 
         self.corr = corr
