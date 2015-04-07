@@ -1,4 +1,17 @@
+# distutils: language = c++
+
+"""
+Supposedly this can be used, have yet to get it to work
+# distutils: sources = cpp_fitness_function.cpp
+"""
+
 # cython: profile=True
+from libcpp.vector cimport vector
+cdef extern from "cpp_fitness_function.cpp":
+    float cpp_sphere_function(vector[float] vec)
+    float cpp_rosenbrock_function(vector[float] vec)
+    float cpp_rana_function(vector[float] vec, vector[float] weights)
+    float cpp_schafferF7(vector[float] vec)
 
 from math import floor, sqrt, ceil, cos, sin, fabs
 import numpy as np
@@ -6,6 +19,9 @@ import scipy.interpolate
 import scipy.stats as stats
 import random, itertools
 from copy import deepcopy
+
+#from repoze.lru import LRUCache
+#cache = LRUCache(200)
 
 """
 Example usage:
@@ -25,7 +41,7 @@ def flat_function(vals):
     """Takes in vals so as not to break when called."""
     return 0
 
-def sphere_function(vals):
+def old_sphere_function(vals):
     """
     A very easy test function
     Parameters:
@@ -34,18 +50,38 @@ def sphere_function(vals):
     """
     return sum(val**2 for val in vals)
 
-def rosenbrock_function(vals):
+def sphere_function(object vals):
+    cdef vector[float] vec = vals
+    return cpp_sphere_function(vec)
+
+#Does not work very well; is slower
+"""
+def cached_sphere_function(object vals):
+    key_vals = tuple(vals)
+    if(cache.get(key_vals)):
+        return cache.get(key_vals)
+    cdef vector[float] vec = vals
+    cdef float result = cpp_sphere_function(vec)
+    cache.put(key_vals, result)
+    return result
+"""
+
+def old_rosenbrock_function(vals):
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 
                for i in range(len(vals)-1))
 
-def initialize_rana_weights(vals):
+def rosenbrock_function(object vals):
+    cdef vector[float] vec = vals
+    return cpp_rosenbrock_function(vec)
+
+def initialize_rana_weights(length):
     global RANA_WEIGHTS
-    RANA_WEIGHTS = [random.random() for i in range(len(vals))]
+    RANA_WEIGHTS = [random.random() for i in range(length)]
     total = sum(RANA_WEIGHTS)
     RANA_WEIGHTS = [i/total for i in RANA_WEIGHTS]
 
 
-def rana_function(vals):
+def old_rana_function(vals):
     total = 0.0
     for i in range(len(vals)):
         x = vals[i]
@@ -59,14 +95,22 @@ def rana_function(vals):
         
         global RANA_WEIGHTS
         if RANA_WEIGHTS is None:
-            initialize_rana_weights(vals)
+            initialize_rana_weights(len(vals))
 
         total += RANA_WEIGHTS[i]*x*sin(sqrt(fabs(y+1-x)))* \
                  cos(sqrt(fabs(x+y+1))) + (y+1)*cos(sqrt(fabs(y+1-x)))* \
                  sin(sqrt(fabs(x+y+1)))
     return total
 
-def schafferF7(vals):
+def rana_function(object vals):
+    global RANA_WEIGHTS
+    if RANA_WEIGHTS is None:
+        initialize_rana_weights(len(vals))
+    cdef vector[float] vec = vals
+    cdef vector[float] weights = RANA_WEIGHTS
+    return cpp_rana_function(vec, weights)
+
+def old_schafferF7(vals):
     #Equation from 
     #http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/schafferf7.html
     total = 0.0
@@ -75,6 +119,10 @@ def schafferF7(vals):
         si = sqrt(vals[i]**2 + vals[i+1]**2)
         total += (normalizer * sqrt(si) * (sin(50*si**0.20) + 1))**2
     return total
+
+def schafferF7(object vals):
+    cdef vector[float] vec = vals
+    return cpp_schafferF7(vec)
 
 def deceptive(vals):
     #Adapted from: http://www.cs.unm.edu/~neal.holts/dga/

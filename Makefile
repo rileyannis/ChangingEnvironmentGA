@@ -18,9 +18,13 @@ coverage:
 	coverage run -m unittest discover
 	coverage report -m
 
-profile:
+profile: cython
 	-@rm -r profile_junk_data
 	python profile.py
 
 cython:
 	python setup.py build_ext --inplace
+
+multiprofile: cython
+	-@rm -r multiprofile_junk_data
+	python multiprofile.py
