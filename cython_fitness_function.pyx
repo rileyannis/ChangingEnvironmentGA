@@ -20,8 +20,8 @@ import scipy.stats as stats
 import random, itertools
 from copy import deepcopy
 
-#from repoze.lru import LRUCache
-#cache = LRUCache(200)
+from repoze.lru import LRUCache
+cache = LRUCache(128)
 
 """
 Example usage:
@@ -50,13 +50,13 @@ def old_sphere_function(vals):
     """
     return sum(val**2 for val in vals)
 
-def sphere_function(object vals):
+def new_sphere_function(object vals):
     cdef vector[float] vec = vals
     return cpp_sphere_function(vec)
 
 #Does not work very well; is slower
-"""
-def cached_sphere_function(object vals):
+
+def sphere_function(object vals):
     key_vals = tuple(vals)
     if(cache.get(key_vals)):
         return cache.get(key_vals)
@@ -64,7 +64,7 @@ def cached_sphere_function(object vals):
     cdef float result = cpp_sphere_function(vec)
     cache.put(key_vals, result)
     return result
-"""
+
 
 def old_rosenbrock_function(vals):
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 

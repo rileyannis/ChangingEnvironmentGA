@@ -17,13 +17,17 @@ class TestFitnessFunction(unittest.TestCase):
         self.assertEqual(ff.rosenbrock_function(self.vals), cy.rosenbrock_function(self.vals))
 
     def test_rana_function(self):
-        #Rana functions are based on random numbers, so ff and cy give slightly different numbers
-        self.assertEqual(ff.rana_function(self.vals), ff.rana_function(self.vals))
-        self.assertEqual(cy.rana_function(self.vals), cy.rana_function(self.vals))
+        ff.rana_function(self.vals)
+        self.assertIsNotNone(ff.RANA_WEIGHTS)
+        cy.rana_function(self.vals)
+        self.assertIsNotNone(cy.RANA_WEIGHTS)
         self.assertEqual(len(ff.RANA_WEIGHTS), len(cy.RANA_WEIGHTS))
+        cy.RANA_WEIGHTS = ff.RANA_WEIGHTS
+        #Rana functions are based on random numbers, so ff and cy give slightly different numbers
+        self.assertAlmostEqual(ff.rana_function(self.vals), cy.rana_function(self.vals), places=5)
 
     def test_schafferF7(self):
-        self.assertEqual(ff.schafferF7(self.vals), cy.schafferF7(self.vals))
+        self.assertAlmostEqual(ff.schafferF7(self.vals), cy.schafferF7(self.vals), places=5)
 
     def test_deceptive(self):
         self.assertEqual(ff.deceptive(self.vals), cy.deceptive(self.vals))

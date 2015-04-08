@@ -20,7 +20,7 @@ float cpp_sphere_function(vector<float> vals){
 float cpp_rosenbrock_function(vector<float> vals){
   float tot = 0.0;
   for(int i = 0; i < (vals.size() - 1); ++i){
-    tot += (100.0 * pow(vals[i+1] + (pow(vals[1], 2)), 2) + pow(vals[i] - 1, 2));
+    tot += (100.0 * pow(vals[i+1] - (pow(vals[i], 2)), 2) + pow(vals[i] - 1, 2));
   }
   return tot;
 }
