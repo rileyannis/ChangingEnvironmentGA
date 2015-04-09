@@ -5,6 +5,14 @@ using std::accumulate;
 #include<cmath>
 using std::pow; using std::sqrt; using std::sin; using std::cos; using std::abs;
 
+double add_array(double* ary, int sz){
+  double sum = 0;
+  for(int i = 0; i < sz; ++i){
+    sum += ary[i];
+  }
+  return sum;
+}
+
 float cpp_flat_function(vector<float> vals){
   return 0.0;
 }
@@ -19,21 +27,15 @@ float cpp_sphere_function(vector<float> vals){
 
 float cpp_rosenbrock_function(vector<float> vals){
   float tot = 0.0;
-  for(int i = 0; i < (vals.size() - 1); ++i){
+  for(unsigned int i = 0; i < (vals.size() - 1); ++i){
     tot += (100.0 * pow(vals[i+1] - (pow(vals[i], 2)), 2) + pow(vals[i] - 1, 2));
   }
   return tot;
 }
 
-vector<float> cpp_initialize_rana_weights(vector<float> vals){
-  //Will actually fix later/probably never use
-  vector<float> vec;
-  return vec;
-}
-
 float cpp_rana_function(vector<float> vals, vector<float> weights){
   float tot = 0.0, x, y;
-  for(int i = 0; i < vals.size(); ++i){
+  for(unsigned int i = 0; i < vals.size(); ++i){
     x = vals[i];
     if(i == (vals.size() - 1)){
       y = vals[0];
@@ -49,7 +51,7 @@ float cpp_rana_function(vector<float> vals, vector<float> weights){
 
 float cpp_schafferF7(vector<float> vals){
   float tot = 0.0, norm = 1.0/vals.size(), si;
-  for(int i = 0; i < (vals.size() - 1); ++i){
+  for(unsigned int i = 0; i < (vals.size() - 1); ++i){
     si = sqrt(pow(vals[i], 2) + pow(vals[i + 1], 2));
     tot += pow(norm * sqrt(si) * (sin(50 * pow(si, 0.20)) + 1), 2);
   }

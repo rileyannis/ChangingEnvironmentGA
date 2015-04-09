@@ -12,16 +12,21 @@ cdef extern from "cpp_fitness_function.cpp":
     float cpp_rosenbrock_function(vector[float] vec)
     float cpp_rana_function(vector[float] vec, vector[float] weights)
     float cpp_schafferF7(vector[float] vec)
+    double add_array(double* ary, int size)
 
 from math import floor, sqrt, ceil, cos, sin, fabs
 import numpy as np
+cimport numpy as np
 import scipy.interpolate
 import scipy.stats as stats
 import random, itertools
 from copy import deepcopy
+import cython
 
-from repoze.lru import LRUCache
-cache = LRUCache(128)
+#from repoze.lru import LRUCache
+#cache = LRUCache(128)
+#from cpython cimport array as c_array
+#from array import array
 
 """
 Example usage:
@@ -36,6 +41,16 @@ CHANGE_MODIFIER = 50.0 #cludgey multiplier to get environment 2 to be in
 RANA_WEIGHTS = None #somehow we need to give a constant set of weights to 
                     #the Rana function
 
+""""""
+#Example of how to get numpy arrays to work
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def array_testing():
+    cdef np.ndarray[np.float64_t, mode="c"] a = np.array([1.0,2.0,3.0], ndmin=1)
+    cdef int s
+    s = a.shape[0]
+    return add_array(&a[0], s)
+""""""
 
 def flat_function(vals):
     """Takes in vals so as not to break when called."""
@@ -50,21 +65,19 @@ def old_sphere_function(vals):
     """
     return sum(val**2 for val in vals)
 
-def new_sphere_function(object vals):
+def sphere_function(object vals):
     cdef vector[float] vec = vals
     return cpp_sphere_function(vec)
 
 #Does not work very well; is slower
-
-def sphere_function(object vals):
-    key_vals = tuple(vals)
-    if(cache.get(key_vals)):
-        return cache.get(key_vals)
-    cdef vector[float] vec = vals
-    cdef float result = cpp_sphere_function(vec)
-    cache.put(key_vals, result)
-    return result
-
+#def cached_sphere_function(object vals):
+#    key_vals = tuple(vals)
+#    if(cache.get(key_vals)):
+#        return cache.get(key_vals)
+#    cdef vector[float] vec = vals
+#    cdef float result = cpp_sphere_function(vec)
+#    cache.put(key_vals, result)
+#    return result
 
 def old_rosenbrock_function(vals):
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 
