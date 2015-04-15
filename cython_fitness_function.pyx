@@ -41,7 +41,7 @@ CHANGE_MODIFIER = 50.0 #cludgey multiplier to get environment 2 to be in
 RANA_WEIGHTS = None #somehow we need to give a constant set of weights to 
                     #the Rana function
 
-""""""
+
 #Example of how to get numpy arrays to work
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -50,7 +50,7 @@ def array_testing():
     cdef int s
     s = a.shape[0]
     return add_array(&a[0], s)
-""""""
+
 
 def flat_function(vals):
     """Takes in vals so as not to break when called."""
