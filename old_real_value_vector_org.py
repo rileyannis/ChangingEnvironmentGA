@@ -1,13 +1,3 @@
-"""
-Going to attempt to convert the real value vector org into a real value array org
-SHOULD work at this point
-"""
-#import cython
-#cython.boundscheck(False)
-#cython.wraparound(False)
-
-import numpy as np
-
 import random
 from math import sqrt
 
@@ -26,8 +16,6 @@ class RealValueVectorOrg(object):
     def __init__(self, genotype=None):
         if genotype is None:
             genotype = _create_random_genotype()
-        else:
-            genotype = np.asarray(genotype)
         self.genotype = genotype
 
     def fitness(self, environment):
@@ -56,18 +44,18 @@ class RealValueVectorOrg(object):
 
     def distance(self, other, environment):
         dist = 0.0
-        for i in range(self.genotype.shape[0]):
+        for i in range(len(self.genotype)):
             dist += (self.genotype[i] - other.genotype[i])**2
 
         return sqrt(dist)
 
 def _get_mutated_genotype(genotype, effect_size):
     "Mutates one locus in organism at random"
-    mut_location = random.randrange(genotype.shape[0])
+    mut_location = random.randrange(len(genotype))
     delta = random.normalvariate(0, effect_size)
     mutant_value = genotype[mut_location] + delta
-    #Assignement returns a copy
-    mutant = genotype
+
+    mutant = genotype[:]
     mutant[mut_location] = _wrap_around(mutant_value, RANGE_MIN, RANGE_MAX)            
     return mutant
 
@@ -81,11 +69,7 @@ def _wrap_around(value, min_, max_):
     return value
 
 def _create_random_genotype():
-    """
-    Create a random array genotype
-    """
-    genotype = np.array([])
+    genotype = []
     for _ in range(LENGTH):
-        #Append returns a copy
-        genotype = np.append(genotype, random.uniform(RANGE_MIN, RANGE_MAX))
+        genotype.append(random.uniform(RANGE_MIN, RANGE_MAX))
     return genotype
