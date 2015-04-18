@@ -28,3 +28,7 @@ cython:
 multiprofile: cython
 	-@rm -r multiprofile_junk_data
 	python multiprofile.py
+
+cleanprofile:
+	-@rm -r profile_junk_data
+	-@rm -r multiprofile_junk_data
