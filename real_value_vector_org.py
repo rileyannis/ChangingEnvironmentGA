@@ -27,7 +27,7 @@ class RealValueVectorOrg(object):
         if genotype is None:
             genotype = _create_random_genotype()
         else:
-            genotype = np.asarray(genotype)
+            genotype = np.asarray(genotype, dtype=np.float64)
         self.genotype = genotype
 
     def fitness(self, environment):
@@ -67,7 +67,7 @@ def _get_mutated_genotype(genotype, effect_size):
     delta = random.normalvariate(0, effect_size)
     mutant_value = genotype[mut_location] + delta
     #Assignement returns a copy
-    mutant = genotype
+    mutant = np.array(genotype, copy=True)
     mutant[mut_location] = _wrap_around(mutant_value, RANGE_MIN, RANGE_MAX)            
     return mutant
 
@@ -84,7 +84,7 @@ def _create_random_genotype():
     """
     Create a random array genotype
     """
-    genotype = np.array([])
+    genotype = np.array([], dtype=np.float64)
     for _ in range(LENGTH):
         #Append returns a copy
         genotype = np.append(genotype, random.uniform(RANGE_MIN, RANGE_MAX))
