@@ -8,6 +8,6 @@ Researchers:
 ============
 Riley Annis, Josh Nahum, Emily Dolson
 
-To-Do:
-======
-Add config options for real value orgs
+Dependencies
+============
+Numpy, Scipy, Cython
