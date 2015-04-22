@@ -62,10 +62,12 @@ def old_sphere_function(vals):
     Parameters:
            vals - a list specifying the point in N-dimensionsla space to be
                   evaluated
+    OLD, NOT USED
     """
     return sum(val**2 for val in vals)
 
 def sphere_function(object vals):
+    """Very simple function. Sums the squares of each value."""
     cdef vector[float] vec = vals
     return cpp_sphere_function(vec)
 
@@ -80,6 +82,7 @@ def sphere_function(object vals):
 #    return result
 
 def old_rosenbrock_function(vals):
+    """OLD, NOT USED"""
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 
                for i in range(len(vals)-1))
 
@@ -93,8 +96,8 @@ def initialize_rana_weights(length):
     total = sum(RANA_WEIGHTS)
     RANA_WEIGHTS = [i/total for i in RANA_WEIGHTS]
 
-
 def old_rana_function(vals):
+    """OLD, NOT USED"""
     total = 0.0
     for i in range(len(vals)):
         x = vals[i]
@@ -124,6 +127,7 @@ def rana_function(object vals):
     return cpp_rana_function(vec, weights)
 
 def old_schafferF7(vals):
+    """OLD, NOT USED"""
     #Equation from 
     #http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/schafferf7.html
     total = 0.0
@@ -160,7 +164,10 @@ def deceptive(vals):
     return total/float(dimensions)
 
 cdef class Fitness_Function:
-
+    """
+    Class to store information about the fitness landscape the real value vector orgs
+    will be evaluated over.
+    """
     cdef object fitness1, fitness2, range_, mods
     cdef int optimal, arglen
     cdef bint flipped
@@ -170,7 +177,6 @@ cdef class Fitness_Function:
         """
         func = fitness function type
         arglen = length of real value vector org
-
         """
         self.fitness1 = func
         self.fitness2 = None
@@ -221,16 +227,23 @@ cdef class Fitness_Function:
         return self.fitness2(vals)
 
     def correlation(self, samples=5000):
+    	"""
+    	Evaluates a random data set on both fitness functions # of samples times,
+    	saves the values in two lists, then gets the correlation of the lists
+    	"""
         vals1 = []
         vals2 = []
+        #Samples number of times...
         for i in range(samples):
             solution = []
+            #Make a random data set
             for j in range(self.arglen):
                 solution.append(random.randrange(*self.range_))
+            #Evaluate it on both fitness functions and save the results
             vals1.append(self.fitness1(solution))
             vals2.append(self.fitness2(solution))
+        #Compare all the results against each other and get the r value
         slope, intercept, r_value, p_value, std_err = stats.linregress(vals1, vals2)
-
         return r_value
 
     def sd(self, samples=100):
@@ -281,19 +294,24 @@ cdef class Fitness_Function:
         interval is the size of the range divided by the granularity
         shifted_val is the val's position in the granularity
         """
+        #Make an interval equal to the range size divided by the number of samples
         cdef double interval = float(self.range_[1] - self.range_[0])/MOD_SAMPLES
+        #Shift the val up by half the range (ensuring it is positive), then divide by the interval
         cdef double shifted_val = ((self.range_[0]*-1) + val) / interval
-
+	#Get the ceiling and floor of the shifted val
         cdef int ceil_val = int(ceil(shifted_val))
         cdef int floor_val = int(floor(shifted_val))
-
+	#Make a standard deviation (not ever used???)
         cdef double sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
-
+	#Get the upper and lower bounds on the shifted val's location in the mods dict
         cdef double upper = self.mods[ceil_val]
         cdef double lower = self.mods[floor_val]
+        #If they're the same, return upper
         if upper == lower:
             return upper
+        #Otherwise, get the slope between the bounds
         cdef double slope = (upper-lower)/float(ceil_val - floor_val)
+        #Then multiply the slope by the distance shifted val is from floor val, then add lower to it
         cdef double result = slope*(shifted_val - floor_val) + lower
         return result
 
