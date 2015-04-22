@@ -1,13 +1,4 @@
-"""
-Going to attempt to convert the real value vector org into a real value array org
-SHOULD work at this point
-"""
-#import cython
-#cython.boundscheck(False)
-#cython.wraparound(False)
-
 import numpy as np
-
 import random
 from math import sqrt
 
@@ -18,7 +9,7 @@ MUTATION_EFFECT_SIZE = None
 
 class RealValueVectorOrg(object):
     """
-    this is a class that represents organisms as a real value vector
+    this is a class that represents organisms as a real value array
     fitness is determined by calling the fitness fuction
     the length is determined at object creation
     """
@@ -62,16 +53,17 @@ class RealValueVectorOrg(object):
         return sqrt(dist)
 
 def _get_mutated_genotype(genotype, effect_size):
-    "Mutates one locus in organism at random"
+    """Mutates one locus in organism at random"""
     mut_location = random.randrange(genotype.shape[0])
     delta = random.normalvariate(0, effect_size)
     mutant_value = genotype[mut_location] + delta
-    #Assignement returns a copy
+    #Ensure a copy is made so mutant doesn't edit the original
     mutant = np.array(genotype, copy=True)
     mutant[mut_location] = _wrap_around(mutant_value, RANGE_MIN, RANGE_MAX)            
     return mutant
 
 def _wrap_around(value, min_, max_):
+    """Literally does what it says."""
     width = max_ - min_
     while value < min_ or value > max_:
         if value < min_:
@@ -81,9 +73,7 @@ def _wrap_around(value, min_, max_):
     return value
 
 def _create_random_genotype():
-    """
-    Create a random array genotype
-    """
+    """Create a random array genotype"""
     genotype = np.array([], dtype=np.float64)
     for _ in range(LENGTH):
         #Append returns a copy
