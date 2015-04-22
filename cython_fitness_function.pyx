@@ -54,7 +54,7 @@ def array_testing():
 
 def flat_function(vals):
     """Takes in vals so as not to break when called."""
-    return 0
+    return 0.0
 
 def old_sphere_function(vals):
     """
@@ -140,6 +140,8 @@ def old_schafferF7(vals):
 def schafferF7(object vals):
     cdef vector[float] vec = vals
     return cpp_schafferF7(vec)
+
+#SHOULD MAKE A CYTHON VERSION OF DECEPTIVE
 
 def deceptive(vals):
     #Adapted from: http://www.cs.unm.edu/~neal.holts/dga/
