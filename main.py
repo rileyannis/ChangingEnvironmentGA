@@ -74,6 +74,7 @@ def get_crowded_population(mutated_population, old_population, environment):
     return new_population
 
 def get_best_organism(pop, environment):
+    """Gets the best org in a given population"""
     best_org = pop[0]
     for org in pop:
         if org.is_better_than(best_org, environment):
@@ -93,6 +94,7 @@ def get_best_crowded_organism(new_org, sample, environment):
     return most_similar
 
 def get_next_generation(population, environment):
+    """Get a mutated population, then get a selected population from it"""
     new_population = get_mutated_population(population)
     if CROWDING:
         new_new_population = get_crowded_population(new_population, population, environment)
@@ -101,10 +103,12 @@ def get_next_generation(population, environment):
     return new_new_population
 
 def print_status(generation, population, environment):
+    """Outputs information to console. Only used if VERBOSE is true"""
     average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def evolve_population(reference_environment, alternative_environment):
+    """Evolve a population!"""
     current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation")]
     current_fitness_best = [("Generation", "Best_fitness", "Best_org")]
@@ -118,6 +122,7 @@ def evolve_population(reference_environment, alternative_environment):
     start_of_trimester_3 = int(floor(NUMBER_OF_GENERATIONS*2.0/3.0))
 
     population = create_initial_population()
+    #In each generation, get the next one, update lists, then output to file
     for gen in range(NUMBER_OF_GENERATIONS):
         if gen == start_of_trimester_2:
             current_environment = alternative_environment
@@ -143,6 +148,7 @@ def evolve_population(reference_environment, alternative_environment):
     return result
 
 def get_generation_stats(population, environment):
+    """Gets the stats for the given population"""
     average_fitness = get_average_fitness(population, environment)
     best_org = get_best_organism(population, environment)
     best_fitness = best_org.fitness(environment)
@@ -152,6 +158,7 @@ def get_generation_stats(population, environment):
     
 
 def get_average_fitness(pop, environment):
+    """Gets average fitness of a population"""
     total = 0
     for org in pop:
         total += org.fitness(environment)
@@ -159,6 +166,7 @@ def get_average_fitness(pop, environment):
 
 
 def set_global_variables(config):
+    """Sets all the global variables based on the config file"""
     global OUTPUT_FOLDER
     OUTPUT_FOLDER = config.get("DEFAULT", "output_folder")
     global CONFIG_FILE
@@ -219,6 +227,7 @@ def save_string_to_file(string, filename):
         f.write(string)
 
 def generate_data():
+    """The main function; generates all the data"""
     if ORG_TYPE == "vector":
         fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, real_value_vector_org.LENGTH)
         fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
