@@ -8,8 +8,8 @@ Supposedly this can be used, have yet to get it to work
 # cython: profile=True
 from libcpp.vector cimport vector
 cdef extern from "cpp_fitness_function.cpp":
-    float cpp_sphere_function(vector[float] vec)
-    float cpp_rosenbrock_function(vector[float] vec)
+    float cpp_sphere_function(double* vals, long sz)
+    float cpp_rosenbrock_function(double* vals, long sz)
     float cpp_rana_function(vector[float] vec, vector[float] weights)
     float cpp_schafferF7(vector[float] vec)
     double add_array(double* ary, int size)
@@ -66,10 +66,10 @@ def old_sphere_function(vals):
     """
     return sum(val**2 for val in vals)
 
-def sphere_function(object vals):
+def sphere_function(np.ndarray[np.float64_t] vals):
     """Very simple function. Sums the squares of each value."""
-    cdef vector[float] vec = vals
-    return cpp_sphere_function(vec)
+    cdef long sz = vals.shape[0]
+    return cpp_sphere_function(&vals[0], sz)
 
 #Does not work very well; is slower
 #def cached_sphere_function(object vals):
@@ -86,15 +86,23 @@ def old_rosenbrock_function(vals):
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 
                for i in range(len(vals)-1))
 
-def rosenbrock_function(object vals):
-    cdef vector[float] vec = vals
-    return cpp_rosenbrock_function(vec)
+def rosenbrock_function(np.ndarray[np.float64_t] vals):
+    cdef long sz = vals.shape[0]
+    return cpp_rosenbrock_function(&vals[0], sz)
 
 def initialize_rana_weights(length):
+    #NEED TO MAKE THE RANA WEIGHTS AN ARRAY
     global RANA_WEIGHTS
     RANA_WEIGHTS = [random.random() for i in range(length)]
     total = sum(RANA_WEIGHTS)
     RANA_WEIGHTS = [i/total for i in RANA_WEIGHTS]
+    #NEED TO FIX THIS ASAP
+    RANA_WEIGHTS = np.array([], dtype=np.float64)
+    for _ in range(length):
+        #Append returns a copy
+        RANA_WEIGHTS = np.append(RANA_WEIGHTS, random.uniform(RANGE_MIN, RANGE_MAX))
+    return genotype
+
 
 def old_rana_function(vals):
     """OLD, NOT USED"""
@@ -118,13 +126,12 @@ def old_rana_function(vals):
                  sin(sqrt(fabs(x+y+1)))
     return total
 
-def rana_function(object vals):
+def rana_function(np.ndarray[np.float64_t] vals):
+    cdef long sz = vals.shape[0]
     global RANA_WEIGHTS
     if RANA_WEIGHTS is None:
-        initialize_rana_weights(len(vals))
-    cdef vector[float] vec = vals
-    cdef vector[float] weights = RANA_WEIGHTS
-    return cpp_rana_function(vec, weights)
+        initialize_rana_weights(sz)
+    return cpp_rana_function(&vals[0], sz, RANA_WEIGHTS)
 
 def old_schafferF7(vals):
     """OLD, NOT USED"""
@@ -229,10 +236,10 @@ cdef class Fitness_Function:
         return self.fitness2(vals)
 
     def correlation(self, samples=5000):
-    	"""
-    	Evaluates a random data set on both fitness functions # of samples times,
-    	saves the values in two lists, then gets the correlation of the lists
-    	"""
+        """
+        Evaluates a random data set on both fitness functions # of samples times,
+        saves the values in two lists, then gets the correlation of the lists
+        """
         vals1 = []
         vals2 = []
         #Samples number of times...

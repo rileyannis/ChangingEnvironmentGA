@@ -14,36 +14,31 @@ double add_array(double* ary, int sz){
   return sum;
 }
 
-float cpp_flat_function(vector<float> vals){
-  //Evaluates on a flat landscape. Should probably remove and just return 0.0 in cython
-  return 0.0;
-}
-
 float inline adding_squares(float tot, float val){
   //Inline function made for accumulate in sphere_function
   return tot + (val*val);
 }
 
-float cpp_sphere_function(vector<float> vals){
+float cpp_sphere_function(double* vals, long sz){
   //Accumulates the squares of all vals
-  return accumulate(vals.begin(), vals.end(), 0.0, adding_squares);
+  return accumulate(vals, vals + sz, 0.0, adding_squares);
 }
 
-float cpp_rosenbrock_function(vector<float> vals){
+float cpp_rosenbrock_function(double* vals, long sz){
   //The rosenbrock function! It does things!
   float tot = 0.0;
-  for(unsigned int i = 0; i < (vals.size() - 1); ++i){
+  for(unsigned int i = 0; i < (sz - 1); ++i){
     tot += (100.0 * pow(vals[i+1] - (pow(vals[i], 2)), 2) + pow(vals[i] - 1, 2));
   }
   return tot;
 }
 
-float cpp_rana_function(vector<float> vals, vector<float> weights){
+float cpp_rana_function(double* vals, long sz, double* weights){
   //The rana function! It does more things! Wow!
   float tot = 0.0, x, y;
-  for(unsigned int i = 0; i < vals.size(); ++i){
+  for(unsigned int i = 0; i < sz; ++i){
     x = vals[i];
-    if(i == (vals.size() - 1)){
+    if(i == (sz - 1)){
       y = vals[0];
     }
     else{
