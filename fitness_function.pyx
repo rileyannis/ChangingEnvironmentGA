@@ -8,10 +8,11 @@ Supposedly this can be used, have yet to get it to work
 # cython: profile=True
 from libcpp.vector cimport vector
 cdef extern from "cpp_fitness_function.cpp":
-    float cpp_sphere_function(double* vals, long sz)
-    float cpp_rosenbrock_function(double* vals, long sz)
-    float cpp_rana_function(vector[float] vec, vector[float] weights)
-    float cpp_schafferF7(vector[float] vec)
+    double cpp_sphere_function(double* vals, long sz)
+    double cpp_rosenbrock_function(double* vals, long sz)
+    double cpp_rana_function(double* vals, long sz, double* weights)
+    double cpp_schafferF7(double* vals, long sz)
+    double cpp_deceptive(double* vals, long sz)
     double add_array(double* ary, int size)
 
 from math import floor, sqrt, ceil, cos, sin, fabs
@@ -91,18 +92,15 @@ def rosenbrock_function(np.ndarray[np.float64_t] vals):
     return cpp_rosenbrock_function(&vals[0], sz)
 
 def initialize_rana_weights(length):
-    #NEED TO MAKE THE RANA WEIGHTS AN ARRAY
+    #Initialize temp_weights the same as the old rana weights
+    temp_weights = [random.random() for i in range(length)]
+    total = sum(temp_weights)
+    temp_weights = [i/total for i in temp_weights]
+    #Then copy each index over to the array
     global RANA_WEIGHTS
-    RANA_WEIGHTS = [random.random() for i in range(length)]
-    total = sum(RANA_WEIGHTS)
-    RANA_WEIGHTS = [i/total for i in RANA_WEIGHTS]
-    #NEED TO FIX THIS ASAP
     RANA_WEIGHTS = np.array([], dtype=np.float64)
-    for _ in range(length):
-        #Append returns a copy
-        RANA_WEIGHTS = np.append(RANA_WEIGHTS, random.uniform(RANGE_MIN, RANGE_MAX))
-    return genotype
-
+    for i in range(length):
+        RANA_WEIGHTS = np.append(RANA_WEIGHTS, temp_weights[i])
 
 def old_rana_function(vals):
     """OLD, NOT USED"""
@@ -113,10 +111,8 @@ def old_rana_function(vals):
             y = vals[0]
         else:
             y = vals[i+1]
-
         #Equation from 
         #http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/rana.html
-        
         global RANA_WEIGHTS
         if RANA_WEIGHTS is None:
             initialize_rana_weights(len(vals))
@@ -131,7 +127,9 @@ def rana_function(np.ndarray[np.float64_t] vals):
     global RANA_WEIGHTS
     if RANA_WEIGHTS is None:
         initialize_rana_weights(sz)
-    return cpp_rana_function(&vals[0], sz, RANA_WEIGHTS)
+    #Not ideal, but cannot find a way to have a typed global
+    cdef np.ndarray[np.float64_t] weights = RANA_WEIGHTS
+    return cpp_rana_function(&vals[0], sz, &weights[0])
 
 def old_schafferF7(vals):
     """OLD, NOT USED"""
@@ -144,13 +142,14 @@ def old_schafferF7(vals):
         total += (normalizer * sqrt(si) * (sin(50*si**0.20) + 1))**2
     return total
 
-def schafferF7(object vals):
-    cdef vector[float] vec = vals
-    return cpp_schafferF7(vec)
+def schafferF7(np.ndarray[np.float64_t] vals):
+    cdef long sz = vals.shape[0]
+    return cpp_schafferF7(&vals[0], sz)
 
 #SHOULD MAKE A CYTHON VERSION OF DECEPTIVE
 
-def deceptive(vals):
+def old_deceptive(vals):
+    """OLD, NOT USED"""
     #Adapted from: http://www.cs.unm.edu/~neal.holts/dga/
     #benchmarkFunction/deceptive.html
     deceptiveness = 0.20 #This is actually more like the 
@@ -171,6 +170,10 @@ def deceptive(vals):
             total += (vals[i]-deceptiveness)* \
                        (deceptive_best/(1.0-deceptiveness))
     return total/float(dimensions)
+
+def deceptive(np.ndarray[np.float64_t] vals):
+    cdef long sz = vals.shape[0]
+    return cpp_deceptive(&vals[0], sz)
 
 cdef class Fitness_Function:
     """

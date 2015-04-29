@@ -26,8 +26,8 @@ float cpp_sphere_function(double* vals, long sz){
 
 float cpp_rosenbrock_function(double* vals, long sz){
   //The rosenbrock function! It does things!
-  float tot = 0.0;
-  for(unsigned int i = 0; i < (sz - 1); ++i){
+  double tot = 0.0;
+  for(long i = 0; i < (sz - 1); ++i){
     tot += (100.0 * pow(vals[i+1] - (pow(vals[i], 2)), 2) + pow(vals[i] - 1, 2));
   }
   return tot;
@@ -35,8 +35,8 @@ float cpp_rosenbrock_function(double* vals, long sz){
 
 float cpp_rana_function(double* vals, long sz, double* weights){
   //The rana function! It does more things! Wow!
-  float tot = 0.0, x, y;
-  for(unsigned int i = 0; i < sz; ++i){
+  double tot = 0.0, x, y;
+  for(long i = 0; i < sz; ++i){
     x = vals[i];
     if(i == (sz - 1)){
       y = vals[0];
@@ -50,21 +50,20 @@ float cpp_rana_function(double* vals, long sz, double* weights){
   return tot;
 }
 
-float cpp_schafferF7(vector<float> vals){
+float cpp_schafferF7(double* vals, long sz){
   //The schafferF7 function! It does other things!
-  float tot = 0.0, norm = 1.0/vals.size(), si;
-  for(unsigned int i = 0; i < (vals.size() - 1); ++i){
+  double tot = 0.0, norm = 1.0/sz, si;
+  for(long i = 0; i < sz - 1; ++i){
     si = sqrt(pow(vals[i], 2) + pow(vals[i + 1], 2));
     tot += pow(norm * sqrt(si) * (sin(50 * pow(si, 0.20)) + 1), 2);
   }
   return tot;
 }
 
-float cpp_deceptive(vector<float> vals){
+float cpp_deceptive(double* vals, long sz){
   //The deceptive function. It does stuff.
-  float decep = 0.20, best = 1.0, decep_best = 0.7, tot = 0.0;
-  int dim = vals.size();
-  for(int i = 0; i < dim; ++i){
+  double decep = 0.20, best = 1.0, decep_best = 0.7, tot = 0.0;
+  for(long i = 0; i < sz; ++i){
     if(vals[i] < decep){
       tot += vals[i] * (-1.0 / decep) + best;
     }
@@ -72,5 +71,5 @@ float cpp_deceptive(vector<float> vals){
       tot += (vals[i] - decep) * (decep_best / (1.0 - decep));
     }
   }
-  return tot / dim;
+  return tot / sz;
 }

@@ -9,7 +9,7 @@ run:
 	python changing_environment_ga.py -c config.ini -o default_data
 
 clean:
-	-@rm -r *~ *.pyc *.csv *.c *.so cython_fitness_function.cpp build default_data 2>/dev/null || true
+	-@rm -r *~ *.pyc *.csv *.c *.so fitness_function.cpp build default_data 2>/dev/null || true
 
 test: cython
 	python -m unittest discover
