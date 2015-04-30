@@ -74,8 +74,7 @@ def _wrap_around(value, min_, max_):
 
 def _create_random_genotype():
     """Create a random array genotype"""
-    genotype = np.array([], dtype=np.float64)
-    for _ in range(LENGTH):
-        #Append returns a copy
-        genotype = np.append(genotype, random.uniform(RANGE_MIN, RANGE_MAX))
+    genotype = np.zeros(LENGTH, dtype=np.float64)
+    for i in range(LENGTH):
+        genotype[i] = random.uniform(RANGE_MIN, RANGE_MAX)
     return genotype

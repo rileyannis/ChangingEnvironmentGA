@@ -211,23 +211,22 @@ cdef class Fitness_Function:
     #    return [put_in_range(vals[i] + modgen(vals[i])) for i in range(len(vals))]
 
     #Cython version
-    cdef object _apply_modgen_to_vals(self, object vals, object modgen):
+    cdef _apply_modgen_to_vals(self, np.ndarray[np.float64_t] vals, object modgen):
         """
         Apply modgen to each val in vals.
         """
-        new_vals = []
+        cdef np.ndarray[np.float64_t] new_vals = np.zeros(vals.shape[0], np.float64)
         cdef double val, mod, val_and_mod
-        for i in range(len(vals)):
+        for i in range(vals.shape[0]):
             val = vals[i]
             mod = modgen(vals[i])
             val_and_mod = val + mod
             if val_and_mod < self.range_[0]:
-                new_vals.append(self.range_[0])
+                new_vals[i] = self.range_[0]
             elif val_and_mod > self.range_[1]:
-                new_vals.append(self.range_[1])
+                new_vals[i] = self.range_[1]
             else:
-                new_vals.append(val_and_mod)
-
+                new_vals[i] = val_and_mod
         return new_vals
     
     def fitness1_fitness(self, vals):
@@ -247,10 +246,10 @@ cdef class Fitness_Function:
         vals2 = []
         #Samples number of times...
         for i in range(samples):
-            solution = []
+            solution = np.zeros(self.arglen, np.float64)
             #Make a random data set
             for j in range(self.arglen):
-                solution.append(random.randrange(*self.range_))
+                solution[j] = random.randrange(*self.range_)
             #Evaluate it on both fitness functions and save the results
             vals1.append(self.fitness1(solution))
             vals2.append(self.fitness2(solution))
@@ -258,6 +257,7 @@ cdef class Fitness_Function:
         slope, intercept, r_value, p_value, std_err = stats.linregress(vals1, vals2)
         return r_value
 
+    #IS THIS EVER EVEN USED???
     def sd(self, samples=100):
         vals = []
         for i in range(samples):
