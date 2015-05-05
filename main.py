@@ -106,6 +106,10 @@ def print_status(generation, population, environment):
     average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
+def reset_fitness_cache(population):
+    for org in population:
+        org.reset_fitness_cache()
+
 def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
     current_fitness_list = [("Generation", "Average_Fitness", 
@@ -124,8 +128,10 @@ def evolve_population(reference_environment, alternative_environment):
     #In each generation, get the next one, update lists, then output to file
     for gen in range(NUMBER_OF_GENERATIONS):
         if gen == start_of_trimester_2:
+            reset_fitness_cache(population)
             current_environment = alternative_environment
         elif gen == start_of_trimester_3:
+            reset_fitness_cache(population)
             current_environment = reference_environment
         population = get_next_generation(population, current_environment)
 
