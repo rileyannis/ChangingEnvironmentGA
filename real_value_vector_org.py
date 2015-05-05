@@ -20,9 +20,15 @@ class RealValueVectorOrg(object):
         else:
             genotype = np.asarray(genotype, dtype=np.float64)
         self.genotype = genotype
+        self._fitness_cache = None
 
     def fitness(self, environment):
-        return environment(self.genotype)
+        if self._fitness_cache is None:
+            self._fitness_cache = environment(self.genotype)
+        return self._fitness_cache
+
+    def reset_fitness_cache(self):
+        self._fitness_cache = None
 
     def get_mutant(self):        
         return RealValueVectorOrg(_get_mutated_genotype(self.genotype, MUTATION_EFFECT_SIZE))
