@@ -33,9 +33,6 @@ class RealValueVectorOrg(object):
     def get_mutant(self):        
         return RealValueVectorOrg(_get_mutated_genotype(self.genotype, MUTATION_EFFECT_SIZE))
 
-    def get_clone(self):
-        return RealValueVectorOrg(self.genotype)
-
     def __eq__(self, other):
         return self.genotype == other.genotype
 
