@@ -114,10 +114,11 @@ def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
     current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation")]
-    current_fitness_best = [("Generation", "Best_fitness", "Best_org")]
+    current_fitness_best = [("Generation", "Best_Fitness", "Best_Org")]
 
-    reference_fitness_list = current_fitness_list[:]
-    reference_fitness_best = current_fitness_best[:]
+    reference_fitness_list = [("Generation", "Ref_Average_Fitness", 
+                    "Ref_Standard_Deviation")]
+    reference_fitness_best = [("Generation", "Ref_Best_Fitness", "Ref_Best_Org")]
 
     current_environment = reference_environment
 
@@ -198,7 +199,9 @@ def set_global_variables(config):
     elif ORG_TYPE == "vector":
         fitness_function_type_str = config.get("DEFAULT", "fitness_function_type")
         global FITNESS_FUNCTION_TYPE
-        if fitness_function_type_str == "sphere":
+        if fitness_function_type_str == "flat":
+            FITNESS_FUNCTION_TYPE = ff.flat_function
+        elif fitness_function_type_str == "sphere":
             FITNESS_FUNCTION_TYPE = ff.sphere_function
         elif fitness_function_type_str == "rosenbrock":
             FITNESS_FUNCTION_TYPE = ff.rosenbrock_function

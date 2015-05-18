@@ -24,8 +24,8 @@ def get_data(common_dir):
             continue
 
         dir_name_list = d.split("/")[-1].split("_")
-        idnum = dir_name_list[-1]
-        config = "_".join(dir_name_list[:-1])
+        idmun = dir_name_list[-2] + "-" + dir_name_list[-1]
+        config = "_".join(dir_name_list[:-2])
 
         if config in data:
             data[config][idnum] = {}
@@ -45,6 +45,61 @@ def get_data(common_dir):
         data[config][idnum]["best_reference"] = \
             pd.read_csv(common_dir+"/"+d+"/reference_best_fitnesses.csv")
 
+    return data
+
+def new_way_to_get_desired_data(common_dir, desired_data):
+    #Make a new dictionary
+    data = {}
+    #For each sub directory...
+    for sub_dir in os.listdir(common_dir):
+        #If it's not actually a directory, skip it
+        if not os.path.isdir(common_dir + "/" + sub_dir):
+            continue
+        #Grab the meaningful config name
+        sub_dir_name_list = sub_dir.split("/")[-1].split("_")
+        config = "_".join(dir_name_list[:-2])
+        #Make sure the config name is in the dictionary
+        if config not in data:
+            data[config] = []
+        #Append the desired data to the associated list
+        #with open(common_dir+"/"+d+"/correlation.dat") as infile:
+        #    data[config].append(float(infile.readline()))
+        if desired_data == "average_experienced":
+            data[config].append(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_fitnesses.csv"))
+        elif desired_data == "average_reference":
+            data[config].append(pd.read_csv(common_dir+"/"+sub_dir+"/reference_fitnesses.csv"))
+        elif desired_data == "best_experienced":
+            data[config].append(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_best_fitnesses.csv"))
+        elif desired_data == "best_reference":
+            data[config].append(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"))
+        else:
+            #Not sure of best way to throw error
+            print("***INVALID DATA REQUESTED***")
+    return data
+
+def new_way_to_get_all_data(common_dir):
+    #Make a new dictionary
+    data = {}
+    #For each sub directory...
+    for sub_dir in os.listdir(common_dir):
+        #If it's not actually a directory, skip it
+        if not os.path.isdir(common_dir + "/" + sub_dir):
+            continue
+        #Grab the meaningful config name
+        sub_dir_name_list = sub_dir.split("/")[-1].split("_")
+        config = "_".join(dir_name_list[:-2])
+        #Make sure the config name is in the dictionary
+        if config not in data:
+            data[config] = []
+        #Merge all the data into one dataframe, merging on generation
+        with open(common_dir+"/"+sub_dir+"/correlation.dat") as infile:
+            df = DataFrame([{"Correlation": float(infile.readline())}])
+        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_fitnesses.csv"))
+        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_fitnesses.csv"), on="Generation")
+        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_best_fitnesses.csv"), on="Generation")
+        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"), on="Generation")
+        #Append the dataframe to the associated list
+        data[config].append(df)
     return data
 
 def plot_single_run_over_time(single_run_data, directory):
