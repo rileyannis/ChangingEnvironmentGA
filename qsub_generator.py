@@ -3,7 +3,7 @@ import itertools
 from subprocess import call
 import datetime
 
-array_size = 4
+array_size = 40
 walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
 alt_corrs = [-1, -.99, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, .99, 1]
@@ -11,8 +11,8 @@ alt_corrs = [-1, -.99, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, .99, 1]
 function_types = ["sphere", "rana"]
 #alt_corrs = [-.99, .99]
 #alt_corrs = [1]
-num_gens = [1000]
-num_runs_per_job = 20
+num_gens = [10000]
+num_runs_per_job = 2
 output_dir_base = "length_100_" + today
 
 common = """
@@ -58,12 +58,13 @@ def write_to_file(filename, contents):
     with open(filename, "w") as file_handle:
         file_handle.write(contents)
 
-def start_runs(jobs, submit_jobs=True):
+def start_runs(jobs, submit_jobs=True, print_jobs=True):
     for job in jobs:
         contents = common + "\n" + job + "\n"
         write_to_file("tmp.sub", contents)
-        print "----------Submitting----------"
-        print contents
+        if print_jobs:
+            print("----------Submitting----------")
+            print(contents)
         if submit_jobs:
             call(["qsub", 'tmp.sub'])
             call(["rm", 'tmp.sub']) 
@@ -80,4 +81,4 @@ def create_config_files():
 if __name__ == "__main__":
     config_files = create_config_files()
     jobs = [convert_config_file_name_to_job_string(name, output_dir_base) for name in config_files]
-    start_runs(jobs, submit_jobs=True)
+    start_runs(jobs, submit_jobs=True, print_jobs=True)
