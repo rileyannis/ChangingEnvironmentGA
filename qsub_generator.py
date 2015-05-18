@@ -3,6 +3,7 @@ import itertools
 from subprocess import call
 
 array_size = 4 #needs to go back to 100 as soon as testing is done
+walltime = "10:00:00"
 
 def convert_config_file_name_to_job(file_name, output_dir_base):
     return "python changing_environment_ga.py -c {0} -o {1}/{0}_${{PBS_ARRAYID}}".format(file_name, output_dir_base)
@@ -10,7 +11,7 @@ def convert_config_file_name_to_job(file_name, output_dir_base):
 common = """
 #!/bin/bash -login
 
-#PBS -l walltime=10:00:00
+#PBS -l walltime={1}
 #PBS -l nodes=1:ppn=1
 #PBS -l mem=1gb
 #PBS -N changing_environment_test
@@ -20,7 +21,7 @@ module load NumPy
 module load SciPy
 
 cd ~/ChangingEnvironmentGA
-""".format(array_size)
+""".format(array_size, walltime)
 
 
 config_common = """
