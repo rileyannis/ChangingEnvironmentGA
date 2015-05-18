@@ -80,4 +80,4 @@ def create_config_files():
 if __name__ == "__main__":
     config_files = create_config_files()
     jobs = [convert_config_file_name_to_job_string(name, output_dir_base) for name in config_files]
-    start_runs(jobs, False)
+    start_runs(jobs, submit_jobs=True)
