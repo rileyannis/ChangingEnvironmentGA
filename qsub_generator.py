@@ -3,12 +3,12 @@ import itertools
 from subprocess import call
 import datetime
 
-array_size = 4 #needs to go back to 100 as soon as testing is done
+array_size = 4
 walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
-alt_corrs = [-1, -.99, -0.8, 0, 0.8, .99, 1]
+alt_corrs = [-1, -.99, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, .99, 1]
 #function_types = ["schafferf7"]
-function_types = ["rana"]
+function_types = ["sphere", "rana"]
 #alt_corrs = [-.99, .99]
 #alt_corrs = [1]
 num_gens = [1000]
