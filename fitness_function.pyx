@@ -246,13 +246,13 @@ cdef class Fitness_Function:
         vals2 = []
         #Samples number of times...
         for i in range(samples):
-            solution = np.zeros(self.arglen, np.float64)
+            random_genotype = np.zeros(self.arglen, np.float64)
             #Make a random data set
             for j in range(self.arglen):
-                solution[j] = random.randrange(*self.range_)
+                random_genotype[j] = random.randrange(*self.range_)
             #Evaluate it on both fitness functions and save the results
-            vals1.append(self.fitness1(solution))
-            vals2.append(self.fitness2(solution))
+            vals1.append(self.fitness1(random_genotype))
+            vals2.append(self.fitness2(random_genotype))
         #Compare all the results against each other and get the r value
         slope, intercept, r_value, p_value, std_err = stats.linregress(vals1, vals2)
         return r_value
