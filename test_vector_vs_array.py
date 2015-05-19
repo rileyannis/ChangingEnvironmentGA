@@ -78,14 +78,6 @@ class TestVectorOrgVsArrayOrg(unittest.TestCase):
         self.assertIs(type(repr(org3)), str)
         self.assertNotEqual(repr(org3), repr(org4))
 
-    def test_get_clone(self):
-        org1 = rvvo.RealValueVectorOrg([0,0])
-        org2 = org1.get_clone()
-        self.assertEqual(org1, org2)
-        org3 = arr.RealValueVectorOrg([0,0])
-        org4 = org3.get_clone()
-        self.assertEqual((org3==org4).all(), True)
-
     def test_get_mutant(self):
         org1 = rvvo.RealValueVectorOrg([0,0])
         org2 = org1.get_mutant()
