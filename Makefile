@@ -29,3 +29,6 @@ multiprofile: cython
 cleanprofile:
 	-@rm -r profile_junk_data
 	-@rm -r multiprofile_junk_data
+
+submit: cython
+	python qsub_generator.py
