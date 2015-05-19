@@ -2,11 +2,8 @@
 
 all: clean vector
 
-vector: 
-	python changing_environment_ga.py -c vector_config.ini -o default_data
-
 run: clean cython
-	python changing_environment_ga.py -c config.ini -o default_data
+	python changing_environment_ga.py -c quick_test.ini -o default_data
 
 clean:
 	-@rm -r *~ *.pyc *.csv *.c *.so fitness_function.cpp build default_data 2>/dev/null || true
