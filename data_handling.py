@@ -9,44 +9,15 @@ from matplotlib.lines import Line2D
 #import scipy.stats as stats
 
 def main():
-    test_dir = "RTR"
+    test_dir = "test_2015_May_19"
     data = get_data(test_dir)
-    plot_aggregate_over_time(data, "deceptive", test_dir)
-    plot_stddev_over_time(data, "deceptive", test_dir)
-    plot_average_final_fitness(data, "deceptive", test_dir)
+    plot_aggregate_over_time(data, "sphere", test_dir)
+    plot_stddev_over_time(data, "sphere", test_dir)
+    plot_average_final_fitness(data, "sphere", test_dir)
     #plot_single_run_over_time(data[data.keys()[0]]["1"]["average_experienced"], test_dir)
     #print data.keys()[0]
 
-def get_data(common_dir):
-    data = {}
-    for d in os.listdir(common_dir):
-        if not os.path.isdir(common_dir + "/" + d):
-            continue
-
-        dir_name_list = d.split("/")[-1].split("_")
-        idmun = dir_name_list[-2] + "-" + dir_name_list[-1]
-        config = "_".join(dir_name_list[:-2])
-
-        if config in data:
-            data[config][idnum] = {}
-        else:
-            data[config] = {}
-            data[config][idnum] = {}
-
-        with open(common_dir+"/"+d+"/correlation.dat") as infile:
-            data[config][idnum]["correlation"] = float(infile.readline())
-
-        data[config][idnum]["average_experienced"] = \
-            pd.read_csv(common_dir+"/"+d+"/experienced_fitnesses.csv")
-        data[config][idnum]["average_reference"] = \
-            pd.read_csv(common_dir+"/"+d+"/reference_fitnesses.csv")
-        data[config][idnum]["best_experienced"] = \
-            pd.read_csv(common_dir+"/"+d+"/experienced_best_fitnesses.csv")
-        data[config][idnum]["best_reference"] = \
-            pd.read_csv(common_dir+"/"+d+"/reference_best_fitnesses.csv")
-
-    return data
-
+#Not currently used, but could be used to grab one set of data
 def new_way_to_get_desired_data(common_dir, desired_data):
     #Make a new dictionary
     data = {}
@@ -77,7 +48,7 @@ def new_way_to_get_desired_data(common_dir, desired_data):
             print("***INVALID DATA REQUESTED***")
     return data
 
-def new_way_to_get_all_data(common_dir):
+def get_data(common_dir):
     #Make a new dictionary
     data = {}
     #For each sub directory...
@@ -87,21 +58,27 @@ def new_way_to_get_all_data(common_dir):
             continue
         #Grab the meaningful config name
         sub_dir_name_list = sub_dir.split("/")[-1].split("_")
-        config = "_".join(dir_name_list[:-2])
+        config = "_".join(sub_dir_name_list[:-2])
         #Make sure the config name is in the dictionary
         if config not in data:
             data[config] = []
-        #Merge all the data into one dataframe, merging on generation
+        #Get Correlation
         with open(common_dir+"/"+sub_dir+"/correlation.dat") as infile:
-            df = DataFrame([{"Correlation": float(infile.readline())}])
-        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_fitnesses.csv"))
-        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_fitnesses.csv"), on="Generation")
-        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_best_fitnesses.csv"), on="Generation")
-        df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"), on="Generation")
-        #Append the dataframe to the associated list
-        data[config].append(df)
+            corr = float(infile.readline())
+        #Merge the rest of the data into one dataframe, merging on generation
+        #Get Generation, Average_Fitness, and Standard_Deviation
+        df = pd.read_csv(common_dir+"/"+sub_dir+"/experienced_fitnesses.csv")
+        #Get Ref_Average_Fitness and Ref_Standard_Deviation
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_fitnesses.csv"), on="Generation")
+        #Get Best_Fitness and Best_Org
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_best_fitnesses.csv"), on="Generation")
+        #Get Ref_Best_Fitness and Ref_Best_Org
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"), on="Generation")
+        #Append the correlation and dataframe to the associated list
+        data[config].append([corr, df])
     return data
 
+#Not corrected for use with the new data
 def plot_single_run_over_time(single_run_data, directory):
     plt.clear()
     plt.plot(single_run_data["Generation"], np.log(single_run_data["Average_Fitness"]))
@@ -114,8 +91,8 @@ def plot_aggregate_over_time(data, key=None, directory="."):
         if (key != None and key not in config):
             continue
         series = []
-        for run in data[config]:
-            series.append(data[config][run]["average_reference"]["Average_Fitness"])
+        for run in range(len(data[config])):
+            series.append(data[config][run][1]["Ref_Average_Fitness"])
         
         averages = []
         #stdevs = []
@@ -126,15 +103,15 @@ def plot_aggregate_over_time(data, key=None, directory="."):
                 add_factor = 20000
             logs = [np.log(s[i]+add_factor) for s in series]
             averages.append(sum(logs)/float(len(logs)))
-        lines[config] = Line2D(data[config][data[config].keys()[0]]["average_reference"]["Generation"], averages)
+        lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
-        x = data[config][data[config].keys()[0]]["average_reference"]["Generation"]
+        x = data[config][0][1]["Generation"]
         plt.plot(x, averages, hold=True, label=config)
     plt.legend(loc="upper right")
     plt.xlabel("Generation")
-    plt.ylabel("Average Fitness")
+    plt.ylabel("Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/runs_over_time_"+key+"_2500gen.png")
+    plt.savefig(directory+"/runs_over_time_"+key+"_10000gen.png")
 
 def plot_stddev_over_time(data, key=None, directory="."):
     plt.clf()
@@ -143,8 +120,8 @@ def plot_stddev_over_time(data, key=None, directory="."):
         if (key != None and key not in config):
             continue
         series = []
-        for run in data[config]:
-            series.append(data[config][run]["average_reference"]["Standard_Deviation"])
+        for run in range(len(data[config])):
+            series.append(data[config][run][1]["Ref_Standard_Deviation"])
         
         averages = []
         #stdevs = []
@@ -155,15 +132,15 @@ def plot_stddev_over_time(data, key=None, directory="."):
                 add_factor = 20000
             devs = [s[i] for s in series]
             averages.append(sum(devs)/float(len(devs)))
-        lines[config] = Line2D(data[config][data[config].keys()[0]]["average_reference"]["Generation"], averages)
+        lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
-        x = data[config][data[config].keys()[0]]["average_reference"]["Generation"]
+        x = data[config][0][1]["Generation"]
         plt.plot(x, averages, hold=True, label=config)
     plt.legend(loc="upper right")
     plt.xlabel("Generation")
-    plt.ylabel("Average Fitness")
+    plt.ylabel("Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/diversity_over_time_"+key+"_2500gen.png")
+    plt.savefig(directory+"/diversity_over_time_"+key+"_10000gen.png")
 
 def plot_average_final_fitness(data, key=None, directory="."):
     plt.clf()
@@ -172,17 +149,17 @@ def plot_average_final_fitness(data, key=None, directory="."):
     
     for config in data:
         if key == None or key in config:
-            for run in data[config]:
-                corrs.append(data[config][run]["correlation"])
+            for run in range(len(data[config])):
+                corrs.append(data[config][run][0])
                 add_factor=0
                 if "rana" in config:
                     add_factor = 20000
-                finals.append(add_factor+float(data[config][run]["average_reference"]["Average_Fitness"][-1:]))
+                finals.append(add_factor+float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
                 #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
     
     plt.plot(corrs, np.log(finals), ".")
     plt.xlabel("Correlation")
-    plt.ylabel("Average Fitness")
+    plt.ylabel("Reference Average Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter_"+key+".png")
 
 if __name__ == "__main__":
