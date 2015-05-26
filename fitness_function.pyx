@@ -271,6 +271,7 @@ cdef class Fitness_Function:
         """
         Initializes the self.mods dictionary with the pertubations that will be applied to each value.
         """
+        #THIS IS THE ONLY PLACE THESE TWO GLOBALS ARE USED, EQUAL TO 50*50.0=250.0
         sd = MUTATION_EFFECT_SIZE  * CHANGE_MODIFIER * (1 - abs(self.corr))
         return [random.normalvariate(0, sd) for _ in range(MOD_SAMPLES + 1)]
 

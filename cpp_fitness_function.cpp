@@ -44,8 +44,8 @@ float cpp_rana_function(double* vals, long sz, double* weights){
     else{
       y = vals[i + 1];
     }
-    tot += weights[i] * x * sin(sqrt(abs(y + 1 - x))) * cos(sqrt(abs(x + y + 1)))
-      + (y + 1) * cos(sqrt(abs(y + 1 - x))) * sin(sqrt(abs(x + y + 1)));
+    tot += weights[i] * (x * sin(sqrt(abs(y + 1 - x))) * cos(sqrt(abs(x + y + 1)))
+			 + (y + 1) * cos(sqrt(abs(y + 1 - x))) * sin(sqrt(abs(x + y + 1))));
   }
   return tot;
 }
