@@ -140,11 +140,12 @@ def evolve_population(reference_environment, alternative_environment):
             population, current_environment)
         current_fitness_list.append((gen, average_fitness, stdev))
         current_fitness_best.append((gen, best_fitness, best_org))
-
-        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
-            population, reference_environment)
-        reference_fitness_list.append((gen, average_fitness, stdev))
-        reference_fitness_best.append((gen, best_fitness, best_org))
+        
+        if not ORG_TYPE == "bit_vector":
+            average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+                population, reference_environment)
+            reference_fitness_list.append((gen, average_fitness, stdev))
+            reference_fitness_best.append((gen, best_fitness, best_org))
 
         if VERBOSE:
             print_status(gen, population, current_environment)
@@ -222,10 +223,12 @@ def set_global_variables(config):
         mut_effect_size = config.getfloat("DEFAULT", "mutation_effect_size")
         ff.MUTATION_EFFECT_SIZE = mut_effect_size
         real_value_vector_org.MUTATION_EFFECT_SIZE = mut_effect_size
-    global ALTERNATE_ENVIRONMENT_CORR
-    ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
-        "DEFAULT", "alternate_environment_corr")
-    
+        global ALTERNATE_ENVIRONMENT_CORR
+        ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
+            "DEFAULT", "alternate_environment_corr")
+    if ORG_TYPE == "bit_vector":
+        bit_vector_org.LENGTH = config.getint("DEFAULT", "length")
+
 def save_table_to_file(table, filename):
     with open(filename, "wb") as f:
         writer = csv.writer(f)
@@ -240,11 +243,14 @@ def generate_data():
     if ORG_TYPE == "vector":
         fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, real_value_vector_org.LENGTH)
         fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
-        reference_environment  = fitness_function.fitness1_fitness
-        alternative_environment  = fitness_function.fitness2_fitness
+        reference_environment = fitness_function.fitness1_fitness
+        alternative_environment = fitness_function.fitness2_fitness
     elif ORG_TYPE == "string":
-        reference_environment  = string_org.default_environment
-        alternative_environment  = string_org.hash_environment
+        reference_environment = string_org.default_environment
+        alternative_environment = string_org.hash_environment
+    elif ORG_TYPE == "bit_vector":
+        reference_environment = bit_vector_org.fitness_function
+        alternate_environment = reference_environment
 
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
@@ -268,14 +274,15 @@ def generate_data():
     time_filename = join_path("time.dat")
 
     save_table_to_file(experienced_fits, experienced_filename)
-    save_table_to_file(reference_fits, reference_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
-    save_table_to_file(reference_bests, reference_best_filename)
-    if ORG_TYPE == "vector":
-        save_string_to_file(str(fitness_function.correlation()), corr_filename)
+    if not ORG_TYPE == "bit_vector":
+        save_table_to_file(reference_fits, reference_filename)
+        save_table_to_file(reference_bests, reference_best_filename)
+        if ORG_TYPE == "vector":
+            save_string_to_file(str(fitness_function.correlation()), corr_filename)
 
-    start_time = datetime.datetime.fromtimestamp(START_TIME)
-    end_time = datetime.datetime.now()
-    time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
-    save_string_to_file(time_str, time_filename)
+        start_time = datetime.datetime.fromtimestamp(START_TIME)
+        end_time = datetime.datetime.now()
+        time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
+        save_string_to_file(time_str, time_filename)
     
