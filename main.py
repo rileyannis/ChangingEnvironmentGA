@@ -8,6 +8,7 @@ from string import ascii_uppercase
 import csv
 import string_org
 import real_value_vector_org
+import bit_vector_org
 import scipy.stats as stats
 import fitness_function as ff
 from math import floor
@@ -29,18 +30,13 @@ CROWDING = False
 
 def create_initial_population():
     """
-    Create a starting population by appending randomly generated organisms to an empty list.
+    Create a starting population by forming a list of randomly generated organisms.
     """
-    population = []
-    for _ in range(NUMBER_OF_ORGANISMS):
-        if ORG_TYPE == "string":
-            population.append(string_org.StringOrg())
-        elif ORG_TYPE == "vector":
-            population.append(
-                real_value_vector_org.RealValueVectorOrg())
-    return population
-
-
+    org_type_map = {"string": string_org.StringOrg; "vector": real_value_vector_org.RealValueVectorOrg;
+                    "bit_vector": bit_vector_org.BitVectorOrg}
+    if ORG_TYPE in org_type_map:
+        return [org_type_map[ORG_TYPE]() for _ in range(NUMBER_OF_ORGANISMS)]
+    
 def get_mutated_population(population):
     """
     Return a new population with a percentage of organisms mutated based on the mutation rate.
