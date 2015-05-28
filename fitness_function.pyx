@@ -146,8 +146,6 @@ def schafferF7(np.ndarray[np.float64_t] vals):
     cdef long sz = vals.shape[0]
     return cpp_schafferF7(&vals[0], sz)
 
-#SHOULD MAKE A CYTHON VERSION OF DECEPTIVE
-
 def old_deceptive(vals):
     """OLD, NOT USED"""
     #Adapted from: http://www.cs.unm.edu/~neal.holts/dga/
@@ -343,3 +341,9 @@ cdef class Fitness_Function:
         def inverted(vals):
             return function(vals) * -1
         return inverted
+
+    def get_fitness1(self):
+        return self.fitness1
+
+    def get_fitness2(self):
+        return self.fitness2
