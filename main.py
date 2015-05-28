@@ -112,6 +112,7 @@ def reset_fitness_cache(population):
 
 def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
+    #Set up the output lists
     current_fitness_list = [("Generation", "Average_Fitness", 
                     "Standard_Deviation")]
     current_fitness_best = [("Generation", "Best_Fitness", "Best_Org")]
@@ -120,22 +121,25 @@ def evolve_population(reference_environment, alternative_environment):
                     "Ref_Standard_Deviation")]
     reference_fitness_best = [("Generation", "Ref_Best_Fitness", "Ref_Best_Org")]
 
+    #Set up the other variables
     current_environment = reference_environment
-
     start_of_trimester_2 = int(floor(NUMBER_OF_GENERATIONS/3.0))
     start_of_trimester_3 = int(floor(NUMBER_OF_GENERATIONS*2.0/3.0))
 
     population = create_initial_population()
-    #In each generation, get the next one, update lists, then output to file
+    #In each generation...
     for gen in range(NUMBER_OF_GENERATIONS):
+        #Check if the environment needs changed
         if gen == start_of_trimester_2:
             reset_fitness_cache(population)
             current_environment = alternative_environment
         elif gen == start_of_trimester_3:
             reset_fitness_cache(population)
             current_environment = reference_environment
+        #Get the next generation
         population = get_next_generation(population, current_environment)
 
+        #Append the stats to the output lists
         average_fitness, stdev, best_org, best_fitness = get_generation_stats(
             population, current_environment)
         current_fitness_list.append((gen, average_fitness, stdev))
@@ -149,6 +153,7 @@ def evolve_population(reference_environment, alternative_environment):
         if VERBOSE:
             print_status(gen, population, current_environment)
     
+    #Return the output lists
     result =  (current_fitness_list, current_fitness_best, 
                reference_fitness_list, reference_fitness_best)
     return result
