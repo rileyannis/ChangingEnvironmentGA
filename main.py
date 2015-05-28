@@ -193,8 +193,6 @@ def set_global_variables(config):
     TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
-    global CROWDING
-    CROWDING = eval(config.get("DEFAULT", "crowding"))
     if ORG_TYPE == "string":
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
@@ -226,6 +224,8 @@ def set_global_variables(config):
         global ALTERNATE_ENVIRONMENT_CORR
         ALTERNATE_ENVIRONMENT_CORR = config.getfloat(
             "DEFAULT", "alternate_environment_corr")
+        global CROWDING
+        CROWDING = eval(config.get("DEFAULT", "crowding"))
     if ORG_TYPE == "bit_vector":
         bit_vector_org.LENGTH = config.getint("DEFAULT", "length")
 
