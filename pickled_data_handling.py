@@ -8,11 +8,15 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 #import scipy.stats as stats
 import cPickle
+import operator
+
+COLORS = ["silver", "maroon", "red", "purple", "fuchsia", "green", "lime", "olive", "yellow",
+              "navy", "blue", "teal", "aqua"]
 
 def main():
-    test_dir = "length_100_2015_May_27"
+    test_dir = "length_100_2015_May_19"
     data = get_data(test_dir)
-    landscape = "schafferf7"
+    landscape = "sphere"
     plot_aggregate_over_time(data, landscape, test_dir)
     plot_stddev_over_time(data, landscape, test_dir)
     plot_average_final_fitness(data, landscape, test_dir)
@@ -54,7 +58,7 @@ def get_data(common_dir):
     file_name = common_dir + "/pickled_data"
     try:
         data_file = open(file_name, "r")
-        data = pickle.load(data_file)
+        data = cPickle.load(data_file)
         data_file.close()
         return data
     except:
@@ -87,7 +91,7 @@ def get_data(common_dir):
         df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"), on="Generation")
         #Append the correlation and dataframe to the associated list
         data[config].append([corr, df])
-    pickle.dump(data, data_file)
+    cPickle.dump(data, data_file)
     data_file.close()
     return data
 
@@ -100,6 +104,8 @@ def plot_single_run_over_time(single_run_data, directory):
 def plot_aggregate_over_time(data, key=None, directory="."):
     plt.clf()
     lines = {}
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
         if (key != None and key not in config):
             continue
@@ -119,8 +125,19 @@ def plot_aggregate_over_time(data, key=None, directory="."):
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
         x = data[config][0][1]["Generation"]
-        plt.plot(x, averages, hold=True, label=(config.split("_")[1]))
-    plt.legend(loc="upper right")
+        try:
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+        except:
+            colors = [color for color in COLORS]
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+    
+    handles, labels = ax.get_legend_handles_labels()
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Generation")
     plt.ylabel("Log of Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
@@ -129,6 +146,8 @@ def plot_aggregate_over_time(data, key=None, directory="."):
 def plot_stddev_over_time(data, key=None, directory="."):
     plt.clf()
     lines = {}
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
         if (key != None and key not in config):
             continue
@@ -148,8 +167,19 @@ def plot_stddev_over_time(data, key=None, directory="."):
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
         x = data[config][0][1]["Generation"]
-        plt.plot(x, averages, hold=True, label=(config.split("_")[1]))
-    plt.legend(loc="upper right")
+        try:
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+        except:
+            colors = [color for color in COLORS]
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+    
+    handles, labels = ax.get_legend_handles_labels()
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Generation")
     plt.ylabel("Log of Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
@@ -157,10 +187,11 @@ def plot_stddev_over_time(data, key=None, directory="."):
 
 def plot_average_final_fitness(data, key=None, directory="."):
     plt.clf()
-    corrs = []
-    finals = []
-    
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
+        corrs = []
+        finals = []
         if key == None or key in config:
             for run in range(len(data[config])):
                 corrs.append(data[config][run][0])
@@ -169,8 +200,21 @@ def plot_average_final_fitness(data, key=None, directory="."):
                 #    add_factor = 20000
                 finals.append(add_factor+float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
                 #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
+            try:
+                ax.plot(corrs, np.log(finals), marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
+            except:
+                colors = [color for color in COLORS]
+                ax.plot(corrs, np.log(finals), marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
     
-    plt.plot(corrs, np.log(finals), ".")
+    handles, labels = ax.get_legend_handles_labels()
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Correlation")
     plt.ylabel("Log of Reference Average Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter_"+key+".png")
