@@ -14,6 +14,19 @@ class MemoryPDGenotype(object):
         assert len(decision_list) == 2 ** number_of_bits_of_memory
         self.number_of_bits_of_memory = number_of_bits_of_memory
         self.decision_list = decision_list
+    
+    def __eq__(self, other):
+        return (self.number_of_bits_of_memory == other.number_of_bits_of_memory and
+                self.decision_list == other.decision_list)
+    
+    def __ne__(self, other):
+        return not self == other
+    
+    def __str__(self):
+        return "MemoryPDGenotype({}, {})".format(self.number_of_bits_of_memory, self.decision_list)
+    
+    def __repr__(self):
+        return str(self)
 
     def get_mutant_of_self(self):
         """
@@ -51,7 +64,7 @@ class MemoryPDGenotype(object):
         return decision_list_mutant(mutation_location)
 
 
-class BitVectorOrg(object):
+class PDOrg(object):
     """
         
         
@@ -61,21 +74,13 @@ class BitVectorOrg(object):
     def __init__(self, genotype=None):
         if genotype is None:
             genotype = _create_random_genotype()
-        else:
-            genotype = np.asarray(genotype, dtype=np.float64)
         self.genotype = genotype
-        self._fitness_cache = None
     
     def fitness(self, environment):
-        if self._fitness_cache is None:
-            self._fitness_cache = environment(self.genotype)
-        return self._fitness_cache
-    
-    def reset_fitness_cache(self):
-        self._fitness_cache = None
+        pass
     
     def get_mutant(self):
-        return RealValueVectorOrg(_get_mutated_genotype(self.genotype, MUTATION_EFFECT_SIZE))
+        return PDOrg(self.genotype.get_mutant_of_self())
     
     def __eq__(self, other):
         return self.genotype == other.genotype
@@ -84,37 +89,21 @@ class BitVectorOrg(object):
         return not self == other
     
     def __str__(self):
-        return "RealValueVectorOrg({})".format(self.genotype)
+        return "PDOrg({})".format(self.genotype)
     
     def __repr__(self):
         return str(self)
     
     def is_better_than(self, other, environment):
-        return self.fitness(environment) < other.fitness(environment)
-
-def _get_mutated_genotype(genotype, effect_size):
-    """Mutates one locus in organism at random"""
-    mut_location = random.randrange(genotype.shape[0])
-    delta = random.normalvariate(0, effect_size)
-    mutant_value = genotype[mut_location] + delta
-    #Ensure a copy is made so mutant doesn't edit the original
-    mutant = np.array(genotype, copy=True)
-    mutant[mut_location] = _wrap_around(mutant_value, RANGE_MIN, RANGE_MAX)
-    return mutant
-
-def _wrap_around(value, min_, max_):
-    """Literally does what it says."""
-    width = max_ - min_
-    while value < min_ or value > max_:
-        if value < min_:
-            value += width
-        else:
-            value -= width
-    return value
+        pass
 
 def _create_random_genotype():
-    """Create a random array genotype"""
-    genotype = np.zeros(LENGTH, dtype=np.float64)
-    for i in range(LENGTH):
-        genotype[i] = random.uniform(RANGE_MIN, RANGE_MAX)
-    return genotype
+    number_of_bits_of_memory = random.randrange(MAX_BITS_OF_MEMORY + 1)
+
+    length = 2 ** number_of_bits_of_memory
+    decision_list = [random.choice([True, False]) for _ in range(length)]
+
+    return MemoryPDGenotype(number_of_bits_of_memory, decision_list)
+
+
+
