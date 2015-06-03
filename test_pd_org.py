@@ -127,7 +127,7 @@ class TestPDOrg(unittest.TestCase):
         Test if no genotype is given to PDOrg constructor
         """
         random_org = PDOrg()
-        self.assertTrue(isinstance(random_org.genotype, Geno))
+        self.assertIsInstance(random_org.genotype, Geno)
     
     def test_get_mutant(self):
         mutant_org = self.org.get_mutant()
@@ -147,9 +147,23 @@ class TestPDOrg(unittest.TestCase):
         self.assertEqual(expected, repr_result)
         
     def test_opponent_cooperated_last_round(self):
-        pass
-    
-    
+        self.org.opponent_cooperated_last_round(True)
+        self.assertSequenceEqual([False, True], self.org.memory)
+        
+        self.org.opponent_cooperated_last_round(False)
+        self.assertSequenceEqual([True, False], self.org.memory)
+        
+    def test_will_cooperate(self):
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(False, did_cooperate)
+        
+        self.org.opponent_cooperated_last_round(True)
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(False, did_cooperate)
+        
+        self.org.opponent_cooperated_last_round(True)
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(True, did_cooperate)
     
     
 
