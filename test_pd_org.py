@@ -165,7 +165,5 @@ class TestPDOrg(unittest.TestCase):
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(True, did_cooperate)
     
-    
-
 if __name__ == "__main__":
     unittest.main()
