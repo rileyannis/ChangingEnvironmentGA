@@ -197,7 +197,7 @@ def plot_stddev_over_time(data, key=None, directory="."):
             add_factor = 0
             #if "rana" in config:
             #    add_factor = 20000
-            devs = [s[i] for s in series]
+            devs = [np.log(s[i]) for s in series]
             averages.append(sum(devs)/float(len(devs)))
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
@@ -218,7 +218,7 @@ def plot_stddev_over_time(data, key=None, directory="."):
     ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
     ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Generation")
-    plt.ylabel("Log of Reference Average Fitness")
+    plt.ylabel("Log of Standard Deviation")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
     plt.savefig(directory+"/diversity_over_time_"+key+"_10000gen.png")
 
