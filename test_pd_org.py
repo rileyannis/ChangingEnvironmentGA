@@ -45,6 +45,23 @@ class TestMemoryPDGenotype(unittest.TestCase):
     def test_decision_list_mutant(self):
         mutant = self.geno._decision_list_mutant()
         self.assertNotEqual(mutant, self.geno)
+        self.assertEqual(mutant.number_of_bits_of_memory,
+            self.geno.number_of_bits_of_memory)
+        self.assertNotEqual(mutant.decision_list, self.geno.decision_list)
+        self.assertEqual(mutant.initial_memory, self.geno.initial_memory)
+        
+    def test_initial_memory_mutant(self):
+        mutant = self.geno._initial_memory_mutant()
+        self.assertNotEqual(mutant, self.geno)
+        self.assertEqual(mutant.number_of_bits_of_memory,
+            self.geno.number_of_bits_of_memory)
+        self.assertEqual(mutant.decision_list, self.geno.decision_list)
+        self.assertNotEqual(mutant.initial_memory, self.geno.initial_memory)
+    
+    def test_initial_memory_mutant_no_memory(self):
+        no_memory = Geno(0, [True], [])
+        mutant = no_memory._initial_memory_mutant()
+        self.assertEqual(mutant, no_memory)
         
 
 if __name__ == "__main__":

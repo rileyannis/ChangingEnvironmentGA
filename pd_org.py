@@ -73,8 +73,14 @@ class MemoryPDGenotype(object):
         return MemoryPDGenotype(self.number_of_bits_of_memory, new_decision_list, self.initial_memory)
         
     def _initial_memory_mutant(self):
+        """
+        Normally, a single of bit of initial memory is flipped,
+        but if there is no memory, no change is made
+        """
+        if self.number_of_bits_of_memory == 0:
+            return self
         mutation_location = random.randrange(len(self.initial_memory))
-        new_initial_memory = self.initial_memory
+        new_initial_memory = self.initial_memory[:]
         new_initial_memory[mutation_location] = not new_initial_memory[mutation_location]
         return MemoryPDGenotype(self.number_of_bits_of_memory, self.decision_list, new_initial_memory)
 
