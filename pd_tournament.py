@@ -5,14 +5,14 @@ their score in an iterated Prisoner's Dilemma
 
 import pd_org
 
-NUMBER_OF_ROUNDS = 500
+NUMBER_OF_ROUNDS = 64
 
-TEMPTATION = 4
+TEMPTATION = 5
 REWARD = 3
-PUNISHMENT = 2
-SUCKER = 1
+PUNISHMENT = 1
+SUCKER = 0
 
-def my_reward(self_is_cooperator, other_is_cooperator):
+def pd_payout(self_is_cooperator, other_is_cooperator):
     """
     Function my_reward determines reward given by the state of self and other
         
@@ -20,7 +20,7 @@ def my_reward(self_is_cooperator, other_is_cooperator):
     if self_is_cooperator:
         if other_is_cooperator:
             return reward
-            return sucker
+        return sucker
     if other_is_cooperator:
         return temptation
     return punishment
@@ -41,5 +41,5 @@ def my_reward(self_is_cooperator, other_is_cooperator):
 
 
 def run_game(organism_a, organism_b):
-    pass
+
 
