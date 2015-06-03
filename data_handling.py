@@ -7,11 +7,17 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 #import scipy.stats as stats
+import cPickle
+import operator
+
+COLORS = ["silver", "maroon", "red", "purple", "fuchsia", "green", "lime", "olive", "yellow",
+              "navy", "blue", "teal", "aqua"]
 
 def main():
-    test_dir = "length_100_2015_May_26"
-    data = get_data(test_dir)
-    landscape = "rosenbrock"
+    test_dir = "length_100_2015_May_19"
+    #data = get_data(test_dir)
+    data = get_pickled_data(test_dir)
+    landscape = "sphere"
     plot_aggregate_over_time(data, landscape, test_dir)
     plot_stddev_over_time(data, landscape, test_dir)
     plot_average_final_fitness(data, landscape, test_dir)
@@ -50,6 +56,7 @@ def new_way_to_get_desired_data(common_dir, desired_data):
     return data
 
 def get_data(common_dir):
+    """Version of get_data that doesn't use cPickle"""
     #Make a new dictionary
     data = {}
     #For each sub directory...
@@ -79,6 +86,48 @@ def get_data(common_dir):
         data[config].append([corr, df])
     return data
 
+def get_pickled_data(common_dir):
+    """Uses cPickle to store data the first time around so we can regenerate graphs later"""
+    file_name = common_dir + "/pickled_data"
+    try:
+        data_file = open(file_name, "r")
+        data = cPickle.load(data_file)
+        data_file.close()
+        return data
+    except:
+        pass
+    data_file = open(file_name, "w")
+    #Make a new dictionary
+    data = {}
+    #For each sub directory...
+    for sub_dir in os.listdir(common_dir):
+        #If it's not actually a directory, skip it
+        if not os.path.isdir(common_dir + "/" + sub_dir):
+            continue
+        #Grab the meaningful config name
+        sub_dir_name_list = sub_dir.split("/")[-1].split("_")
+        config = "_".join(sub_dir_name_list[:-2])
+        #Make sure the config name is in the dictionary
+        if config not in data:
+            data[config] = []
+        #Get Correlation
+        with open(common_dir+"/"+sub_dir+"/correlation.dat") as infile:
+            corr = float(infile.readline())
+        #Merge the rest of the data into one dataframe, merging on generation
+        #Get Generation, Average_Fitness, and Standard_Deviation
+        df = pd.read_csv(common_dir+"/"+sub_dir+"/experienced_fitnesses.csv")
+        #Get Ref_Average_Fitness and Ref_Standard_Deviation
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_fitnesses.csv"), on="Generation")
+        #Get Best_Fitness and Best_Org
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/experienced_best_fitnesses.csv"), on="Generation")
+        #Get Ref_Best_Fitness and Ref_Best_Org
+        df = df.merge(pd.read_csv(common_dir+"/"+sub_dir+"/reference_best_fitnesses.csv"), on="Generation")
+        #Append the correlation and dataframe to the associated list
+        data[config].append([corr, df])
+    cPickle.dump(data, data_file)
+    data_file.close()
+    return data
+
 #Not corrected for use with the new data
 def plot_single_run_over_time(single_run_data, directory):
     plt.clear()
@@ -88,6 +137,8 @@ def plot_single_run_over_time(single_run_data, directory):
 def plot_aggregate_over_time(data, key=None, directory="."):
     plt.clf()
     lines = {}
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
         if (key != None and key not in config):
             continue
@@ -107,8 +158,21 @@ def plot_aggregate_over_time(data, key=None, directory="."):
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
         x = data[config][0][1]["Generation"]
-        plt.plot(x, averages, hold=True, label=(config.split("_")[1]))
-    plt.legend(loc="upper right")
+        try:
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+        except:
+            colors = [color for color in COLORS]
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+    
+    handles, labels = ax.get_legend_handles_labels()
+    labels = [float(label) for label in labels]
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    labels2 = [str(label) for label in labels2]
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Generation")
     plt.ylabel("Log of Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
@@ -117,6 +181,8 @@ def plot_aggregate_over_time(data, key=None, directory="."):
 def plot_stddev_over_time(data, key=None, directory="."):
     plt.clf()
     lines = {}
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
         if (key != None and key not in config):
             continue
@@ -136,8 +202,21 @@ def plot_stddev_over_time(data, key=None, directory="."):
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
     
         x = data[config][0][1]["Generation"]
-        plt.plot(x, averages, hold=True, label=(config.split("_")[1]))
-    plt.legend(loc="upper right")
+        try:
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+        except:
+            colors = [color for color in COLORS]
+            ax.plot(x, averages, color=colors.pop(), label=(config.split("_")[1]))
+    
+    handles, labels = ax.get_legend_handles_labels()
+    labels = [float(label) for label in labels]
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    labels2 = [str(label) for label in labels2]
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Generation")
     plt.ylabel("Log of Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
@@ -145,10 +224,11 @@ def plot_stddev_over_time(data, key=None, directory="."):
 
 def plot_average_final_fitness(data, key=None, directory="."):
     plt.clf()
-    corrs = []
-    finals = []
-    
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
     for config in data:
+        corrs = []
+        finals = []
         if key == None or key in config:
             for run in range(len(data[config])):
                 corrs.append(data[config][run][0])
@@ -157,8 +237,23 @@ def plot_average_final_fitness(data, key=None, directory="."):
                 #    add_factor = 20000
                 finals.append(add_factor+float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
                 #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
+            try:
+                ax.plot(corrs, np.log(finals), marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
+            except:
+                colors = [color for color in COLORS]
+                ax.plot(corrs, np.log(finals), marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
     
-    plt.plot(corrs, np.log(finals), ".")
+    handles, labels = ax.get_legend_handles_labels()
+    labels = [float(label) for label in labels]
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    labels2 = [str(label) for label in labels2]
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
     plt.xlabel("Correlation")
     plt.ylabel("Log of Reference Average Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter_"+key+".png")
