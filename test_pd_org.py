@@ -1,6 +1,7 @@
 import unittest
 import pd_org
 from pd_org import MemoryPDGenotype as Geno
+from pd_org import PDOrg
 
 class TestMemoryPDGenotype(unittest.TestCase):
 
@@ -89,9 +90,36 @@ class TestMemoryPDGenotype(unittest.TestCase):
                 self.fail("number of bits MUST change")
     
     def test_get_mutant_of_self(self):
-        mutant = self.geno.get_mutant_of_self()
-        self.assertNotEqual(self.geno, mutant)
+        for _ in range(100):
+            mutant = self.geno.get_mutant_of_self()
+            self.assertNotEqual(self.geno, mutant)
+            
+class TestCreateRandomGenotype(unittest.TestCase):
+    def setUp(self):
+        pd_org.MAX_BITS_OF_MEMORY = 5
+      
+    def test_call(self):
+        geno = pd_org._create_random_genotype()
+        self.assertTrue(isinstance(geno, Geno))
+    
+            
+class TestPDOrg(unittest.TestCase):
+    
+    def setUp(self):
+        pd_org.MAX_BITS_OF_MEMORY = 5
+        pd_org.MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = .33
+        pd_org.MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE = .33
+        num_bits = 2
+        decision_list = [True, False, False, True]
+        initial_mem = [True, False]
+        self.geno = Geno(num_bits, decision_list, initial_mem)
+        self.org = PDOrg(self.geno)
         
+    def test_init(self):
+        pass
+    
+    
+    
     
 
 if __name__ == "__main__":

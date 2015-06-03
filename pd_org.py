@@ -120,12 +120,15 @@ class PDOrg(object):
         pass
 
 def _create_random_genotype():
+    """
+    Creates random memory PD genotype
+    
+    Used by PDOrg as default returned genotype
+    """
     number_of_bits_of_memory = random.randrange(MAX_BITS_OF_MEMORY + 1)
-
     length = 2 ** number_of_bits_of_memory
     decision_list = [random.choice([True, False]) for _ in range(length)]
-    initial_memory = number_of_bits_of_memory
-
+    initial_memory = [random.choice([True, False]) for _ in range(number_of_bits_of_memory)]
     return MemoryPDGenotype(number_of_bits_of_memory, decision_list, initial_memory)
 
 
