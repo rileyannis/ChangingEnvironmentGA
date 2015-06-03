@@ -4,6 +4,7 @@
 """
 
 import random
+from collections import deque
 
 MAX_BITS_OF_MEMORY = None
 MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = None
@@ -97,9 +98,7 @@ class PDOrg(object):
         if genotype is None:
             genotype = _create_random_genotype()
         self.genotype = genotype
-    
-    def fitness(self, environment):
-        pass
+        self.memory = deque(self.genotype.initial_memory)
     
     def get_mutant(self):
         return PDOrg(self.genotype.get_mutant_of_self())
@@ -115,9 +114,33 @@ class PDOrg(object):
     
     def __repr__(self):
         return str(self)
+        
+    def will_cooperate(self):
+        """
+        Returns True if organism will cooperate, else False for defection
+        
+        First convert self.memory to a binary string ("101")
+        Then, convert binary string to integer (5)
+        Return value of decision list at index
+        """
+        
+        binary_string_index = "".join("1" if i else "0" for i in self.memory)
+        decision_list_index = int(binary_string_index, 2)
+        return self.genotype.decision_list[decision_list_index]
+       
+    def opponent_cooperated_last_round(self, did_cooperate):
+        """
+        Stores opponent's last move in memory at the right end of memory and
+        deletes oldest move (on left)
+        """
+        self.memory.append(did_cooperate)
+        self.memory.popleft()   
+        
+    def fitness(self, environment):
+        raise NotImplementedError()
     
     def is_better_than(self, other, environment):
-        pass
+        raise NotImplementedError()
 
 def _create_random_genotype():
     """

@@ -120,6 +120,7 @@ class TestPDOrg(unittest.TestCase):
         Tests if genotype given to PDOrg constructor
         """
         self.assertEqual(self.org.genotype, self.geno)
+        self.assertSequenceEqual(self.org.memory, self.geno.initial_memory)
         
     def test_init_no_geno(self):
         """
@@ -144,6 +145,11 @@ class TestPDOrg(unittest.TestCase):
         self.assertEqual(expected, result)
         repr_result = repr(self.org)
         self.assertEqual(expected, repr_result)
+        
+    def test_opponent_cooperated_last_round(self):
+        pass
+    
+    
     
     
 
