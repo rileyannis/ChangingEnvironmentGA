@@ -45,10 +45,10 @@ class MemoryPDGenotype(object):
         
         random_value = random.random()
         if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY:
-            return _get_bits_of_memory_mutant()
+            return self._get_bits_of_memory_mutant()
         if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY + MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE:
-            return _initial_memory_mutant()
-        return _decision_list_mutant()
+            return self._initial_memory_mutant()
+        return self._decision_list_mutant()
 
 
     def _get_bits_of_memory_mutant(self):

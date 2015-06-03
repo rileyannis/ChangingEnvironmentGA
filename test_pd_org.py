@@ -6,6 +6,8 @@ class TestMemoryPDGenotype(unittest.TestCase):
 
     def setUp(self):
         pd_org.MAX_BITS_OF_MEMORY = 5
+        pd_org.MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = .33
+        pd_org.MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE = .33
         self.num_bits = 2
         self.decision_list = [True, False, False, True]
         self.initial_mem = [True, False]
@@ -85,7 +87,10 @@ class TestMemoryPDGenotype(unittest.TestCase):
                 self.assertIn(mutant.initial_memory[-1], [True, False])
             else:
                 self.fail("number of bits MUST change")
-                
+    
+    def test_get_mutant_of_self(self):
+        mutant = self.geno.get_mutant_of_self()
+        self.assertNotEqual(self.geno, mutant)
         
     
 
