@@ -74,7 +74,18 @@ class TestMemoryPDGenotype(unittest.TestCase):
         self.assertEqual(mutant, no_memory)
     
     def test_bits_of_memory_mutant(self):
-        pass
+        for _ in range(100):
+            mutant = self.geno._get_bits_of_memory_mutant()
+            if mutant.number_of_bits_of_memory == 1:
+                self.assertEqual(mutant.decision_list, self.geno.decision_list[:2])
+                self.assertEqual(mutant.initial_memory, self.geno.initial_memory[:1])
+            elif mutant.number_of_bits_of_memory == 3:
+                self.assertEqual(mutant.decision_list, self.geno.decision_list * 2)
+                self.assertEqual(mutant.initial_memory[:-1], self.geno.initial_memory)
+                self.assertIn(mutant.initial_memory[-1], [True, False])
+            else:
+                self.fail("number of bits MUST change")
+                
         
     
 

@@ -60,12 +60,15 @@ class MemoryPDGenotype(object):
         if should_increase_memory:
             new_number_of_bits_of_memory = self.number_of_bits_of_memory + 1
             new_decision_list = self.decision_list * 2
-            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list)
+            new_initial_memory = self.initial_memory[:]
+            new_initial_memory.append(random.choice([True,False]))
+            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, new_initial_memory)
         # should decrease memory
         new_number_of_bits_of_memory = self.number_of_bits_of_memory - 1
         length_of_new_decision_list = len(self.decision_list) // 2
         new_decision_list = self.decision_list[:length_of_new_decision_list]
-        return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, self.initial_memory) 
+        new_initial_memory = self.initial_memory[:-1]
+        return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, new_initial_memory) 
         
     def _decision_list_mutant(self):
         mutation_location = random.randrange(len(self.decision_list))
