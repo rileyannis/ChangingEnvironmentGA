@@ -1,40 +1,45 @@
 """
 
+
 """
 
 import random
 
 MAX_BITS_OF_MEMORY = None
+MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = None
+MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE = None
+
 
 class MemoryPDGenotype(object):
     """
+    This class creates a genotype.
     """
 
-    def __init__(self, number_of_bits_of_memory, decision_list):
+    def __init__(self, number_of_bits_of_memory, decision_list, initial_memory):
         assert len(decision_list) == 2 ** number_of_bits_of_memory
+        assert len(initial_memory) == number_of_bits_of_memory
         self.number_of_bits_of_memory = number_of_bits_of_memory
         self.decision_list = decision_list
+        self.initial_memory = initial_memory
+    
     
     def __eq__(self, other):
         return (self.number_of_bits_of_memory == other.number_of_bits_of_memory and
-                self.decision_list == other.decision_list)
+                self.decision_list == other.decision_list and self.initial_memory == other.initial_memory)
     
     def __ne__(self, other):
         return not self == other
     
     def __str__(self):
-        return "MemoryPDGenotype({}, {})".format(self.number_of_bits_of_memory, self.decision_list)
+        return "MemoryPDGenotype({}, {}, {})".format(self.number_of_bits_of_memory, self.decision_list, self.initial_memory)
     
     def __repr__(self):
         return str(self)
 
     def get_mutant_of_self(self):
         """
-        Returns a mutant of the current genotype.
-        Mutations are as equally likely to happen to any single location in the decision 
-        list as to change the number of bits of memory.
-        Thus, the number of possible mutations is the length of the decision list plus one
-        (possibility of changing length).
+        Determines when and how each type of mutation occurs.
+        Returns new (mutated) genotype.
         """
 
         def get_bits_of_memory_mutant():
@@ -51,24 +56,33 @@ class MemoryPDGenotype(object):
             new_number_of_bits_of_memory = self.number_of_bits_of_memory - 1
             length_of_new_decision_list = len(self.decision_list) // 2
             new_decision_list = self.decision_list[:length_of_new_decision_list]
-            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list)
+            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, self.initial_memory)
 
-        def decision_list_mutant(mutation_location):
+        def decision_list_mutant():
+            mutation_location = random.randrange(len(self.decision_list))
             new_decision_list = self.decision_list[:]
             new_decision_list[mutation_location] = not new_decision_list[mutation_location]
-            return MemoryPDGenotype(self.number_of_bits_of_memory, new_decision_list)
-
-        mutation_location = random.randrange(len(self.decision_list) + 1)
-        if mutation_location == len(self.decision_list):
+            return MemoryPDGenotype(self.number_of_bits_of_memory, new_decision_list, self.initial_memory)
+        
+        def initial_memory_mutant():
+            mutation_location = random.randrange(len(self.initial_memory))
+            new_initial_memory = self.initial_memory
+            new_initial_memory[mutation_location] = not new_initial_memory[mutation_location]
+            return MemoryPDGenotype(self.number_of_bits_of_memory, self.decision_list, new_initial_memory)
+       
+        random_value = random.random()
+        if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY:
             return get_bits_of_memory_mutant()
-        return decision_list_mutant(mutation_location)
+        if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY + MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE:
+            return initial_memory_mutant()
+        return decision_list_mutant()
+
+
 
 
 class PDOrg(object):
     """
-        
-        
-        
+    This class creates a PD organism.
     """
     
     def __init__(self, genotype=None):
@@ -102,8 +116,9 @@ def _create_random_genotype():
 
     length = 2 ** number_of_bits_of_memory
     decision_list = [random.choice([True, False]) for _ in range(length)]
+    initial_memory = number_of_bits_of_memory
 
-    return MemoryPDGenotype(number_of_bits_of_memory, decision_list)
+    return MemoryPDGenotype(number_of_bits_of_memory, decision_list, initial_memory)
 
 
 
