@@ -41,44 +41,42 @@ class MemoryPDGenotype(object):
         Determines when and how each type of mutation occurs.
         Returns new (mutated) genotype.
         """
-
-        def get_bits_of_memory_mutant():
-            should_increase_memory = random.choice([True, False])
-            if self.number_of_bits_of_memory == 0 and not should_increase_memory:
-                return self
-            if self.number_of_bits_of_memory == MAX_BITS_OF_MEMORY and should_increase_memory:
-                return self
-            if should_increase_memory:
-                new_number_of_bits_of_memory = self.number_of_bits_of_memory + 1
-                new_decision_list = self.decision_list * 2
-                return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list)
-            # should decrease memory
-            new_number_of_bits_of_memory = self.number_of_bits_of_memory - 1
-            length_of_new_decision_list = len(self.decision_list) // 2
-            new_decision_list = self.decision_list[:length_of_new_decision_list]
-            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, self.initial_memory)
-
-        def decision_list_mutant():
-            mutation_location = random.randrange(len(self.decision_list))
-            new_decision_list = self.decision_list[:]
-            new_decision_list[mutation_location] = not new_decision_list[mutation_location]
-            return MemoryPDGenotype(self.number_of_bits_of_memory, new_decision_list, self.initial_memory)
         
-        def initial_memory_mutant():
-            mutation_location = random.randrange(len(self.initial_memory))
-            new_initial_memory = self.initial_memory
-            new_initial_memory[mutation_location] = not new_initial_memory[mutation_location]
-            return MemoryPDGenotype(self.number_of_bits_of_memory, self.decision_list, new_initial_memory)
-       
         random_value = random.random()
         if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY:
-            return get_bits_of_memory_mutant()
+            return _get_bits_of_memory_mutant()
         if random_value < MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY + MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE:
-            return initial_memory_mutant()
-        return decision_list_mutant()
+            return _initial_memory_mutant()
+        return _decision_list_mutant()
 
 
-
+    def _get_bits_of_memory_mutant(self):
+        should_increase_memory = random.choice([True, False])
+        if self.number_of_bits_of_memory == 0 and not should_increase_memory:
+            return self
+        if self.number_of_bits_of_memory == MAX_BITS_OF_MEMORY and should_increase_memory:
+            return self
+        if should_increase_memory:
+            new_number_of_bits_of_memory = self.number_of_bits_of_memory + 1
+            new_decision_list = self.decision_list * 2
+            return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list)
+        # should decrease memory
+        new_number_of_bits_of_memory = self.number_of_bits_of_memory - 1
+        length_of_new_decision_list = len(self.decision_list) // 2
+        new_decision_list = self.decision_list[:length_of_new_decision_list]
+        return MemoryPDGenotype(new_number_of_bits_of_memory, new_decision_list, self.initial_memory) 
+        
+    def _decision_list_mutant(self):
+        mutation_location = random.randrange(len(self.decision_list))
+        new_decision_list = self.decision_list[:]
+        new_decision_list[mutation_location] = not new_decision_list[mutation_location]
+        return MemoryPDGenotype(self.number_of_bits_of_memory, new_decision_list, self.initial_memory)
+        
+    def _initial_memory_mutant(self):
+        mutation_location = random.randrange(len(self.initial_memory))
+        new_initial_memory = self.initial_memory
+        new_initial_memory[mutation_location] = not new_initial_memory[mutation_location]
+        return MemoryPDGenotype(self.number_of_bits_of_memory, self.decision_list, new_initial_memory)
 
 class PDOrg(object):
     """
