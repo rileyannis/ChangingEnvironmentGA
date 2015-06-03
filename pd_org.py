@@ -16,6 +16,7 @@ class MemoryPDGenotype(object):
     """
 
     def __init__(self, number_of_bits_of_memory, decision_list, initial_memory):
+        assert 0 <= number_of_bits_of_memory <= MAX_BITS_OF_MEMORY
         assert len(decision_list) == 2 ** number_of_bits_of_memory
         assert len(initial_memory) == number_of_bits_of_memory
         self.number_of_bits_of_memory = number_of_bits_of_memory

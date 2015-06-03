@@ -1,18 +1,22 @@
 import unittest
+import pd_org
 from pd_org import MemoryPDGenotype as Geno
 
 class TestMemoryPDGenotype(unittest.TestCase):
 
     def setUp(self):
+        pd_org.MAX_BITS_OF_MEMORY = 5
         self.num_bits = 2
         self.decision_list = [True, False, False, True]
         self.initial_mem = [True, False]
         self.geno = Geno(self.num_bits, self.decision_list, self.initial_mem)
         
+        
     def test_init(self):
         self.assertEqual(self.num_bits, self.geno.number_of_bits_of_memory)
         self.assertEqual(self.decision_list, self.geno.decision_list)
         self.assertEqual(self.initial_mem, self.geno.initial_memory)
+        
 
     def test_init_bad(self):
         with self.assertRaises(AssertionError):
@@ -20,6 +24,12 @@ class TestMemoryPDGenotype(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             Geno(2, [True]*3, [False]*2)
+        
+        with self.assertRaises(AssertionError):
+            Geno(6, [True]*(2**6), [False]*6)
+            
+        with self.assertRaises(AssertionError):
+            Geno(-1, [], [])
 
     def test_eq(self):
         geno2 = Geno(self.num_bits, self.decision_list, self.initial_mem)
@@ -62,7 +72,11 @@ class TestMemoryPDGenotype(unittest.TestCase):
         no_memory = Geno(0, [True], [])
         mutant = no_memory._initial_memory_mutant()
         self.assertEqual(mutant, no_memory)
+    
+    def test_bits_of_memory_mutant(self):
+        pass
         
+    
 
 if __name__ == "__main__":
     unittest.main()
