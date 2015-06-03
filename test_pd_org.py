@@ -116,9 +116,34 @@ class TestPDOrg(unittest.TestCase):
         self.org = PDOrg(self.geno)
         
     def test_init(self):
-        pass
+        """
+        Tests if genotype given to PDOrg constructor
+        """
+        self.assertEqual(self.org.genotype, self.geno)
+        
+    def test_init_no_geno(self):
+        """
+        Test if no genotype is given to PDOrg constructor
+        """
+        random_org = PDOrg()
+        self.assertTrue(isinstance(random_org.genotype, Geno))
     
-    
+    def test_get_mutant(self):
+        mutant_org = self.org.get_mutant()
+        self.assertNotEqual(mutant_org.genotype, self.org.genotype)
+        
+    def test_eq(self):
+        other_org = PDOrg(Geno(1, [False, True], [True]))
+        same_org = PDOrg(self.geno)
+        self.assertNotEqual(self.org, other_org)
+        self.assertEqual(self.org, same_org)
+        
+    def test_str(self):
+        expected = "PDOrg(MemoryPDGenotype(2, [True, False, False, True], [True, False]))"
+        result = str(self.org)
+        self.assertEqual(expected, result)
+        repr_result = repr(self.org)
+        self.assertEqual(expected, repr_result)
     
     
 
