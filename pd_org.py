@@ -99,7 +99,7 @@ class PDOrg(object):
         if genotype is None:
             genotype = _create_random_genotype()
         self.genotype = genotype
-        self.memory = deque(self.genotype.initial_memory)
+        self.initialize_memory()
     
     def get_mutant(self):
         return PDOrg(self.genotype.get_mutant_of_self())
@@ -137,11 +137,16 @@ class PDOrg(object):
         self.memory.append(did_cooperate)
         self.memory.popleft()   
         
+    def initialize_memory(self):
+        self.memory = deque(self.genotype.initial_memory)
+        
     def fitness(self, environment):
         raise NotImplementedError()
     
     def is_better_than(self, other, environment):
         raise NotImplementedError()
+        
+    
 
 def _create_random_genotype():
     """

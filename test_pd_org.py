@@ -168,6 +168,20 @@ class TestPDOrg(unittest.TestCase):
         self.org.opponent_cooperated_last_round(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(True, did_cooperate)
+        
+    def test_initialize_memory(self):
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(False, did_cooperate)
+         
+        self.org.opponent_cooperated_last_round(True)
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(False, did_cooperate)
+        
+        self.org.initialize_memory()
+        
+        self.org.opponent_cooperated_last_round(True)
+        did_cooperate = self.org.will_cooperate()
+        self.assertEqual(False, did_cooperate)
     
 if __name__ == "__main__":
     unittest.main()
