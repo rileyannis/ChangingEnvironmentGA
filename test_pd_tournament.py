@@ -46,28 +46,26 @@ class TestFunctions(unittest.TestCase):
         expected_adj_payout_b = 7.84
         self.assertAlmostEqual(expected_adj_payout_a, adj_payout_a, 2)
         self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
-        
-    def test_get_relative_fitness(self):
-        relative_fitness = pd_tournament.get_relative_fitness(4, 11)
-        expected_relative_fitness = .363
-        self.assertAlmostEqual(expected_relative_fitness, relative_fitness, 2)
                 
     def test_get_average_payouts(self):
         organisms = [self.organism_a, self.organism_b]
-        results = pd_tournament.get_average_payouts(organisms)
-        expected = [2.97, 7.84]
+        results = list(pd_tournament.get_average_payouts(organisms))
+        expected = [(self.organism_a, 2.97), (self.organism_b, 7.84)]
         
         for i in range(len(expected)):
-            self.assertAlmostEqual(expected[i], results[i], 2)
+            self.assertEqual(expected[i][0], results[i][0])
+            self.assertAlmostEqual(expected[i][1], results[i][1], 2)
             
     def test_get_average_payouts_hard(self):
         organisms = [self.organism_a, self.organism_b, self.organism_a]
        
-        results = pd_tournament.get_average_payouts(organisms)
-        expected = [3.465, 7.84, 3.465]
+        results = list(pd_tournament.get_average_payouts(organisms))
+        expected = [(self.organism_a, 3.465), (self.organism_b, 7.84), (self.organism_a, 3.465)]
        
         for i in range(len(expected)):
-            self.assertAlmostEqual(expected[i], results[i], 2)
+            self.assertEqual(expected[i][0], results[i][0])
+            self.assertAlmostEqual(expected[i][1], results[i][1], 2)
+       
     
 if __name__ == "__main__":
     unittest.main()

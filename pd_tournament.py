@@ -87,21 +87,12 @@ def adjusted_payout(organism_a, organism_b):
    
     return adj_payout_a, adj_payout_b
     
-    
-def get_relative_fitness(adj_payout_a, adj_payout_b):
-    return adj_payout_a / adj_payout_b
-    
-    
 def get_average_payouts(organisms):
-    """
-    Returns list of average fitnesses of organisms
-    
+    """    
     Lists all possible pairs of organisms, calls adj_payout
     Averages all together
-    Returns fitnesses same order organisms
+    Returns a generator of pairs of orgs and their avg payout
     """
-
-    
     total_payouts = [0.0 for _ in organisms]
     all_pairs = itertools.combinations(range(len(organisms)), 2)
     for i, j in all_pairs:
@@ -112,5 +103,6 @@ def get_average_payouts(organisms):
         total_payouts[j] += payout_b
             
     number_of_games_per_org = len(organisms) - 1
-    return [payout / number_of_games_per_org for payout in total_payouts]       
-            
+    average_payouts = [payout / number_of_games_per_org for payout in total_payouts] 
+  
+    return zip(organisms, average_payouts)
