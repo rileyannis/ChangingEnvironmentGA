@@ -48,23 +48,21 @@ class TestFunctions(unittest.TestCase):
         self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
                 
     def test_get_average_payouts(self):
+        def check(organisms, expected):
+            results = list(pd_tournament.get_average_payouts(organisms))
+            for i in range(len(expected)):
+                self.assertEqual(expected[i][0], results[i][0])
+                self.assertAlmostEqual(expected[i][1], results[i][1], 2) 
+          
         organisms = [self.organism_a, self.organism_b]
-        results = list(pd_tournament.get_average_payouts(organisms))
         expected = [(self.organism_a, 2.97), (self.organism_b, 7.84)]
+        check(organisms, expected)
         
-        for i in range(len(expected)):
-            self.assertEqual(expected[i][0], results[i][0])
-            self.assertAlmostEqual(expected[i][1], results[i][1], 2)
-            
-    def test_get_average_payouts_hard(self):
         organisms = [self.organism_a, self.organism_b, self.organism_a]
-       
-        results = list(pd_tournament.get_average_payouts(organisms))
         expected = [(self.organism_a, 3.465), (self.organism_b, 7.84), (self.organism_a, 3.465)]
-       
-        for i in range(len(expected)):
-            self.assertEqual(expected[i][0], results[i][0])
-            self.assertAlmostEqual(expected[i][1], results[i][1], 2)
+        check(organisms, expected)
+            
+
        
     
 if __name__ == "__main__":
