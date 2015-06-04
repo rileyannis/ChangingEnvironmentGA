@@ -98,6 +98,10 @@ class TestMemoryPDGenotype(unittest.TestCase):
             mutant = self.geno.get_mutant_of_self()
             self.assertNotEqual(self.geno, mutant)
             
+    def test_hash(self):
+        clone = Geno(self.num_bits, self.decision_list, self.initial_mem)
+        self.assertEqual(hash(clone), hash(self.geno))
+            
 class TestCreateRandomGenotype(unittest.TestCase):
     def setUp(self):
         pd_org.MAX_BITS_OF_MEMORY = 5
@@ -182,6 +186,11 @@ class TestPDOrg(unittest.TestCase):
         self.org.opponent_cooperated_last_round(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
+        
+    def test_hash(self):
+        clone = PDOrg(self.geno)
+        self.assertEqual(hash(clone), hash(self.org))
+        
     
 if __name__ == "__main__":
     unittest.main()

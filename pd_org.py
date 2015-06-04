@@ -38,6 +38,12 @@ class MemoryPDGenotype(object):
     
     def __repr__(self):
         return str(self)
+        
+    def __hash__(self):
+        hashable_tuple = (self.number_of_bits_of_memory, 
+            tuple(self.decision_list), 
+            tuple(self.initial_memory))
+        return hash(hashable_tuple)
 
     def get_mutant_of_self(self):
         """
@@ -115,6 +121,9 @@ class PDOrg(object):
     
     def __repr__(self):
         return str(self)
+        
+    def __hash__(self):
+        return hash(self.genotype)
         
     def will_cooperate(self):
         """
