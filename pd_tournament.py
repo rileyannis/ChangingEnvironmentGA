@@ -4,6 +4,7 @@ their score in an iterated Prisoner's Dilemma
 """
 
 import pd_org
+import itertools
 
 NUMBER_OF_ROUNDS = 64
 
@@ -44,6 +45,9 @@ def run_game(organism_a, organism_b):
     Run a game of NUMBER OF ROUNDS long
     Return payout for both organisms
     """
+    organism_a.initialize_memory()
+    organism_b.initialize_memory()
+    
     total_payout_a = 0
     total_payout_b = 0
     
@@ -59,11 +63,14 @@ def run_game(organism_a, organism_b):
         total_payout_a += payout_a
         total_payout_b += payout_b
     
+    organism_a.initialize_memory()
+    organism_b.initialize_memory()
+    
     return total_payout_a, total_payout_b
     
 def adjusted_payout(organism_a, organism_b):
     """
-    Returns relative fitness of each organism
+    Returns adjusted payout reward for each organism
     """
     def proportion_cost(org):
         return PROPORTION_COST_PER_MEMORY_BIT * org.genotype.number_of_bits_of_memory
@@ -72,7 +79,6 @@ def adjusted_payout(organism_a, organism_b):
         return payout * (1 - proportion_cost)
         
     payout_a, payout_b = run_game(organism_a, organism_b)
-    
     a_proportion_cost = proportion_cost(organism_a)
     b_proportion_cost = proportion_cost(organism_b)
     
@@ -86,3 +92,44 @@ def get_relative_fitness(adj_payout_a, adj_payout_b):
     return adj_payout_a / adj_payout_b
     
     
+def get_average_payouts(organisms):
+    """
+    Returns list of average fitnesses of organisms
+    
+    Lists all possible pairs of organisms, calls adj_payout
+    Averages all together
+    Returns fitnesses same order organisms
+    """
+
+    
+    total_payouts = [0.0 for _ in organisms]
+    for i in range(len(organisms) - 1):
+        for j in range(i + 1, len(organisms)):
+            org_a = organisms[i]
+            org_b = organisms[j]
+            payout_a, payout_b = adjusted_payout(org_a, org_b)
+            total_payouts[i] += payout_a
+            total_payouts[j] += payout_b
+            
+    number_of_games_per_org = len(organisms) - 1
+    return [payout / number_of_games_per_org for payout in total_payouts]       
+            
+
+
+    junk = """
+    for org in organisms:
+        org.total_payout = 0.0
+    all_pairs = itertools.combinations(organisms, 2)
+    for organism_a, organism_b in all_pairs:
+        payout_a, payout_b = adjusted_payout(organism_a, organism_b)
+
+        organism_a.total_payout += payout_a
+        organism_b.total_payout += payout_b
+     
+    
+    total_payouts = [org.total_payout for org in organisms]
+
+    number_of_games_per_org = len(organisms) - 1
+    #return [payout / number_of_games_per_org for payout in total_payouts]
+    return total_payouts
+    """

@@ -24,7 +24,7 @@ class TestPDPayout(unittest.TestCase):
                 self.assertEqual(expected_payout_b, payout_b)
                 
                 
-class TestRunGame(unittest.TestCase):
+class TestFunctions(unittest.TestCase):
     def setUp(self):
         pd_org.MAX_BITS_OF_MEMORY = 4
 
@@ -46,7 +46,28 @@ class TestRunGame(unittest.TestCase):
         expected_adj_payout_b = 7.84
         self.assertAlmostEqual(expected_adj_payout_a, adj_payout_a, 2)
         self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
+        
+    def test_get_relative_fitness(self):
+        relative_fitness = pd_tournament.get_relative_fitness(4, 11)
+        expected_relative_fitness = .363
+        self.assertAlmostEqual(expected_relative_fitness, relative_fitness, 2)
                 
-
+    def test_get_average_payouts(self):
+        organisms = [self.organism_a, self.organism_b]
+        results = pd_tournament.get_average_payouts(organisms)
+        expected = [2.97, 7.84]
+        
+        for i in range(len(expected)):
+            self.assertAlmostEqual(expected[i], results[i], 2)
+            
+    def test_get_average_payouts_hard(self):
+        organisms = [self.organism_a, self.organism_b, self.organism_a]
+       
+        results = pd_tournament.get_average_payouts(organisms)
+        expected = [3.465, 7.84, 3.465]
+       
+        for i in range(len(expected)):
+            self.assertAlmostEqual(expected[i], results[i], 2)
+    
 if __name__ == "__main__":
     unittest.main()
