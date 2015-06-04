@@ -4,6 +4,7 @@
 """
 
 import random
+import pd_tournament
 from collections import deque
 
 MAX_BITS_OF_MEMORY = None

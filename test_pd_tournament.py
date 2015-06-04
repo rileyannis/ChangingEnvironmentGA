@@ -39,6 +39,13 @@ class TestRunGame(unittest.TestCase):
         expected_total_payout_b = 8
         self.assertEqual(expected_total_payout_a, total_payout_a)
         self.assertEqual(expected_total_payout_b, total_payout_b)
+        
+    def test_adj_payout(self):
+        adj_payout_a, adj_payout_b = pd_tournament.adjusted_payout(self.organism_a, self.organism_b)
+        expected_adj_payout_a = 2.97
+        expected_adj_payout_b = 7.84
+        self.assertAlmostEqual(expected_adj_payout_a, adj_payout_a, 2)
+        self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
                 
 
 if __name__ == "__main__":
