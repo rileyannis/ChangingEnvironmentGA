@@ -15,5 +15,5 @@ def get_tally_of_number_of_bits_of_memory(organisms):
         
     return tally
         
-        
+    
     
