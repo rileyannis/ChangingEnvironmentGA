@@ -24,8 +24,11 @@ class RealValueVectorOrg(object):
 
     def fitness(self, environment):
         if self._fitness_cache is None:
-            self._fitness_cache = environment(self.genotype)
-        return self._fitness_cache
+            self._fitness_cache = {}
+            self._fitness_cache[environment] = environment(self.genotype)
+        elif environment not in self._fitness_cache:
+            self._fitness_cache[environment] = environment(self.genotype)
+        return self._fitness_cache[environment]
 
     def reset_fitness_cache(self):
         self._fitness_cache = None

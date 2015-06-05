@@ -102,10 +102,6 @@ def print_status(generation, population, environment):
     average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
-def reset_fitness_cache(population):
-    for org in population:
-        org.reset_fitness_cache()
-
 def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
     #Set up the output lists
@@ -127,10 +123,8 @@ def evolve_population(reference_environment, alternative_environment):
     for gen in range(NUMBER_OF_GENERATIONS):
         #Check if the environment needs changed
         if gen == start_of_trimester_2:
-            reset_fitness_cache(population)
             current_environment = alternative_environment
         elif gen == start_of_trimester_3:
-            reset_fitness_cache(population)
             current_environment = reference_environment
         #Get the next generation
         population = get_next_generation(population, current_environment)
@@ -141,7 +135,7 @@ def evolve_population(reference_environment, alternative_environment):
         current_fitness_list.append((gen, average_fitness, stdev))
         current_fitness_best.append((gen, best_fitness, best_org))
         
-        if not ORG_TYPE == "bit_vector":
+        if ORG_TYPE != "bit_vector":
             average_fitness, stdev, best_org, best_fitness = get_generation_stats(
                 population, reference_environment)
             reference_fitness_list.append((gen, average_fitness, stdev))
@@ -275,7 +269,7 @@ def generate_data():
 
     save_table_to_file(experienced_fits, experienced_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
-    if not ORG_TYPE == "bit_vector":
+    if ORG_TYPE != "bit_vector":
         save_table_to_file(reference_fits, reference_filename)
         save_table_to_file(reference_bests, reference_best_filename)
         if ORG_TYPE == "vector":
