@@ -6,11 +6,8 @@ import datetime
 array_size = 40
 walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
-alt_corrs = [-1, -.99, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, .99, 1]
-#function_types = ["schafferf7"]
-function_types = ["sphere", "rana"]
-#alt_corrs = [-.99, .99]
-#alt_corrs = [1]
+alt_corrs = [-1, -0.99, -0.9, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, 0.9, 0.99, 1]
+function_types = ["rosenbrock"]
 num_gens = [10000]
 num_runs_per_job = 2
 output_dir_base = "length_100_" + today
