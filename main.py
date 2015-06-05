@@ -15,7 +15,7 @@ import os
 import shutil
 import datetime
 import pd_selection
-
+import pd_analysis
 
 FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
@@ -102,6 +102,20 @@ def print_status(generation, population, environment):
     average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
+def pd_evolve_population():
+    organisms = create_initial_population()
+    output = []
+    headers = []
+    for i in range(pd_org.MAX_NUMBER_OF_BITS + 1):
+        headers.append("Organisms With " + str(i) + " Bits of Memory")
+    output.append(headers)
+    for i in range(NUMBER_OF_GENERATIONS):
+        organisms = pd_selection.get_next_generation_by_selection(organisms)
+        organisms = get_mutation_population(organisms)
+        output.append(pd_analysis.get_tally_of_number_of_bits_of_memory(organisms))
+
+    return output
+
 def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
     #Set up the output lists
@@ -178,13 +192,13 @@ def set_global_variables(config):
     VERBOSE = config.getboolean("DEFAULT", "verbose")
     global NUMBER_OF_ORGANISMS
     NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
+    global NUMBER_OF_GENERATIONS
+    NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
     if ORG_TYPE != "pd":
         global MUTATION_RATE
         MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
-        global NUMBER_OF_GENERATIONS
-        NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
         global TOURNAMENT_SIZE
         TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")    
     elif ORG_TYPE == "string":
@@ -251,9 +265,16 @@ def generate_data():
     elif ORG_TYPE == "string":
         reference_environment = string_org.default_environment
         alternative_environment = string_org.hash_environment
-
+        
+    if ORG_TYPE != "pd":
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
+
+    if ORG_TYPE == "pd":
+        output = pd_evolve_population()
+        
+
+
 
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
@@ -265,6 +286,11 @@ def generate_data():
 
     config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
     shutil.copyfile(CONFIG_FILE, config_dest)
+    
+    if ORG_TYPE == "pd":
+        output_filename = join_path("bits_of_memory_overtime.csv")
+        save_table_to_file(output, output_filename)
+        return
     
     experienced_filename = join_path("experienced_fitnesses.csv")
     reference_filename = join_path("reference_fitnesses.csv")
