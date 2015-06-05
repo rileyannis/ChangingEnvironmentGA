@@ -173,6 +173,11 @@ class TestPDOrg(unittest.TestCase):
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(True, did_cooperate)
         
+    def test_will_cooperate_empty(self):
+        org = PDOrg(Geno(0, [True], []))
+        did_cooperate = org.will_cooperate()
+        self.assertEqual(did_cooperate, True)
+        
     def test_initialize_memory(self):
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)

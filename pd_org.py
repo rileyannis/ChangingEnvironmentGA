@@ -133,9 +133,11 @@ class PDOrg(object):
         Then, convert binary string to integer (5)
         Return value of decision list at index
         """
-        
-        binary_string_index = "".join("1" if i else "0" for i in self.memory)
-        decision_list_index = int(binary_string_index, 2)
+        if not self.memory:
+            decision_list_index = 0
+        else:
+            binary_string_index = "".join("1" if i else "0" for i in self.memory)
+            decision_list_index = int(binary_string_index, 2)
         return self.genotype.decision_list[decision_list_index]
        
     def opponent_cooperated_last_round(self, did_cooperate):
