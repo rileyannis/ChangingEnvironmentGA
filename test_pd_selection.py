@@ -17,13 +17,7 @@ class TestSelection(unittest.TestCase):
         self.assertEqual(set(result), set(expected))
         
     def test_get_next_generation_by_selection(self):
-        """
-        Get next generation by selection is a function that takes a list of organisms
-        
-        For a given tournament size, it runs a tournament, selects the best half and adds
-        them to a population that becomes the next generation
-        It repeats more tournaments until the next generation reaches the population size
-        """
+        pd_selection.TOURNAMENT_SIZE = 2
         organism_a = pd_org.PDOrg(pd_org.MemoryPDGenotype(1,[True, False], [False]))
         organism_b = pd_org.PDOrg(pd_org.MemoryPDGenotype(2,[True, False, False, True], [False, True]))
         organisms = [organism_a, organism_b]
