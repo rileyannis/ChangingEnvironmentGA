@@ -8,7 +8,6 @@ from string import ascii_uppercase
 import csv
 import string_org
 import real_value_vector_org
-import bit_vector_org
 import scipy.stats as stats
 import fitness_function as ff
 from math import floor
@@ -32,8 +31,7 @@ def create_initial_population():
     """
     Create a starting population by forming a list of randomly generated organisms.
     """
-    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg,
-                    "bit_vector": bit_vector_org.BitVectorOrg}
+    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg}
     if ORG_TYPE in org_type_map:
         return [org_type_map[ORG_TYPE]() for _ in range(NUMBER_OF_ORGANISMS)]
     
@@ -135,11 +133,10 @@ def evolve_population(reference_environment, alternative_environment):
         current_fitness_list.append((gen, average_fitness, stdev))
         current_fitness_best.append((gen, best_fitness, best_org))
         
-        if ORG_TYPE != "bit_vector":
-            average_fitness, stdev, best_org, best_fitness = get_generation_stats(
-                population, reference_environment)
-            reference_fitness_list.append((gen, average_fitness, stdev))
-            reference_fitness_best.append((gen, best_fitness, best_org))
+        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+            population, reference_environment)
+        reference_fitness_list.append((gen, average_fitness, stdev))
+        reference_fitness_best.append((gen, best_fitness, best_org))
 
         if VERBOSE:
             print_status(gen, population, current_environment)
@@ -220,8 +217,6 @@ def set_global_variables(config):
             "DEFAULT", "alternate_environment_corr")
         global CROWDING
         CROWDING = eval(config.get("DEFAULT", "crowding"))
-    if ORG_TYPE == "bit_vector":
-        bit_vector_org.LENGTH = config.getint("DEFAULT", "length")
 
 def save_table_to_file(table, filename):
     with open(filename, "wb") as f:
@@ -242,9 +237,6 @@ def generate_data():
     elif ORG_TYPE == "string":
         reference_environment = string_org.default_environment
         alternative_environment = string_org.hash_environment
-    elif ORG_TYPE == "bit_vector":
-        reference_environment = bit_vector_org.fitness_function
-        alternate_environment = reference_environment
 
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
@@ -269,14 +261,13 @@ def generate_data():
 
     save_table_to_file(experienced_fits, experienced_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
-    if ORG_TYPE != "bit_vector":
-        save_table_to_file(reference_fits, reference_filename)
-        save_table_to_file(reference_bests, reference_best_filename)
-        if ORG_TYPE == "vector":
-            save_string_to_file(str(fitness_function.correlation()), corr_filename)
-
-        start_time = datetime.datetime.fromtimestamp(START_TIME)
-        end_time = datetime.datetime.now()
-        time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
-        save_string_to_file(time_str, time_filename)
+    save_table_to_file(reference_fits, reference_filename)
+    save_table_to_file(reference_bests, reference_best_filename)
+    if ORG_TYPE == "vector":
+        save_string_to_file(str(fitness_function.correlation()), corr_filename)
+        
+    start_time = datetime.datetime.fromtimestamp(START_TIME)
+    end_time = datetime.datetime.now()
+    time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
+    save_string_to_file(time_str, time_filename)
     
