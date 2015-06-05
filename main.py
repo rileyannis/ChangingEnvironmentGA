@@ -14,6 +14,8 @@ from math import floor
 import os
 import shutil
 import datetime
+import pd_selection
+
 
 FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
@@ -176,15 +178,16 @@ def set_global_variables(config):
     VERBOSE = config.getboolean("DEFAULT", "verbose")
     global NUMBER_OF_ORGANISMS
     NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
-    global MUTATION_RATE
-    MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
-    global NUMBER_OF_GENERATIONS
-    NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
-    global TOURNAMENT_SIZE
-    TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
-    if ORG_TYPE == "string":
+    if ORG_TYPE != "pd":
+        global MUTATION_RATE
+        MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
+        global NUMBER_OF_GENERATIONS
+        NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
+        global TOURNAMENT_SIZE
+        TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")    
+    elif ORG_TYPE == "string":
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
     elif ORG_TYPE == "vector":
@@ -217,7 +220,18 @@ def set_global_variables(config):
             "DEFAULT", "alternate_environment_corr")
         global CROWDING
         CROWDING = eval(config.get("DEFAULT", "crowding"))
-
+    elif ORG_TYPE == "pd":
+        pd_tournament.NUMBER_OF_ROUNDS = config.getint("DEFAULT", "number_of_rounds")
+        pd_tournament.TEMPTATION = config.getint("DEFAULT", "temptation")
+        pd_tournament.REWARD = config.getint("DEFAULT", "reward")
+        pd_tournament.PUNISHMENT = config.getint("DEFAULT", "punishment")
+        pd_tournament.SUCKER = config.getint("DEFAULT", "sucker")
+        pd_tournament.POPULATION_COST_PER_MEMORY_BIT = config.getfloat("DEFAULT", "population_cost_per_memory_bit")
+        pd_selection.TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
+        pd_org.MAX_BITS_OF_MEMORY = config.getint("DEFAULT", "max_bits_of_memory")
+        pd_org.MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = config.getfloat("DEFAULT", "mutation_likelihood_of_bits_of_memory")
+        pd_org.MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE = config.getfloat("DEFAULT", "mutation_likelihood_of_initial_memory_state")
+        
 def save_table_to_file(table, filename):
     with open(filename, "wb") as f:
         writer = csv.writer(f)
