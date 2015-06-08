@@ -8,13 +8,14 @@ from string import ascii_uppercase
 import csv
 import string_org
 import real_value_vector_org
-import bit_vector_org
 import scipy.stats as stats
 import fitness_function as ff
 from math import floor
 import os
 import shutil
 import datetime
+import pd_selection
+import pd_analysis
 
 FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
@@ -32,8 +33,7 @@ def create_initial_population():
     """
     Create a starting population by forming a list of randomly generated organisms.
     """
-    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg,
-                    "bit_vector": bit_vector_org.BitVectorOrg}
+    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg}
     if ORG_TYPE in org_type_map:
         return [org_type_map[ORG_TYPE]() for _ in range(NUMBER_OF_ORGANISMS)]
     
@@ -102,6 +102,20 @@ def print_status(generation, population, environment):
     average_fitness = get_average_fitness(population, environment)
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
+def pd_evolve_population():
+    organisms = create_initial_population()
+    output = []
+    headers = []
+    for i in range(pd_org.MAX_NUMBER_OF_BITS + 1):
+        headers.append("Organisms With " + str(i) + " Bits of Memory")
+    output.append(headers)
+    for i in range(NUMBER_OF_GENERATIONS):
+        organisms = pd_selection.get_next_generation_by_selection(organisms)
+        organisms = get_mutation_population(organisms)
+        output.append(pd_analysis.get_tally_of_number_of_bits_of_memory(organisms))
+
+    return output
+
 def evolve_population(reference_environment, alternative_environment):
     """Evolve a population!"""
     #Set up the output lists
@@ -135,11 +149,10 @@ def evolve_population(reference_environment, alternative_environment):
         current_fitness_list.append((gen, average_fitness, stdev))
         current_fitness_best.append((gen, best_fitness, best_org))
         
-        if ORG_TYPE != "bit_vector":
-            average_fitness, stdev, best_org, best_fitness = get_generation_stats(
-                population, reference_environment)
-            reference_fitness_list.append((gen, average_fitness, stdev))
-            reference_fitness_best.append((gen, best_fitness, best_org))
+        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+            population, reference_environment)
+        reference_fitness_list.append((gen, average_fitness, stdev))
+        reference_fitness_best.append((gen, best_fitness, best_org))
 
         if VERBOSE:
             print_status(gen, population, current_environment)
@@ -179,15 +192,16 @@ def set_global_variables(config):
     VERBOSE = config.getboolean("DEFAULT", "verbose")
     global NUMBER_OF_ORGANISMS
     NUMBER_OF_ORGANISMS = config.getint("DEFAULT", "number_of_organisms")
-    global MUTATION_RATE
-    MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
     global NUMBER_OF_GENERATIONS
     NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
-    global TOURNAMENT_SIZE
-    TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
-    if ORG_TYPE == "string":
+    if ORG_TYPE != "pd":
+        global MUTATION_RATE
+        MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
+        global TOURNAMENT_SIZE
+        TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")    
+    elif ORG_TYPE == "string":
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
     elif ORG_TYPE == "vector":
@@ -220,9 +234,18 @@ def set_global_variables(config):
             "DEFAULT", "alternate_environment_corr")
         global CROWDING
         CROWDING = eval(config.get("DEFAULT", "crowding"))
-    if ORG_TYPE == "bit_vector":
-        bit_vector_org.LENGTH = config.getint("DEFAULT", "length")
-
+    elif ORG_TYPE == "pd":
+        pd_tournament.NUMBER_OF_ROUNDS = config.getint("DEFAULT", "number_of_rounds")
+        pd_tournament.TEMPTATION = config.getint("DEFAULT", "temptation")
+        pd_tournament.REWARD = config.getint("DEFAULT", "reward")
+        pd_tournament.PUNISHMENT = config.getint("DEFAULT", "punishment")
+        pd_tournament.SUCKER = config.getint("DEFAULT", "sucker")
+        pd_tournament.POPULATION_COST_PER_MEMORY_BIT = config.getfloat("DEFAULT", "population_cost_per_memory_bit")
+        pd_selection.TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
+        pd_org.MAX_BITS_OF_MEMORY = config.getint("DEFAULT", "max_bits_of_memory")
+        pd_org.MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = config.getfloat("DEFAULT", "mutation_likelihood_of_bits_of_memory")
+        pd_org.MUTATION_LIKELIHOOD_OF_INITIAL_MEMORY_STATE = config.getfloat("DEFAULT", "mutation_likelihood_of_initial_memory_state")
+        
 def save_table_to_file(table, filename):
     with open(filename, "wb") as f:
         writer = csv.writer(f)
@@ -242,12 +265,16 @@ def generate_data():
     elif ORG_TYPE == "string":
         reference_environment = string_org.default_environment
         alternative_environment = string_org.hash_environment
-    elif ORG_TYPE == "bit_vector":
-        reference_environment = bit_vector_org.fitness_function
-        alternate_environment = reference_environment
-
+        
+    if ORG_TYPE != "pd":
     experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
         reference_environment, alternative_environment)
+
+    if ORG_TYPE == "pd":
+        output = pd_evolve_population()
+        
+
+
 
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
@@ -260,6 +287,11 @@ def generate_data():
     config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
     shutil.copyfile(CONFIG_FILE, config_dest)
     
+    if ORG_TYPE == "pd":
+        output_filename = join_path("bits_of_memory_overtime.csv")
+        save_table_to_file(output, output_filename)
+        return
+    
     experienced_filename = join_path("experienced_fitnesses.csv")
     reference_filename = join_path("reference_fitnesses.csv")
     experienced_best_filename = join_path("experienced_best_fitnesses.csv")
@@ -269,14 +301,13 @@ def generate_data():
 
     save_table_to_file(experienced_fits, experienced_filename)
     save_table_to_file(experienced_bests, experienced_best_filename)
-    if ORG_TYPE != "bit_vector":
-        save_table_to_file(reference_fits, reference_filename)
-        save_table_to_file(reference_bests, reference_best_filename)
-        if ORG_TYPE == "vector":
-            save_string_to_file(str(fitness_function.correlation()), corr_filename)
-
-        start_time = datetime.datetime.fromtimestamp(START_TIME)
-        end_time = datetime.datetime.now()
-        time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
-        save_string_to_file(time_str, time_filename)
+    save_table_to_file(reference_fits, reference_filename)
+    save_table_to_file(reference_bests, reference_best_filename)
+    if ORG_TYPE == "vector":
+        save_string_to_file(str(fitness_function.correlation()), corr_filename)
+        
+    start_time = datetime.datetime.fromtimestamp(START_TIME)
+    end_time = datetime.datetime.now()
+    time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)
+    save_string_to_file(time_str, time_filename)
     
