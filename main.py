@@ -267,8 +267,8 @@ def generate_data():
         alternative_environment = string_org.hash_environment
         
     if ORG_TYPE != "pd":
-    experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
-        reference_environment, alternative_environment)
+        experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
+            reference_environment, alternative_environment)
 
     if ORG_TYPE == "pd":
         output = pd_evolve_population()
