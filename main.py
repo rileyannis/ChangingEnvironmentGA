@@ -270,17 +270,10 @@ def generate_data():
         
     if ORG_TYPE != "pd":
         experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
-<<<<<<< HEAD
             reference_environment, alternative_environment)
-=======
-        reference_environment, alternative_environment)
->>>>>>> micky/master
 
     if ORG_TYPE == "pd":
         output = pd_evolve_population()
-        
-
-
 
     if os.path.exists(OUTPUT_FOLDER):
         raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
