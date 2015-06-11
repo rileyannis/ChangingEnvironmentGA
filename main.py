@@ -292,22 +292,22 @@ def generate_data():
     if ORG_TYPE == "pd":
         output_filename = join_path("bits_of_memory_overtime.csv")
         save_table_to_file(output, output_filename)
-        return
-    
-    experienced_filename = join_path("experienced_fitnesses.csv")
-    reference_filename = join_path("reference_fitnesses.csv")
-    experienced_best_filename = join_path("experienced_best_fitnesses.csv")
-    reference_best_filename = join_path("reference_best_fitnesses.csv")
-    corr_filename = join_path("correlation.dat")
-    time_filename = join_path("time.dat")
-
-    save_table_to_file(experienced_fits, experienced_filename)
-    save_table_to_file(experienced_bests, experienced_best_filename)
-    save_table_to_file(reference_fits, reference_filename)
-    save_table_to_file(reference_bests, reference_best_filename)
-    if ORG_TYPE == "vector":
-        save_string_to_file(str(fitness_function.correlation()), corr_filename)
         
+    else:
+        experienced_filename = join_path("experienced_fitnesses.csv")
+        reference_filename = join_path("reference_fitnesses.csv")
+        experienced_best_filename = join_path("experienced_best_fitnesses.csv")
+        reference_best_filename = join_path("reference_best_fitnesses.csv")
+        corr_filename = join_path("correlation.dat")
+   
+
+        save_table_to_file(experienced_fits, experienced_filename)
+        save_table_to_file(experienced_bests, experienced_best_filename)
+        save_table_to_file(reference_fits, reference_filename)
+        save_table_to_file(reference_bests, reference_best_filename)
+        if ORG_TYPE == "vector":
+            save_string_to_file(str(fitness_function.correlation()), corr_filename)
+    time_filename = join_path("time.dat")     
     start_time = datetime.datetime.fromtimestamp(START_TIME)
     end_time = datetime.datetime.now()
     time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)

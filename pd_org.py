@@ -28,13 +28,16 @@ class MemoryPDGenotype(object):
     
     def __eq__(self, other):
         return (self.number_of_bits_of_memory == other.number_of_bits_of_memory and
-                self.decision_list == other.decision_list and self.initial_memory == other.initial_memory)
+                self.decision_list == other.decision_list and
+                self.initial_memory == other.initial_memory)
     
     def __ne__(self, other):
         return not self == other
     
     def __str__(self):
-        return "MemoryPDGenotype({}, {}, {})".format(self.number_of_bits_of_memory, self.decision_list, self.initial_memory)
+        return "MemoryPDGenotype({}, {}, {}, {})".format(self.number_of_bits_of_memory,
+                                                         self.decision_list,
+                                                         self.initial_memory)
     
     def __repr__(self):
         return str(self)
