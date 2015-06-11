@@ -16,6 +16,8 @@ import shutil
 import datetime
 import pd_selection
 import pd_analysis
+import pd_tournament
+import pd_org
 
 FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
@@ -33,7 +35,7 @@ def create_initial_population():
     """
     Create a starting population by forming a list of randomly generated organisms.
     """
-    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg}
+    org_type_map = {"string": string_org.StringOrg, "vector": real_value_vector_org.RealValueVectorOrg, "pd": pd_org.PDOrg}
     if ORG_TYPE in org_type_map:
         return [org_type_map[ORG_TYPE]() for _ in range(NUMBER_OF_ORGANISMS)]
     
@@ -106,12 +108,12 @@ def pd_evolve_population():
     organisms = create_initial_population()
     output = []
     headers = []
-    for i in range(pd_org.MAX_NUMBER_OF_BITS + 1):
+    for i in range(pd_org.MAX_BITS_OF_MEMORY + 1):
         headers.append("Organisms With " + str(i) + " Bits of Memory")
     output.append(headers)
     for i in range(NUMBER_OF_GENERATIONS):
         organisms = pd_selection.get_next_generation_by_selection(organisms)
-        organisms = get_mutation_population(organisms)
+        organisms = get_mutated_population(organisms)
         output.append(pd_analysis.get_tally_of_number_of_bits_of_memory(organisms))
 
     return output
@@ -201,7 +203,7 @@ def set_global_variables(config):
         MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
         global TOURNAMENT_SIZE
         TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")    
-    elif ORG_TYPE == "string":
+    if ORG_TYPE == "string":
         string_org.TARGET_STRING = config.get("DEFAULT", "target_string")
         string_org.LETTERS = config.get("DEFAULT", "letters")
     elif ORG_TYPE == "vector":
@@ -268,7 +270,11 @@ def generate_data():
         
     if ORG_TYPE != "pd":
         experienced_fits, experienced_bests, reference_fits, reference_bests = evolve_population(
+<<<<<<< HEAD
             reference_environment, alternative_environment)
+=======
+        reference_environment, alternative_environment)
+>>>>>>> micky/master
 
     if ORG_TYPE == "pd":
         output = pd_evolve_population()
@@ -290,22 +296,22 @@ def generate_data():
     if ORG_TYPE == "pd":
         output_filename = join_path("bits_of_memory_overtime.csv")
         save_table_to_file(output, output_filename)
-        return
-    
-    experienced_filename = join_path("experienced_fitnesses.csv")
-    reference_filename = join_path("reference_fitnesses.csv")
-    experienced_best_filename = join_path("experienced_best_fitnesses.csv")
-    reference_best_filename = join_path("reference_best_fitnesses.csv")
-    corr_filename = join_path("correlation.dat")
-    time_filename = join_path("time.dat")
-
-    save_table_to_file(experienced_fits, experienced_filename)
-    save_table_to_file(experienced_bests, experienced_best_filename)
-    save_table_to_file(reference_fits, reference_filename)
-    save_table_to_file(reference_bests, reference_best_filename)
-    if ORG_TYPE == "vector":
-        save_string_to_file(str(fitness_function.correlation()), corr_filename)
         
+    else:
+        experienced_filename = join_path("experienced_fitnesses.csv")
+        reference_filename = join_path("reference_fitnesses.csv")
+        experienced_best_filename = join_path("experienced_best_fitnesses.csv")
+        reference_best_filename = join_path("reference_best_fitnesses.csv")
+        corr_filename = join_path("correlation.dat")
+   
+
+        save_table_to_file(experienced_fits, experienced_filename)
+        save_table_to_file(experienced_bests, experienced_best_filename)
+        save_table_to_file(reference_fits, reference_filename)
+        save_table_to_file(reference_bests, reference_best_filename)
+        if ORG_TYPE == "vector":
+            save_string_to_file(str(fitness_function.correlation()), corr_filename)
+    time_filename = join_path("time.dat")     
     start_time = datetime.datetime.fromtimestamp(START_TIME)
     end_time = datetime.datetime.now()
     time_str = "Start_time {}\nEnd_time {}\nDuration {}\n".format(start_time, end_time, end_time - start_time)

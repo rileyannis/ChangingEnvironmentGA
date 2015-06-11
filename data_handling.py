@@ -14,9 +14,9 @@ COLORS = ["silver", "maroon", "red", "purple", "fuchsia", "green", "lime", "oliv
               "navy", "blue", "teal", "aqua"]
 
 def main():
-    test_dir = "length_100_2015_May_27"
-    #data = get_data(test_dir)
-    data = get_pickled_data(test_dir)
+    test_dir = "test_2015_May_19"
+    data = get_data(test_dir)
+    #data = get_pickled_data(test_dir)
     landscape = "schafferf7"
     plot_aggregate_over_time(data, landscape, test_dir)
     plot_stddev_over_time(data, landscape, test_dir)

@@ -8,16 +8,17 @@ from fitness_function import *
 import numpy as np
 
 def main():
-    base = "./ff_plots"
+    base = "ff_plots"
     landscape = schafferF7
     correlation = 0.99
-    directory = "/" + landscape.__name__ + "_" + str(correlation) + ".png"
-    ff = Fitness_Function(landscape, 2)
-    ff.create_fitness2(correlation)
+    for val in range(10):
+        directory = base + "/" + landscape.__name__ + "_" + str(correlation) + "_ver" + str(val) + ".png"
+        ff = Fitness_Function(landscape, 2)
+        ff.create_fitness2(correlation)
     #ff.set_flipped(True)
     #print fitness2([1,1])
     #plotFitnessFunction(ff.get_fitness1())
-    plotFitnessFunction(ff, directory)
+        plotFitnessFunction(ff, directory)
 
 def plotFitnessFunction(ff, directory):
     plt.clf()
@@ -42,7 +43,7 @@ def plotFitnessFunction(ff, directory):
     #surf = ax.plot_trisurf(X, Y, Z, cmap=cm.jet)
     #ax.plot_wireframe(X, Y, Z)
     plt.title("Correlation = " + str(ff.correlation()))
-    plt.savefig(base + directory)
+    plt.savefig(directory)
 
 if __name__ == "__main__":
     main()

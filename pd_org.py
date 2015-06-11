@@ -28,13 +28,16 @@ class MemoryPDGenotype(object):
     
     def __eq__(self, other):
         return (self.number_of_bits_of_memory == other.number_of_bits_of_memory and
-                self.decision_list == other.decision_list and self.initial_memory == other.initial_memory)
+                self.decision_list == other.decision_list and
+                self.initial_memory == other.initial_memory)
     
     def __ne__(self, other):
         return not self == other
     
     def __str__(self):
-        return "MemoryPDGenotype({}, {}, {})".format(self.number_of_bits_of_memory, self.decision_list, self.initial_memory)
+        return "MemoryPDGenotype({}, {}, {}, {})".format(self.number_of_bits_of_memory,
+                                                         self.decision_list,
+                                                         self.initial_memory)
     
     def __repr__(self):
         return str(self)
@@ -133,9 +136,11 @@ class PDOrg(object):
         Then, convert binary string to integer (5)
         Return value of decision list at index
         """
-        
-        binary_string_index = "".join("1" if i else "0" for i in self.memory)
-        decision_list_index = int(binary_string_index, 2)
+        if not self.memory:
+            decision_list_index = 0
+        else:
+            binary_string_index = "".join("1" if i else "0" for i in self.memory)
+            decision_list_index = int(binary_string_index, 2)
         return self.genotype.decision_list[decision_list_index]
        
     def opponent_cooperated_last_round(self, did_cooperate):

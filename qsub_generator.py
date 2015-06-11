@@ -3,13 +3,13 @@ import itertools
 from subprocess import call
 import datetime
 
-array_size = 40
+array_size = 4
 walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
 alt_corrs = [-1, -0.99, -0.9, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, 0.9, 0.99, 1]
-function_types = ["rosenbrock"]
-num_gens = [10000]
-num_runs_per_job = 2
+function_types = ["schafferf7"]
+num_gens = [1000]
+num_runs_per_job = 20
 output_dir_base = "length_100_" + today
 
 common = """
