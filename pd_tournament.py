@@ -15,6 +15,8 @@ SUCKER = 0
 
 PROPORTION_COST_PER_MEMORY_BIT = .01
 
+TOGGLE_SELF_MEMORY_ON = True
+
 def pd_payout(a_cooperates, b_cooperates):
     """
     Function my_reward determines reward given by the state of self and other
@@ -57,9 +59,15 @@ def run_game(organism_a, organism_b):
 
         payout_a, payout_b = pd_payout(a_cooperates, b_cooperates)
         
-        organism_a.opponent_cooperated_last_round(b_cooperates)
-        organism_b.opponent_cooperated_last_round(a_cooperates)
-    
+        if TOGGLE_SELF_MEMORY_ON:
+            organism_a.store_bit_of_memory(a_cooperates)
+            organism_a.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(a_cooperates)
+        else:
+            organism_a.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(a_cooperates)
+
         total_payout_a += payout_a
         total_payout_b += payout_b
     

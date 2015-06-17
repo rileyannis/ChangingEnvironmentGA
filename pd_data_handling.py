@@ -14,12 +14,12 @@ COLORS = ["silver", "maroon", "red", "purple", "fuchsia", "green", "lime", "oliv
               "navy", "blue", "teal", "aqua"]
 
 def main():
-    test_dir = "pdoutput2015_June_09"
+    test_dir = "pdoutput2015_June_15"
     data = get_data(test_dir)
     #data = get_pickled_data(test_dir)
     pop_costs = None
-    mutation_bits = None
-    mutation_initials = None
+    mutation_bits = "0.5"
+    mutation_initials = "0.1"
     plot_aggregate_over_time(data, pop_costs, mutation_bits, mutation_initials, test_dir)
 
 
@@ -65,10 +65,6 @@ def plot_aggregate_over_time(data, pop_cost=None, mutation_bit=None, mutation_in
         averages_df_list = []
         all_runs_averages = []
         #gets averages in each data frame
-        
-        
-
-
         for df in data[config]:
             df_weighted = df["Organisms With 1 Bits of Memory"]
             num_orgs = df.sum(1)
@@ -78,18 +74,13 @@ def plot_aggregate_over_time(data, pop_cost=None, mutation_bit=None, mutation_in
                 df_weighted +=  df["Organisms With {0} Bits of Memory".format(i)].multiply(i)
            
             averages_df_list.append(df_weighted.multiply(1.0 / num_orgs))
-           
-            
-
-        
-
-#averages all the runs
+        #averages all the runs
         for gen in range(len(averages_df_list[0])):
             df_sum = 0.0
             for df in averages_df_list:
                 df_sum += df[gen]
             all_runs_averages.append(df_sum / len(averages_df_list))
-        print all_runs_averages
+        
         x = [val for val in range(len(all_runs_averages))]            
         try:
             ax.plot(x, all_runs_averages, color=colors.pop(), label=(config))
@@ -108,7 +99,7 @@ def plot_aggregate_over_time(data, pop_cost=None, mutation_bit=None, mutation_in
     plt.xlabel("Generation")
     plt.ylabel("Average Bits of Memory")
     
-    plt.savefig(directory+"/average_bits_of_memory.png")
+    plt.savefig(directory+"/average_bits_of_memory_" + str(pop_cost) + "_" + str(mutation_bit) + "_" + str(mutation_initial) + ".png")
 
 def plot_stddev_over_time(data, key=None, directory="."):
     plt.clf()
