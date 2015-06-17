@@ -3,14 +3,14 @@ import random
 
 TOURNAMENT_SIZE = None
 
-def get_best_half(paired_organism_payouts):
+def get_best_half(organisms):
     """
     This will run a tournament with the given organisms and
     return a list of the top half of the organisms in terms of payout
     """
-    sorted_pairs = sorted(paired_organism_payouts, key=lambda pair: pair[1], reverse=True)
-    best_half_pairs = sorted_pairs[:len(paired_organism_payouts) // 2]
-    return [org for org, _ in best_half_pairs]
+    sorted_orgs = sorted(organisms, key=lambda org: org.average_payout, reverse=True)
+    best_half_orgs = sorted_orgs[:len(organisms) // 2]
+    return best_half_orgs[:]
     
 def get_next_generation_by_selection(organisms):
     """
@@ -23,11 +23,11 @@ def get_next_generation_by_selection(organisms):
     population and make more clumps
     It repeats more tournaments until the next generation reaches the population size
     """
-    def generate_contenders(organisms):
-        number_of_tournaments = len(organisms) // TOURNAMENT_SIZE
-        if not len(organisms) % TOURNAMENT_SIZE:
-            number_of_tournaments += 1
+    number_of_tournaments = len(organisms) // TOURNAMENT_SIZE
+    if not len(organisms) % TOURNAMENT_SIZE:
+        number_of_tournaments += 1
         
+    def generate_contenders(organisms):
         while True:
             random.shuffle(organisms)
             for i in range(number_of_tournaments):
@@ -36,13 +36,20 @@ def get_next_generation_by_selection(organisms):
     next_generation = []
     #function that adds things to next generation
     contender_generator = generate_contenders(organisms)
-    
+   
+    #pick organisms for tournament
+    #gets organisms average payout
+    print ("Before Loop!")
+    for _ in range(number_of_tournaments):
+        contenders = next(contender_generator)
+        pd_tournament.get_average_payouts(contenders)
+    print ("After loop")    
+
     while len(next_generation) < len(organisms):
         #pick organisms for the tournament
         contenders = next(contender_generator)
-        #get the winners of the tournament
-        paired_org_payouts = list(pd_tournament.get_average_payouts(contenders))
-        winners = get_best_half(paired_org_payouts)
+        #gets winners of contenders
+        winners = get_best_half(contenders)
         #add winners to the next generation
         next_generation += winners
     #make next_generation same length as organisms

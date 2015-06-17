@@ -32,6 +32,7 @@ class TestFunctionsSelfMemoryOn(unittest.TestCase):
         self.organism_a = pd_org.PDOrg(pd_org.MemoryPDGenotype(1,[True, False], [False]))
         self.organism_b = pd_org.PDOrg(pd_org.MemoryPDGenotype(2,[True, False, False, True], [False, True]))
         
+        
     
     def test_run_game(self):
         total_payout_a, total_payout_b = pd_tournament.run_game(self.organism_a, self.organism_b)
@@ -48,20 +49,24 @@ class TestFunctionsSelfMemoryOn(unittest.TestCase):
         self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
                 
     def test_get_average_payouts(self):
-        def check(organisms, expected):
-            results = list(pd_tournament.get_average_payouts(organisms))
-            for i in range(len(expected)):
-                self.assertEqual(expected[i][0], results[i][0])
-                self.assertAlmostEqual(expected[i][1], results[i][1], 2) 
-          
         organisms = [self.organism_a, self.organism_b]
-        expected = [(self.organism_a, 0), (self.organism_b, 9.8)]
-        check(organisms, expected)
-        
+        pd_tournament.get_average_payouts(organisms)
+        actual_payout_a = self.organism_a.average_payout
+        actual_payout_b = self.organism_b.average_payout
+        expected_payout_a = 0
+        expected_payout_b = 9.8
+        self.assertEqual(expected_payout_a, actual_payout_a)
+        self.assertEqual(expected_payout_b, actual_payout_b)
+       
         organisms = [self.organism_a, self.organism_b, self.organism_a]
-        expected = [(self.organism_a, 1.98), (self.organism_b, 9.8), (self.organism_a, 1.98)]
-        check(organisms, expected)
-            
+        pd_tournament.get_average_payouts(organisms)
+        actual_payout_a = self.organism_a.average_payout
+        actual_payout_b = self.organism_b.average_payout
+        expected_payout_a = 1.98
+        expected_payout_b = 9.8
+        self.assertEqual(expected_payout_a, actual_payout_a)
+        self.assertEqual(expected_payout_b, actual_payout_b)
+
 class TestFunctionsSelfMemoryOff(unittest.TestCase):
     def setUp(self):
         pd_org.MAX_BITS_OF_MEMORY = 4
@@ -83,21 +88,28 @@ class TestFunctionsSelfMemoryOff(unittest.TestCase):
         expected_adj_payout_b = 7.84
         self.assertAlmostEqual(expected_adj_payout_a, adj_payout_a, 2)
         self.assertAlmostEqual(expected_adj_payout_b, adj_payout_b, 2)
-       
+      
     def test_get_average_payouts(self):
-        def check(organisms, expected):
-            results = list(pd_tournament.get_average_payouts(organisms))
-            for i in range(len(expected)):
-                self.assertEqual(expected[i][0], results[i][0])
-                self.assertAlmostEqual(expected[i][1], results[i][1], 2)
-        
         organisms = [self.organism_a, self.organism_b]
-        expected = [(self.organism_a, 2.97), (self.organism_b, 7.84)]
-        check(organisms, expected)
-
+        pd_tournament.get_average_payouts(organisms)
+        actual_payout_a = self.organism_a.average_payout
+        actual_payout_b = self.organism_b.average_payout
+        expected_payout_a = 2.97
+        expected_payout_b = 7.84
+        self.assertAlmostEqual(expected_payout_a, actual_payout_a, 2)
+        self.assertEqual(expected_payout_b, actual_payout_b)
+       
         organisms = [self.organism_a, self.organism_b, self.organism_a]
-        expected = [(self.organism_a, 3.46), (self.organism_b, 7.84), (self.organism_a, 3.46)]
-        check(organisms, expected)
+        pd_tournament.get_average_payouts(organisms)
+        actual_payout_a = self.organism_a.average_payout
+        actual_payout_b = self.organism_b.average_payout
+        expected_payout_a = 3.46
+        expected_payout_b = 7.84
+        self.assertAlmostEqual(expected_payout_a, actual_payout_a, 2)
+        self.assertEqual(expected_payout_b, actual_payout_b)
+
+
     
+
 if __name__ == "__main__":
     unittest.main()

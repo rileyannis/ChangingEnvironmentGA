@@ -114,9 +114,10 @@ class PDOrg(object):
         self.id = PDOrg.next_org_id
         PDOrg.next_org_id += 1
         self.parent = parent
+        self.average_payout = None
         
     def get_mutant(self):
-        return PDOrg(self.genotype.get_mutant_of_self())
+        return PDOrg(self.genotype.get_mutant_of_self(), self.id)
     
     def __eq__(self, other):
         return self.genotype == other.genotype
