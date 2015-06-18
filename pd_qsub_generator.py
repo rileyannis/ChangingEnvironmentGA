@@ -8,9 +8,9 @@ walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
 num_runs_per_job = 2
 output_dir_base = "pdoutput" + today
-pop_costs = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
-mutation_bits = [0.1, 0.2, 0.3, 0.4, 0.5]
-mutation_initials = [0.1, 0.2, 0.3, 0.4, 0.5]
+pop_costs = [-1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+#mutation_bits = [0.1, 0.2, 0.3, 0.4, 0.5]
+#mutation_initials = [0.1, 0.2, 0.3, 0.4, 0.5]
 common = """
 #!/bin/bash -login
 
@@ -29,7 +29,7 @@ cd ~/ChangingEnvironmentGA
 
 config_common = """
 [DEFAULT]
-number_of_generations = 20
+number_of_generations = 500
 number_of_organisms = 500
 org_type = pd
 verbose = False
@@ -41,9 +41,11 @@ punishment = 1
 sucker = 0
 proportion_cost_per_memory_bit = {0}
 max_bits_of_memory = 4
-mutation_likelihood_of_bits_of_memory = {1}
-mutation_likelihood_of_initial_memory_state = {2}
-toggle_self_memory_on = False 
+mutation_likelihood_of_bits_of_memory = 0.1
+mutation_likelihood_of_initial_memory_state = 0.1
+toggle_self_memory_on = False
+mutation_rate = 0.3
+output_frequency = 10
 """
 
 def convert_config_file_name_to_job_string(file_name, output_dir_base):
@@ -69,10 +71,9 @@ def start_runs(jobs, submit_jobs=True, print_jobs=True):
     
 def create_config_files():
     config_files = []
-    for pop_cost, mutation_bit, mutation_initial in itertools.product(pop_costs, mutation_bits,
-                                                          mutation_initials):
-        config_filename = "{0}_{1}_{2}gen.ini".format(pop_cost, mutation_bit, mutation_initial)
-        contents = config_common.format(pop_cost, mutation_bit, mutation_initial)
+    for pop_cost in itertools.product(pop_costs):
+        config_filename = "{0}_gen.ini".format(pop_cost)
+        contents = config_common.format(pop_cost)
         write_to_file(config_filename, contents)
         config_files.append(config_filename)
     return config_files
