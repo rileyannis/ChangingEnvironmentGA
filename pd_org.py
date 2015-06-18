@@ -116,6 +116,7 @@ class PDOrg(object):
         self.parent = parent
         self.average_payout = None
         
+        
     def get_mutant(self):
         return PDOrg(self.genotype.get_mutant_of_self(), self.id)
     

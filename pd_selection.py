@@ -39,11 +39,11 @@ def get_next_generation_by_selection(organisms):
    
     #pick organisms for tournament
     #gets organisms average payout
-    print ("Before Loop!")
+
     for _ in range(number_of_tournaments):
         contenders = next(contender_generator)
         pd_tournament.get_average_payouts(contenders)
-    print ("After loop")    
+
 
     while len(next_generation) < len(organisms):
         #pick organisms for the tournament
