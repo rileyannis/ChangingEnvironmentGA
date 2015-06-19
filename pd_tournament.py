@@ -15,6 +15,8 @@ SUCKER = 0
 
 PROPORTION_COST_PER_MEMORY_BIT = .01
 
+TOGGLE_SELF_MEMORY_ON = False
+
 def pd_payout(a_cooperates, b_cooperates):
     """
     Function my_reward determines reward given by the state of self and other
@@ -57,9 +59,15 @@ def run_game(organism_a, organism_b):
 
         payout_a, payout_b = pd_payout(a_cooperates, b_cooperates)
         
-        organism_a.opponent_cooperated_last_round(b_cooperates)
-        organism_b.opponent_cooperated_last_round(a_cooperates)
-    
+        if TOGGLE_SELF_MEMORY_ON:
+            organism_a.store_bit_of_memory(a_cooperates)
+            organism_a.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(a_cooperates)
+        else:
+            organism_a.store_bit_of_memory(b_cooperates)
+            organism_b.store_bit_of_memory(a_cooperates)
+
         total_payout_a += payout_a
         total_payout_b += payout_b
     
@@ -91,7 +99,7 @@ def get_average_payouts(organisms):
     """    
     Lists all possible pairs of organisms, calls adj_payout
     Averages all together
-    Returns a generator of pairs of orgs and their avg payout
+    Updates organisms.average_payout for every org in organisms list
     """
     total_payouts = [0.0 for _ in organisms]
     all_pairs = itertools.combinations(range(len(organisms)), 2)
@@ -104,5 +112,8 @@ def get_average_payouts(organisms):
             
     number_of_games_per_org = len(organisms) - 1
     average_payouts = [payout / number_of_games_per_org for payout in total_payouts] 
-  
-    return zip(organisms, average_payouts)
+    
+    for i in range(len(organisms)):
+        organisms[i].average_payout = average_payouts[i]
+
+

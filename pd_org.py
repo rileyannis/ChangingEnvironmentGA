@@ -35,9 +35,9 @@ class MemoryPDGenotype(object):
         return not self == other
     
     def __str__(self):
-        return "MemoryPDGenotype({}, {}, {}, {})".format(self.number_of_bits_of_memory,
-                                                         self.decision_list,
-                                                         self.initial_memory)
+        return "MemoryPDGenotype({}, {}, {})".format(self.number_of_bits_of_memory,
+                                                     self.decision_list,
+                                                     self.initial_memory)
     
     def __repr__(self):
         return str(self)
@@ -104,14 +104,21 @@ class PDOrg(object):
     This class creates a PD organism.
     """
     
-    def __init__(self, genotype=None):
+    next_org_id = 0
+    
+    def __init__(self, genotype=None, parent=None):
         if genotype is None:
             genotype = _create_random_genotype()
         self.genotype = genotype
         self.initialize_memory()
-    
+        self.id = PDOrg.next_org_id
+        PDOrg.next_org_id += 1
+        self.parent = parent
+        self.average_payout = None
+        
+        
     def get_mutant(self):
-        return PDOrg(self.genotype.get_mutant_of_self())
+        return PDOrg(self.genotype.get_mutant_of_self(), self.id)
     
     def __eq__(self, other):
         return self.genotype == other.genotype
@@ -143,7 +150,7 @@ class PDOrg(object):
             decision_list_index = int(binary_string_index, 2)
         return self.genotype.decision_list[decision_list_index]
        
-    def opponent_cooperated_last_round(self, did_cooperate):
+    def store_bit_of_memory(self, did_cooperate):
         """
         Stores opponent's last move in memory at the right end of memory and
         deletes oldest move (on left)

@@ -18,6 +18,7 @@ import pd_selection
 import pd_analysis
 import pd_tournament
 import pd_org
+import pd_make_detail_file
 
 FITNESS_FUNCTION_TYPE = None
 NUMBER_OF_ORGANISMS = None
@@ -30,6 +31,7 @@ VERBOSE = False
 ALTERNATE_ENVIRONMENT_CORR = None
 START_TIME = None
 CROWDING = False
+OUTPUT_FREQUENCY = None
 
 def create_initial_population():
     """
@@ -43,6 +45,7 @@ def get_mutated_population(population):
     """
     Return a new population with a percentage of organisms mutated based on the mutation rate.
     """
+    
     new_population = []
     for org in population:
         if random.random() < MUTATION_RATE:
@@ -105,16 +108,36 @@ def print_status(generation, population, environment):
     print("Gen = {}  Pop = {}  Fit = {}".format(generation, population, average_fitness))
 
 def pd_evolve_population():
+    past_organisms = {}
+    
     organisms = create_initial_population()
     output = []
     headers = []
     for i in range(pd_org.MAX_BITS_OF_MEMORY + 1):
         headers.append("Organisms With " + str(i) + " Bits of Memory")
     output.append(headers)
-    for i in range(NUMBER_OF_GENERATIONS):
+    for org in organisms:
+    #adding into the dictionary
+        if org in past_organisms:
+            past_organisms[org].append(org)
+        else:
+            past_organisms[org] = [org]
+        
+    pd_make_detail_file.make_file_detail(organisms, past_organisms, 0)
+
+    for i in range(NUMBER_OF_GENERATIONS):       
         organisms = pd_selection.get_next_generation_by_selection(organisms)
         organisms = get_mutated_population(organisms)
         output.append(pd_analysis.get_tally_of_number_of_bits_of_memory(organisms))
+
+        for org in organisms:
+        #adding into the dictionary
+            if org in past_organisms:
+                past_organisms[org].append(org)
+            else:
+                past_organisms[org] = [org]
+        if ( (i + 1) % OUTPUT_FREQUENCY == 0):
+            pd_make_detail_file.make_file_detail(organisms, past_organisms, i + 1)
 
     return output
 
@@ -198,9 +221,11 @@ def set_global_variables(config):
     NUMBER_OF_GENERATIONS = config.getint("DEFAULT", "number_of_generations")
     global ORG_TYPE
     ORG_TYPE = config.get("DEFAULT", "org_type")
+    global MUTATION_RATE
+    MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
+    global OUTPUT_FREQUENCY
+    OUTPUT_FREQUENCY = config.getint("DEFAULT", "output_frequency")
     if ORG_TYPE != "pd":
-        global MUTATION_RATE
-        MUTATION_RATE = config.getfloat("DEFAULT", "mutation_rate")
         global TOURNAMENT_SIZE
         TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")    
     if ORG_TYPE == "string":
@@ -244,7 +269,8 @@ def set_global_variables(config):
         pd_tournament.REWARD = config.getint("DEFAULT", "reward")
         pd_tournament.PUNISHMENT = config.getint("DEFAULT", "punishment")
         pd_tournament.SUCKER = config.getint("DEFAULT", "sucker")
-        pd_tournament.POPULATION_COST_PER_MEMORY_BIT = config.getfloat("DEFAULT", "population_cost_per_memory_bit")
+        pd_tournament.PROPORTION_COST_PER_MEMORY_BIT = config.getfloat("DEFAULT", "proportion_cost_per_memory_bit")
+        pd_tournament.TOGGLE_SELF_MEMORY_ON = config.getboolean("DEFAULT", "toggle_self_memory_on")
         pd_selection.TOURNAMENT_SIZE = config.getint("DEFAULT", "tournament_size")
         pd_org.MAX_BITS_OF_MEMORY = config.getint("DEFAULT", "max_bits_of_memory")
         pd_org.MUTATION_LIKELIHOOD_OF_BITS_OF_MEMORY = config.getfloat("DEFAULT", "mutation_likelihood_of_bits_of_memory")

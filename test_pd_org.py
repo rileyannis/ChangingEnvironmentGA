@@ -122,14 +122,20 @@ class TestPDOrg(unittest.TestCase):
         initial_mem = [True, False]
         self.geno = Geno(num_bits, decision_list, initial_mem)
         self.org = PDOrg(self.geno)
-        
+     
     def test_init(self):
         """
         Tests if genotype given to PDOrg constructor
         """
         self.assertEqual(self.org.genotype, self.geno)
         self.assertSequenceEqual(self.org.memory, self.geno.initial_memory)
+        PDOrg.next_org_id = 0
+        org_two = PDOrg(self.geno, 0)
         
+        self.assertEqual(org_two.id, 0)
+        
+        self.assertEqual(org_two.parent, 0)
+
     def test_init_no_geno(self):
         """
         Test if no genotype is given to PDOrg constructor
@@ -154,22 +160,24 @@ class TestPDOrg(unittest.TestCase):
         repr_result = repr(self.org)
         self.assertEqual(expected, repr_result)
         
-    def test_opponent_cooperated_last_round(self):
-        self.org.opponent_cooperated_last_round(True)
-        self.assertSequenceEqual([False, True], self.org.memory)
-        
-        self.org.opponent_cooperated_last_round(False)
+    def test_store_bit_of_memory(self):
+        self.org.store_bit_of_memory(True)
+        self.org.store_bit_of_memory(False)
         self.assertSequenceEqual([True, False], self.org.memory)
+        
+        self.org.store_bit_of_memory(False)
+        self.org.store_bit_of_memory(True)
+        self.assertSequenceEqual([False, True], self.org.memory)
         
     def test_will_cooperate(self):
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
         
-        self.org.opponent_cooperated_last_round(True)
+        self.org.store_bit_of_memory(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
         
-        self.org.opponent_cooperated_last_round(True)
+        self.org.store_bit_of_memory(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(True, did_cooperate)
         
@@ -182,13 +190,13 @@ class TestPDOrg(unittest.TestCase):
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
          
-        self.org.opponent_cooperated_last_round(True)
+        self.org.store_bit_of_memory(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
         
         self.org.initialize_memory()
         
-        self.org.opponent_cooperated_last_round(True)
+        self.org.store_bit_of_memory(True)
         did_cooperate = self.org.will_cooperate()
         self.assertEqual(False, did_cooperate)
         
