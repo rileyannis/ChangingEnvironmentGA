@@ -8,13 +8,13 @@ Riley Annis, Josh Nahum, Emily Dolson
 Numpy, Scipy, Cython
 
 ###Necessary Files:
-changing_environments_ga.py
-main.py
-fitness_function.pyx
-cpp_fitness_function.cpp
-string_org.py
-real_value_vector_org.py
-bit_vector_org.py
+* changing_environments_ga.py
+* main.py
+* fitness_function.pyx
+* cpp_fitness_function.cpp
+* string_org.py
+* real_value_vector_org.py
+* bit_vector_org.py
 
 ###Config File Arguenments:
 * Necessary for all types:
@@ -35,8 +35,8 @@ bit_vector_org.py
   * mutation_effect_size
   * alternate_environment_corr
   * length
-* Necessary for bit vector orgs:
-  * length
+* Necessary for pd orgs:
+  * Will fill in later
 
 ###changing_environments_ga.py Command Line Arguements:
 * -c  config file location
@@ -48,14 +48,5 @@ Not used, possibly broken.
 ###Use With Real Value Vector Orgs:
 I'll get to this soon, I promise.
 
-###Use With Bit Vector Orgs (Static Environment):
-* Constant:
-  * LENGTH
-* Class:
-  * BitVectorOrg
-* Methods:
-  * fitness(environment)
-  * is_better_than(other_org, environment)
-  * get_mutant()
-* Function:
-  * fitness_function(genotype)
+###Use With PD Orgs (Static Environment):
+Might fill this in
