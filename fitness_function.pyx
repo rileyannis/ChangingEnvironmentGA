@@ -11,7 +11,7 @@ cdef extern from "cpp_fitness_function.cpp":
     double cpp_sphere_function(double* vals, long sz)
     double cpp_rosenbrock_function(double* vals, long sz)
     double cpp_rana_function(double* vals, long sz, double* weights)
-    double cpp_schafferF7(double* vals, long sz)
+    double cpp_schafferf7(double* vals, long sz)
     double cpp_deceptive(double* vals, long sz)
     double add_array(double* ary, int size)
 
@@ -131,7 +131,7 @@ def rana_function(np.ndarray[np.float64_t] vals):
     cdef np.ndarray[np.float64_t] weights = RANA_WEIGHTS
     return cpp_rana_function(&vals[0], sz, &weights[0])
 
-def old_schafferF7(vals):
+def old_schafferf7(vals):
     """OLD, NOT USED"""
     #Equation from 
     #http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/schafferf7.html
@@ -142,9 +142,9 @@ def old_schafferF7(vals):
         total += (normalizer * sqrt(si) * (sin(50*si**0.20) + 1))**2
     return total
 
-def schafferF7(np.ndarray[np.float64_t] vals):
+def schafferf7(np.ndarray[np.float64_t] vals):
     cdef long sz = vals.shape[0]
-    return cpp_schafferF7(&vals[0], sz)
+    return cpp_schafferf7(&vals[0], sz)
 
 def old_deceptive(vals):
     """OLD, NOT USED"""

@@ -220,7 +220,7 @@ def set_global_variables(config):
         elif fitness_function_type_str == "deceptive":
             FITNESS_FUNCTION_TYPE = ff.deceptive
         elif fitness_function_type_str == "schafferf7":
-            FITNESS_FUNCTION_TYPE = ff.schafferF7
+            FITNESS_FUNCTION_TYPE = ff.schafferf7
         else:
             raise AssertionError("Unknown (but needed) function type (i.e. sphere)")
         real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")

@@ -50,8 +50,8 @@ float cpp_rana_function(double* vals, long sz, double* weights){
   return tot;
 }
 
-float cpp_schafferF7(double* vals, long sz){
-  //The schafferF7 function! It does other things!
+float cpp_schafferf7(double* vals, long sz){
+  //The schafferf7 function! It does other things!
   double tot = 0.0, norm = 1.0/sz, si;
   for(long i = 0; i < sz - 1; ++i){
     si = sqrt(pow(vals[i], 2) + pow(vals[i + 1], 2));
