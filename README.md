@@ -1,5 +1,5 @@
 #Changing Environments
-This project will observe the relative improvement in fitness of a digital organism moved from its natural environment to a new one, and them back.
+This project will observe the relative improvement in fitness of a digital organism moved from its natural environment to a new one, and then back.
 
 ##Researchers:
 Riley Annis, Josh Nahum, Emily Dolson
@@ -14,7 +14,7 @@ Numpy, Scipy, Cython
 * cpp_fitness_function.cpp
 * string_org.py
 * real_value_vector_org.py
-* bit_vector_org.py
+* pd files
 
 ###Config File Arguenments:
 * Necessary for all types:
