@@ -8,11 +8,12 @@ Supposedly this can be used, have yet to get it to work
 # cython: profile=True
 from libcpp.vector cimport vector
 cdef extern from "cpp_fitness_function.cpp":
-    double cpp_sphere_function(double* vals, long sz)
-    double cpp_rosenbrock_function(double* vals, long sz)
-    double cpp_rana_function(double* vals, long sz, double* weights)
+    double cpp_sphere(double* vals, long sz)
+    double cpp_rosenbrock(double* vals, long sz)
+    double cpp_rana(double* vals, long sz, double* weights)
     double cpp_schafferf7(double* vals, long sz)
     double cpp_deceptive(double* vals, long sz)
+    double cpp_schwefel(double* vals, long sz)
     double add_array(double* ary, int size)
 
 from math import floor, sqrt, ceil, cos, sin, fabs
@@ -53,7 +54,7 @@ def array_testing():
     return add_array(&a[0], s)
 
 
-def flat_function(vals):
+def flat(vals):
     """Takes in vals so as not to break when called."""
     return 0.0
 
@@ -67,10 +68,10 @@ def old_sphere_function(vals):
     """
     return sum(val**2 for val in vals)
 
-def sphere_function(np.ndarray[np.float64_t] vals):
+def sphere(np.ndarray[np.float64_t] vals):
     """Very simple function. Sums the squares of each value."""
     cdef long sz = vals.shape[0]
-    return cpp_sphere_function(&vals[0], sz)
+    return cpp_sphere(&vals[0], sz)
 
 #Does not work very well; is slower
 #def cached_sphere_function(object vals):
@@ -87,9 +88,9 @@ def old_rosenbrock_function(vals):
     return sum(100*(vals[i+1] - vals[i]**2)**2 + (vals[i]-1)**2 
                for i in range(len(vals)-1))
 
-def rosenbrock_function(np.ndarray[np.float64_t] vals):
+def rosenbrock(np.ndarray[np.float64_t] vals):
     cdef long sz = vals.shape[0]
-    return cpp_rosenbrock_function(&vals[0], sz)
+    return cpp_rosenbrock(&vals[0], sz)
 
 def initialize_rana_weights(length):
     #Initialize temp_weights the same as the old rana weights
@@ -122,14 +123,14 @@ def old_rana_function(vals):
                  sin(sqrt(fabs(x+y+1)))
     return total
 
-def rana_function(np.ndarray[np.float64_t] vals):
+def rana(np.ndarray[np.float64_t] vals):
     cdef long sz = vals.shape[0]
     global RANA_WEIGHTS
     if RANA_WEIGHTS is None:
         initialize_rana_weights(sz)
     #Not ideal, but cannot find a way to have a typed global
     cdef np.ndarray[np.float64_t] weights = RANA_WEIGHTS
-    return cpp_rana_function(&vals[0], sz, &weights[0])
+    return cpp_rana(&vals[0], sz, &weights[0])
 
 def old_schafferf7(vals):
     """OLD, NOT USED"""
@@ -172,6 +173,10 @@ def old_deceptive(vals):
 def deceptive(np.ndarray[np.float64_t] vals):
     cdef long sz = vals.shape[0]
     return cpp_deceptive(&vals[0], sz)
+
+def schwefel(np.ndarray[np.float64_t] vals):
+    cdef long sz = vals.shape[0]
+    return cpp_schwefel(&vals[0], sz)
 
 cdef class Fitness_Function:
     """

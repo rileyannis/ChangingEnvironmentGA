@@ -210,17 +210,19 @@ def set_global_variables(config):
         fitness_function_type_str = config.get("DEFAULT", "fitness_function_type")
         global FITNESS_FUNCTION_TYPE
         if fitness_function_type_str == "flat":
-            FITNESS_FUNCTION_TYPE = ff.flat_function
+            FITNESS_FUNCTION_TYPE = ff.flat
         elif fitness_function_type_str == "sphere":
-            FITNESS_FUNCTION_TYPE = ff.sphere_function
+            FITNESS_FUNCTION_TYPE = ff.sphere
         elif fitness_function_type_str == "rosenbrock":
-            FITNESS_FUNCTION_TYPE = ff.rosenbrock_function
+            FITNESS_FUNCTION_TYPE = ff.rosenbrock
         elif fitness_function_type_str == "rana":
             FITNESS_FUNCTION_TYPE = ff.rana_function
         elif fitness_function_type_str == "deceptive":
             FITNESS_FUNCTION_TYPE = ff.deceptive
         elif fitness_function_type_str == "schafferf7":
             FITNESS_FUNCTION_TYPE = ff.schafferf7
+        elif fitness_function_type_str == "schwefel":
+            FITNESS_FUNCTION_TYPE = ff.schwefel
         else:
             raise AssertionError("Unknown (but needed) function type (i.e. sphere)")
         real_value_vector_org.LENGTH = config.getint("DEFAULT", "length")

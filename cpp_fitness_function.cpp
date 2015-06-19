@@ -19,23 +19,25 @@ float inline adding_squares(float tot, float val){
   return tot + (val*val);
 }
 
-float cpp_sphere_function(double* vals, long sz){
+float cpp_sphere(double* vals, long sz){
   //Accumulates the squares of all vals
   return accumulate(vals, vals + sz, 0.0, adding_squares);
 }
 
-float cpp_rosenbrock_function(double* vals, long sz){
+float cpp_rosenbrock(double* vals, long sz){
   //The rosenbrock function! It does things!
-  double tot = 0.0;
+  double tot = 0.0, adjusted_val, adjusted_next = vals[0] * 0.004;
   for(long i = 0; i < (sz - 1); ++i){
-    tot += (100.0 * pow(vals[i+1] - (pow(vals[i], 2)), 2) + pow(vals[i] - 1, 2));
+    adjusted_val = adjusted_next;
+    adjusted_next = vals[i + 1] * 0.004;
+    tot += (100.0 * pow(adjusted_next - (pow(adjusted_val, 2)), 2) + pow(adjusted_val - 1, 2));
   }
   return tot;
 }
 
-float cpp_rana_function(double* vals, long sz, double* weights){
+float cpp_rana(double* vals, long sz, double* weights){
   //The rana function! It does more things! Wow!
-  double tot = 0.0, x, y;
+  double tot = 512.0, x, y;
   for(long i = 0; i < sz; ++i){
     x = vals[i];
     if(i == (sz - 1)){
@@ -52,9 +54,11 @@ float cpp_rana_function(double* vals, long sz, double* weights){
 
 float cpp_schafferf7(double* vals, long sz){
   //The schafferf7 function! It does other things!
-  double tot = 0.0, norm = 1.0/sz, si;
-  for(long i = 0; i < sz - 1; ++i){
-    si = sqrt(pow(vals[i], 2) + pow(vals[i + 1], 2));
+  double tot = 0.0, norm = 1.0/sz, si, adjusted_val, adjusted_next = vals[0] / 512.0 * 100.0;
+  for(long i = 0; i < (sz - 1); ++i){
+    adjusted_val = adjusted_next;
+    adjusted_next = vals[i + 1] / 512.0 * 100.0;
+    si = sqrt(pow(adjusted_val, 2) + pow(adjusted_next, 2));
     tot += pow(norm * sqrt(si) * (sin(50 * pow(si, 0.20)) + 1), 2);
   }
   return tot;
@@ -62,14 +66,26 @@ float cpp_schafferf7(double* vals, long sz){
 
 float cpp_deceptive(double* vals, long sz){
   //The deceptive function. It does stuff.
-  double decep = 0.20, best = 1.0, decep_best = 0.7, tot = 0.0;
+  double decep = 0.2, best = 1.0, decep_best = 0.7, tot = 0.0, adjusted_val;
   for(long i = 0; i < sz; ++i){
-    if(vals[i] < decep){
-      tot += vals[i] * (-1.0 / decep) + best;
+    adjusted_val = (vals[i] + 512.0) / 1024.0;
+    if(adjusted_val < decep){
+      tot += adjusted_val * (-1.0 / decep) + best;
     }
     else{
-      tot += (vals[i] - decep) * (decep_best / (1.0 - decep));
+      tot += (adjusted_val - decep) * (decep_best / (1.0 - decep));
     }
   }
-  return tot / sz;
+  return -1 * tot / sz;
+}
+
+float inline schwefel_sum(float tot, float val){
+  //Inline function for the sum portion of the schwefel function
+  return tot + (-1 * val * sin(sqrt(abs(val))));
+}
+
+float cpp_schwefel(double* vals, long sz){
+  //The schwefel function. This is new!
+  double alpha = 418.982887;
+  return accumulate(vals, vals + sz, alpha * sz, schwefel_sum);
 }
