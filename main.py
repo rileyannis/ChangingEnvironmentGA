@@ -256,7 +256,7 @@ def set_global_variables(config):
         elif fitness_function_type_str == "rosenbrock":
             FITNESS_FUNCTION_TYPE = ff.rosenbrock
         elif fitness_function_type_str == "rana":
-            FITNESS_FUNCTION_TYPE = ff.rana_function
+            FITNESS_FUNCTION_TYPE = ff.rana
         elif fitness_function_type_str == "deceptive":
             FITNESS_FUNCTION_TYPE = ff.deceptive
         elif fitness_function_type_str == "schafferf7":
