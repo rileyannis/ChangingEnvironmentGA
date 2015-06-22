@@ -3,13 +3,13 @@ import itertools
 from subprocess import call
 import datetime
 
-array_size = 4
+array_size = 40
 walltime = "03:59:00"
 today = "{0:%Y}_{0:%B}_{0:%d}".format(datetime.datetime.now())
 alt_corrs = [-1, -0.99, -0.9, -0.8, -0.5, -0.25, 0, 0.25, 0.5, 0.8, 0.9, 0.99, 1]
-function_types = ["schafferf7"]
-num_gens = [1000]
-num_runs_per_job = 20
+function_types = ["schafferf7"]#["deceptive"]#["rana"]#["rosenbrock"]#["schwefel"]#["sphere"]
+num_gens = [10000]
+num_runs_per_job = 2
 output_dir_base = "length_100_" + today
 
 common = """
@@ -43,6 +43,7 @@ mutation_effect_size = 10
 alternate_environment_corr = {1}
 verbose = False
 crowding = False
+output_frequency = 10
 """
 
 def convert_config_file_name_to_job_string(file_name, output_dir_base):

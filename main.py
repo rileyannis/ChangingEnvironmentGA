@@ -158,6 +158,20 @@ def evolve_population(reference_environment, alternative_environment):
     start_of_trimester_3 = int(floor(NUMBER_OF_GENERATIONS*2.0/3.0))
 
     population = create_initial_population()
+
+    average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+        population, current_environment)
+    current_fitness_list.append((0, average_fitness, stdev))
+    current_fitness_best.append((0, best_fitness, best_org))
+        
+    average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+        population, reference_environment)
+    reference_fitness_list.append((0, average_fitness, stdev))
+    reference_fitness_best.append((0, best_fitness, best_org))
+
+    if VERBOSE:
+        print_status(0, population, current_environment)
+
     #In each generation...
     for gen in range(NUMBER_OF_GENERATIONS):
         #Check if the environment needs changed
@@ -169,18 +183,19 @@ def evolve_population(reference_environment, alternative_environment):
         population = get_next_generation(population, current_environment)
 
         #Append the stats to the output lists
-        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
-            population, current_environment)
-        current_fitness_list.append((gen, average_fitness, stdev))
-        current_fitness_best.append((gen, best_fitness, best_org))
+        if ((gen + 1) % OUTPUT_FREQUENCY == 0):
+            average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+                population, current_environment)
+            current_fitness_list.append((gen + 1, average_fitness, stdev))
+            current_fitness_best.append((gen + 1, best_fitness, best_org))
         
-        average_fitness, stdev, best_org, best_fitness = get_generation_stats(
-            population, reference_environment)
-        reference_fitness_list.append((gen, average_fitness, stdev))
-        reference_fitness_best.append((gen, best_fitness, best_org))
+            average_fitness, stdev, best_org, best_fitness = get_generation_stats(
+                population, reference_environment)
+            reference_fitness_list.append((gen + 1, average_fitness, stdev))
+            reference_fitness_best.append((gen + 1, best_fitness, best_org))
 
-        if VERBOSE:
-            print_status(gen, population, current_environment)
+            if VERBOSE:
+                print_status(gen + 1, population, current_environment)
     
     #Return the output lists
     result =  (current_fitness_list, current_fitness_best, 

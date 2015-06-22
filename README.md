@@ -24,6 +24,7 @@ Numpy, Scipy, Cython
   * number_of_generations
   * tournament_size
   * verbose
+  * output_frequency
 * Necessary for string orgs:
   * target_string
   * letters
