@@ -1,14 +1,7 @@
 import csv
 import os
 import pandas as pd
-import numpy as np
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-#import scipy.stats as stats
 import cPickle
-import operator
 import random
 
 def main():
@@ -104,23 +97,24 @@ def randomization_test(data, key, directory, rounds):
                     float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
     #Make a few variables
     output_data = [("Alternate Correlation", "Significance")]
-    num_runs = len(corr_dict[1.0])
-    ctr_avg = sum(corr_dict[1.0])/num_runs
+    ctr_avg = sum(corr_dict[1.0])/len(corr_dict[1.0])
     #For each alternate correlation, get the difference between the control
     for alt_corr in corr_dict.keys():
-        alt_avg = sum(corr_dict[alt_corr])/num_runs
+        alt_avg = sum(corr_dict[alt_corr]) / len(corr_dict[alt_corr])
         diff = abs(alt_avg - ctr_avg)
         all_finals = corr_dict[1.0] + corr_dict[alt_corr]
         less_than = 0
         #Shuffle all the fitnesses, split them up, then get the difference rounds number of times
         for _ in range(rounds):
             random.shuffle(all_finals)
-            rnd_diff = abs(sum(all_finals[:num_runs])/num_runs - sum(all_finals[num_runs:])/num_runs)
+            lst1 = all_finals[:len(all_finals) / 2]
+            lst2 = all_finals[len(all_finals) / 2:]
+            rnd_diff = abs((sum(lst1) / len(lst1)) - (sum(lst2) / len(lst2)))
             #If the difference is less that the control difference, record it
             if rnd_diff < diff:
                 less_than += 1
         #Output the alternate correlation and the percentage of differences less than the control
-        output_data.append((alt_corr, 1.0 - float(less_than)/float(rounds)))
+        output_data.append((alt_corr, 1.0 - (float(less_than) / float(rounds))))
     #Save output to file
     filename = directory + "/randomiztion_test_" + key + "_" + str(rounds) + "_rounds.csv"
     with open(filename, "wb") as f:
