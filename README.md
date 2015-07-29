@@ -47,7 +47,8 @@ Numpy, Scipy, Cython
 Not used, possibly broken.
 
 ###Use With Real Value Vector Orgs:
-I'll get to this soon, I promise.
+* Fitness functions gathered from http://www.cs.unm.edu/~neal.holts/dga/benchmarkFunction/index.html
+* I'll fill the rest of this in soon, promise.
 
 ###Use With PD Orgs (Static Environment):
 Might fill this in
