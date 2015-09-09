@@ -66,17 +66,17 @@ float cpp_schafferf7(double* vals, long sz){
 
 float cpp_deceptive(double* vals, long sz){
   //The deceptive function. It does stuff.
-  double decep = 0.2, best = 1.0, decep_best = 0.7, tot = 1.0, adjusted_val;
+  double decep = 0.2, best = 1.0, decep_best = 0.7, tot = 0.0, adjusted_val;
   for(long i = 0; i < sz; ++i){
     adjusted_val = (vals[i] + 512.0) / 1024.0;
     if(adjusted_val < decep){
-      tot -= (adjusted_val * (-1.0 / decep) + best);
+      tot += (adjusted_val * (-1.0 / decep) + best);
     }
     else{
-      tot -= ((adjusted_val - decep) * (decep_best / (1.0 - decep)));
+      tot += ((adjusted_val - decep) * (decep_best / (1.0 - decep)));
     }
   }
-  return tot / sz;
+  return 1 - (tot / sz);
 }
 
 float inline schwefel_sum(float tot, float val){
