@@ -5,12 +5,14 @@ import cPickle
 import random
 
 def main():
-    test_dir = "length_100_2015_June_03"
+    test_dir = "length_100_2015_June_25"
     rounds = 1000
     #data = get_data(test_dir)
     data = get_pickled_data(test_dir)
-    landscape = "schafferf7"
-    randomization_test(data, landscape, test_dir, rounds)
+    landscape_list = ["schafferf7", "sphere", "rana", "rosenbrock", "schwefel", "deceptive"]
+#    multi_randomization_test(data, landscape_list, test_dir, rounds)
+    for landscape in landscape_list:
+        average_correlation(data, landscape, test_dir, rounds)
 
 def get_data(common_dir):
     """Version of get_data that doesn't use cPickle"""
@@ -117,6 +119,103 @@ def randomization_test(data, key, directory, rounds):
         output_data.append((alt_corr, 1.0 - (float(less_than) / float(rounds))))
     #Save output to file
     filename = directory + "/randomiztion_test_" + key + "_" + str(rounds) + "_rounds.csv"
+    with open(filename, "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(output_data)
+
+def average_correlation(data, key, directory, rounds):
+    corr_dict = {}
+    for config in data:
+        if key == None or key in config:
+            corr_dict[float(config.split("_")[1])] = []
+            for run in range(len(data[config])):
+                corr_dict[float(config.split("_")[1])].append(
+                    float(data[config][run][0]))
+    output_data = [("Alternate Correlation", "Significance")]
+    for alt_corr in corr_dict.keys():
+        output_data.append((alt_corr, (sum(corr_dict[alt_corr]) / float(len(corr_dict[alt_corr])))))
+    filename = directory + "/average_correlation_" + key + ".csv"
+    with open(filename, "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(output_data)
+
+def modified_randomization_test(data, key, directory, rounds):
+    #Gather all of the average final fitnesses into a dictionary
+    corr_dict = {}
+    for config in data:
+        if key == None or key in config:
+            corr_dict[float(config.split("_")[1])] = []
+            for run in range(len(data[config])):
+                corr_dict[float(config.split("_")[1])].append(
+                    float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
+    #Make a few variables
+    output_data = [("Alternate Correlation", "Significance")]
+    ctr_avg = sum(corr_dict[1.0])/len(corr_dict[1.0])
+    #For each alternate correlation, get the difference between the control
+    for alt_corr in corr_dict.keys():
+        alt_avg = sum(corr_dict[alt_corr]) / len(corr_dict[alt_corr])
+        #Not absolute value
+        diff = ctr_avg - alt_avg
+        all_finals = corr_dict[1.0] + corr_dict[alt_corr]
+        less_than = 0
+        #Shuffle all the fitnesses, split them up, then get the difference rounds number of times
+        for _ in range(rounds):
+            random.shuffle(all_finals)
+            lst1 = all_finals[:len(all_finals) / 2]
+            lst2 = all_finals[len(all_finals) / 2:]
+            #Not absolute value
+            rnd_diff = (sum(lst1) / len(lst1)) - (sum(lst2) / len(lst2))
+            #If the difference is less that the control difference, record it
+            if rnd_diff < diff:
+                less_than += 1
+        #Output the alternate correlation and the percentage of differences less than the control
+        output_data.append((alt_corr, (float(less_than) / float(rounds))))
+    #Save output to file
+    filename = directory + "/modified_randomiztion_test_" + key + "_" + str(rounds) + "_rounds.csv"
+    with open(filename, "wb") as f:
+        writer = csv.writer(f)
+        writer.writerows(output_data)
+
+def multi_randomization_test(data, lst, directory, rounds):
+    output_data = [["Alternate Correlation"]]
+    output_dict = {}
+    for key in lst:
+#Gather all of the average final fitnesses into a dictionary
+        corr_dict = {}
+        for config in data:
+            if key == None or key in config:
+                corr_dict[float(config.split("_")[1])] = []
+                if float(config.split("_")[1]) not in output_dict.keys():
+                    output_dict[float(config.split("_")[1])] = []
+                for run in range(len(data[config])):
+                    corr_dict[float(config.split("_")[1])].append(
+                        float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
+#Make a few variables
+        output_data[0].append(key)
+        ctr_avg = sum(corr_dict[1.0])/len(corr_dict[1.0])
+#For each alternate correlation, get the difference between the control
+        for alt_corr in corr_dict.keys():
+            alt_avg = sum(corr_dict[alt_corr]) / len(corr_dict[alt_corr])
+        #Not absolute value
+            diff = ctr_avg - alt_avg
+            all_finals = corr_dict[1.0] + corr_dict[alt_corr]
+            less_than = 0
+        #Shuffle all the fitnesses, split them up, then get the difference rounds number of times
+            for _ in range(rounds):
+                random.shuffle(all_finals)
+                lst1 = all_finals[:len(all_finals) / 2]
+                lst2 = all_finals[len(all_finals) / 2:]
+            #Not absolute value
+                rnd_diff = (sum(lst1) / len(lst1)) - (sum(lst2) / len(lst2))
+            #If the difference is less that the control difference, record it
+                if rnd_diff < diff:
+                    less_than += 1
+        #Output the alternate correlation and the percentage of differences less than the control
+            output_dict[alt_corr].append(float(less_than) / float(rounds))
+    #Save output to file
+    for key in sorted(output_dict.keys(), reverse=True):
+        output_data.append([key].extend(output_dict[key]))
+    filename = directory + "/multi_randomiztion_test_" + str(rounds) + "_rounds.csv"
     with open(filename, "wb") as f:
         writer = csv.writer(f)
         writer.writerows(output_data)

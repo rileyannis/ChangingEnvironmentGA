@@ -14,13 +14,14 @@ COLORS = ["silver", "maroon", "red", "purple", "fuchsia", "green", "lime", "oliv
               "navy", "blue", "teal", "aqua"]
 
 def main():
-    test_dir = "test_2015_May_19"
-    data = get_data(test_dir)
-    #data = get_pickled_data(test_dir)
-    landscape = "schafferf7"
-    plot_aggregate_over_time(data, landscape, test_dir)
-    plot_stddev_over_time(data, landscape, test_dir)
-    plot_average_final_fitness(data, landscape, test_dir)
+    test_dir = "length_100_2015_June_03"
+    #data = get_data(test_dir)
+    data = get_pickled_data(test_dir)
+    landscape = "rana"
+    #plot_aggregate_over_time(data, landscape, test_dir)
+    #plot_stddev_over_time(data, landscape, test_dir)
+    #plot_average_final_fitness(data, landscape, test_dir)
+    plot_best_final_fitness(data, landscape, test_dir)
     #plot_single_run_over_time(data[data.keys()[0]]["1"]["average_experienced"], test_dir)
     #print data.keys()[0]
 
@@ -91,11 +92,12 @@ def get_pickled_data(common_dir):
     file_name = common_dir + "/pickled_data"
     try:
         data_file = open(file_name, "r")
+        print("Using pickled data.")
         data = cPickle.load(data_file)
         data_file.close()
         return data
     except:
-        pass
+        print("Generating data.")
     data_file = open(file_name, "w")
     #Make a new dictionary
     data = {}
@@ -151,8 +153,8 @@ def plot_aggregate_over_time(data, key=None, directory="."):
 
         for i in range(len(series[0])):
             add_factor = 0
-            #if "rana" in config:
-            #    add_factor = 20000
+            if "rana" in config:
+                add_factor = 512
             logs = [np.log(s[i]+add_factor) for s in series]
             averages.append(sum(logs)/float(len(logs)))
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
@@ -176,7 +178,7 @@ def plot_aggregate_over_time(data, key=None, directory="."):
     plt.xlabel("Generation")
     plt.ylabel("Log of Reference Average Fitness")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/runs_over_time_"+key+"_10000gen.png")
+    plt.savefig(directory+"/runs_over_time_"+key+"_1000gen.png")
 
 def plot_stddev_over_time(data, key=None, directory="."):
     plt.clf()
@@ -195,8 +197,8 @@ def plot_stddev_over_time(data, key=None, directory="."):
 
         for i in range(len(series[0])):
             add_factor = 0
-            #if "rana" in config:
-            #    add_factor = 20000
+            if "rana" in config:
+                add_factor = 512
             devs = [np.log(s[i]) for s in series]
             averages.append(sum(devs)/float(len(devs)))
         lines[config] = Line2D(data[config][0][1]["Generation"], averages)
@@ -220,7 +222,7 @@ def plot_stddev_over_time(data, key=None, directory="."):
     plt.xlabel("Generation")
     plt.ylabel("Log of Standard Deviation")
     #plt.figlegend([lines[l] for l in lines], [l for l in lines])
-    plt.savefig(directory+"/diversity_over_time_"+key+"_10000gen.png")
+    plt.savefig(directory+"/diversity_over_time_"+key+"_1000gen.png")
 
 def plot_average_final_fitness(data, key=None, directory="."):
     plt.clf()
@@ -233,8 +235,8 @@ def plot_average_final_fitness(data, key=None, directory="."):
             for run in range(len(data[config])):
                 corrs.append(data[config][run][0])
                 add_factor=0
-                #if "rana" in config:
-                #    add_factor = 20000
+                if "rana" in config:
+                    add_factor = 512
                 finals.append(add_factor+float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
                 #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
             try:
@@ -257,6 +259,42 @@ def plot_average_final_fitness(data, key=None, directory="."):
     plt.xlabel("Correlation")
     plt.ylabel("Log of Reference Average Fitness")
     plt.savefig(directory+"/correlation_vs_final_fitness_scatter_"+key+".png")
+
+def plot_best_final_fitness(data, key=None, directory="."):
+    plt.clf()
+    colors = [color for color in COLORS]
+    ax = plt.subplot(111)
+    for config in data:
+        corrs = []
+        finals = []
+        if key == None or key in config:
+            for run in range(len(data[config])):
+                corrs.append(data[config][run][0])
+                add_factor=0
+                #if "rana" in config:
+                    #add_factor = 512
+                finals.append(add_factor+float(data[config][run][1]["Ref_Average_Fitness"][-1:]))
+                #finals.append(float(data[config][run]["best_reference"]["Best_fitness"][-1:]))
+            try:
+                ax.plot(corrs, finals, marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
+            except:
+                colors = [color for color in COLORS]
+                ax.plot(corrs, finals, marker=".", ls="", color=colors.pop(),
+                        label=(config.split("_")[1]))
+    
+    handles, labels = ax.get_legend_handles_labels()
+    labels = [float(label) for label in labels]
+    hl = sorted(zip(handles, labels), key = operator.itemgetter(1))
+    handles2, labels2 = zip(*hl)
+    labels2 = [str(label) for label in labels2]
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.9, box.height])
+    ax.legend(handles2, labels2, bbox_to_anchor=(1, 1), loc=2, mode="expand", borderaxespad=0.)
+    plt.xlabel("Correlation")
+    plt.ylabel("Reference Final Fitness")
+    plt.savefig(directory+"/correlation_vs_best_final_fitness_scatter_"+key+".png")
 
 if __name__ == "__main__":
     main()
