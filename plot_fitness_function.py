@@ -9,8 +9,8 @@ import numpy as np
 
 def main():
     base = "ff_plots"
-    landscape = schafferF7
-    correlation = 0.99
+    landscape = deceptive
+    correlation = 1
     for val in range(10):
         directory = base + "/" + landscape.__name__ + "_" + str(correlation) + "_ver" + str(val) + ".png"
         ff = Fitness_Function(landscape, 2)

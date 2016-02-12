@@ -1,0 +1,15 @@
+#!/bin/bash -login
+
+#PBS -l walltime=10:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=80gb
+#PBS -N graphing
+
+module load matplotlib
+module load numpy
+module load python/2.7.3
+source testing/env/bin/activate
+cd ~/ChangingEnvironmentGA
+
+#python data_handling_large.py
+python randomization_test.py

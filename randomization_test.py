@@ -5,14 +5,16 @@ import cPickle
 import random
 
 def main():
-    test_dir = "length_100_2015_June_25"
+    test_dir = "length_100_final"
+    output_dir = "length_100_data"
     rounds = 1000
     #data = get_data(test_dir)
     data = get_pickled_data(test_dir)
     landscape_list = ["schafferf7", "sphere", "rana", "rosenbrock", "schwefel", "deceptive"]
 #    multi_randomization_test(data, landscape_list, test_dir, rounds)
     for landscape in landscape_list:
-        average_correlation(data, landscape, test_dir, rounds)
+        #modified_randomization_test(data, landscape, output_dir, rounds)
+        average_correlation(data, landscape, output_dir, rounds)
 
 def get_data(common_dir):
     """Version of get_data that doesn't use cPickle"""
@@ -131,7 +133,7 @@ def average_correlation(data, key, directory, rounds):
             for run in range(len(data[config])):
                 corr_dict[float(config.split("_")[1])].append(
                     float(data[config][run][0]))
-    output_data = [("Alternate Correlation", "Significance")]
+    output_data = [("Alternate Correlation", "Actual Correlation")]
     for alt_corr in corr_dict.keys():
         output_data.append((alt_corr, (sum(corr_dict[alt_corr]) / float(len(corr_dict[alt_corr])))))
     filename = directory + "/average_correlation_" + key + ".csv"
