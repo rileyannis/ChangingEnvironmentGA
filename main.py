@@ -302,6 +302,17 @@ def save_string_to_file(string, filename):
 
 def generate_data():
     """The main function; generates all the data"""
+    if os.path.exists(OUTPUT_FOLDER):
+        raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
+    os.makedirs(OUTPUT_FOLDER)
+    config_filename = os.path.basename(CONFIG_FILE)
+
+    def join_path(filename):
+        return os.path.join(OUTPUT_FOLDER, filename)
+
+    config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
+    shutil.copyfile(CONFIG_FILE, config_dest)
+
     if ORG_TYPE == "vector":
         fitness_function = ff.Fitness_Function(FITNESS_FUNCTION_TYPE, real_value_vector_org.LENGTH)
         fitness_function.create_fitness2(ALTERNATE_ENVIRONMENT_CORR)
@@ -318,17 +329,7 @@ def generate_data():
     if ORG_TYPE == "pd":
         output = pd_evolve_population()
 
-    if os.path.exists(OUTPUT_FOLDER):
-        raise IOError("output_folder: {} already exists".format(OUTPUT_FOLDER))
-    os.makedirs(OUTPUT_FOLDER)
-    config_filename = os.path.basename(CONFIG_FILE)
 
-    def join_path(filename):
-        return os.path.join(OUTPUT_FOLDER, filename)
-
-    config_dest = os.path.join(OUTPUT_FOLDER, config_filename)
-    shutil.copyfile(CONFIG_FILE, config_dest)
-    
     if ORG_TYPE == "pd":
         output_filename = join_path("bits_of_memory_overtime.csv")
         save_table_to_file(output, output_filename)
